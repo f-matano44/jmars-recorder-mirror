@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="mRecCorpus" default="jar" basedir=".">
+	<property name="conf.encoding" value="UTF-8" />
+	<property name="conf.jdk.version" value="17" />
+	<property name="conf.jre.version" value="17" />
+
+    <property name="dir.src"        value="src"/>
+    <property name="dir.build"      value="build"/>
+    <property name="dir.classes"    value="${dir.build}/classes"/>
+    <property name="dir.jar"        value="${dir.build}/jar"/>
+    <property name="class.main"     value="jp.f_matano44.mreccorpus2.mRecCorpus2"/>
+    <property name="file.jar"       value="mRecCorpus2.jar" />
+
+    <target name="clean">
+        <delete dir="${dir.build}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${dir.classes}"/>
+        <javac 
+            srcdir="${dir.src}" 
+            destdir="${dir.classes}" 
+
+			encoding="${conf.encoding}"
+			source="${conf.jdk.version}"
+			target="${conf.jre.version}"
+			includeAntRuntime="false"
+			debug="true"
+		/>
+    </target>
+
+    <target name="jar" depends="clean, compile">
+        <mkdir dir="${dir.jar}"/>
+        <jar 
+            destfile="${dir.jar}/${file.jar}"
+            basedir="${dir.classes}">
+            <manifest>
+                <attribute
+                    name="Main-Class"
+                    value="${class.main}"
+                />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="macOS" depends="jar">
+        <echo message="Build binary file for macOS." />
+        <exec executable="jlink">
+            <arg value="--add-modules" />
+            <arg value="java.base,java.desktop" />
+            <arg value="--output" />
+            <arg value="build/runtime" />
+        </exec>
+        <exec executable="jpackage">
+            <arg value="--type"/>
+            <arg value="app-image"/>
+
+            <arg value="--runtime-image" />
+            <arg value="build/runtime" />
+
+            <arg value="--input"/>
+            <arg value="${dir.jar}"/>
+            <arg value="--main-jar"/>
+            <arg value="mRecCorpus2.jar"/>
+
+            <arg value="--dest"/>
+            <arg value="${dir.build}"/>
+            <arg value="--name"/>
+            <arg value="mRecCorpus2"/>
+        </exec>
+    </target>
+
+</project>
