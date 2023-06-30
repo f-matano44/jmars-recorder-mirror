@@ -20,20 +20,20 @@ public class mRecCorpus2 extends JFrame {
 
         // add panel
         try {
-            final DataClass dat = new DataClass();
-            final JPanel mainPanel = new JPanel();
-            mainPanel.setLayout(new GridBagLayout());
+            final RecorderBody recorder = new RecorderBody();
+            final RecorderPanel rp = new RecorderPanel(recorder);
+            final JPanel mainPanel = new JPanel(new GridBagLayout());
+            final GridBagConstraints gbc = new GridBagConstraints();
+            final var blank = new EmptyBorder(10, 15, 10, 15);
+            mainPanel.setBorder(blank);
 
-            GridBagConstraints gbc = new GridBagConstraints();
-
-            // mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
             gbc.gridx = 0; gbc.gridy = 0;
-            mainPanel.add(new CorpusReaderPanel(), gbc);
+            mainPanel.add(rp.ConfigPanel(), gbc);
             gbc.gridx = 0; gbc.gridy = 1;
-            mainPanel.add(new Recorder(dat), gbc);
-            mainPanel.setBorder(
-                new EmptyBorder(10, 15, 10, 15)
-            );
+            mainPanel.add(new CorpusReaderPanel(), gbc);
+            gbc.gridx = 0; gbc.gridy = 2;
+            mainPanel.add(rp.ControlPanel(), gbc);
+    
             add(mainPanel);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
@@ -45,10 +45,7 @@ public class mRecCorpus2 extends JFrame {
         // Window setting
         pack();
         setSize(800, getSize().height);
-        // Allow to change width only --------------------------------------------
         setMinimumSize(getSize());
-        // setMaximumSize(new Dimension(Short.MAX_VALUE, getSize().height));
-        // Allow to change width only --------------------------------------------
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);

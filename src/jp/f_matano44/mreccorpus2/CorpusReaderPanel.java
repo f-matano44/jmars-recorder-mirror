@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 
-public class CorpusReaderPanel extends JPanel {
+class CorpusReaderPanel extends JPanel {
     private List<String> lines;
     private int currentIndex;
     private JLabel script;
@@ -30,7 +30,7 @@ public class CorpusReaderPanel extends JPanel {
         script = new JLabel();
 
         // set default value
-        index.setText(String.valueOf(currentIndex+1));
+        index.setText("1");
         script.setText("Restart and Select corpus file.");
 
         // script panel
