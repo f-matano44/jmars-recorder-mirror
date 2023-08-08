@@ -1,2 +1,6 @@
-/build/
+.gradle
+build
+bin
 *.jar
+
+!/**/.gitkeep
