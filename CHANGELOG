@@ -1,9 +1,13 @@
+version 1.2.0
+* 設定の簡易化
+* クラス周りの整理
+
 version 1.1.0
-ワンタッチ・セーブの実装
+* ワンタッチ・セーブの実装
 
 version 1.0.1
-クラス周りの整理
-GUI の一部変更
+* クラス周りの整理
+* GUI の一部変更
 
 version 1.0.0
-mRecCorpus の GUI 実装
+* mRecCorpus の GUI 実装

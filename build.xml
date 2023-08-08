@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+    mRecCorpus2
+    Copyright (C) 2023  Fumiyoshi MATANO
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!-- 参考資料: Qiita 利用規約 第 7 条 3 に基づき利用しています-->
+<!-- https://qiita.com/tarosa0001/items/93c19155bc803f10cea0 -->
+
 <project name="mRecCorpus" default="jar" basedir=".">
 	<property name="conf.encoding" value="UTF-8" />
 	<property name="conf.jdk.version" value="17" />
@@ -54,7 +75,7 @@
         </exec>
         <exec executable="jpackage">
             <arg value="--type"/>
-            <arg value="app-image"/>
+            <arg value="dmg"/>
 
             <arg value="--runtime-image" />
             <arg value="build/runtime" />
@@ -63,11 +84,16 @@
             <arg value="${dir.jar}"/>
             <arg value="--main-jar"/>
             <arg value="mRecCorpus2.jar"/>
+            <arg value="--main-class"/>
+            <arg value="${class.main}"/>
 
             <arg value="--dest"/>
             <arg value="${dir.build}"/>
             <arg value="--name"/>
             <arg value="mRecCorpus2"/>
+
+            <arg value="--license-file"/>
+            <arg value="LICENSE.txt"/>
         </exec>
     </target>
 
