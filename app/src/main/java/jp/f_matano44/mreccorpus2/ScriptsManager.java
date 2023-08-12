@@ -19,12 +19,13 @@
 package jp.f_matano44.mreccorpus2;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -33,16 +34,18 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 
-class ScriptsManager extends JPanel {
+final class ScriptsManager extends JPanel {
     private final RecorderBody recorder;
     private final int[] currentIndex;
-    private final int textAreaWidth = 40;
+    private static final int textAreaWidth = 60;
     private final List<String> lines;
 
-    public final JLabel indexLabel;
+    public final JTextArea scriptsPathViewer;
     public final JTextArea scriptViewer;
-    public final JTextArea saveToViewerArea;
-    public final JTextArea scriptsPathViewerArea;
+    public final JButton prevButton;
+    public final JLabel indexLabel;
+    public final JButton nextButton;
+    public final JTextArea saveToViewer;
 
     public ScriptsManager(
         RecorderBody recorder, AppConfig conf, int[] currentIndex
@@ -54,6 +57,12 @@ class ScriptsManager extends JPanel {
         this.indexLabel = new JLabel();
         this.indexLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        // Control button
+        prevButton = new JButton("<< Prev");
+        prevButton.addActionListener((ActionEvent e) -> this.prevLine());
+        nextButton = new JButton("Next >>");
+        nextButton.addActionListener((ActionEvent e) -> this.nextLine());
+
         // Script viewer
         this.scriptViewer = new JTextArea();
         setTextAreaSetting(this.scriptViewer);
@@ -64,20 +73,20 @@ class ScriptsManager extends JPanel {
         this.scriptViewer.setRows(7); // ここの数字は決め打ち
 
         // saveTo Panel
-        this.saveToViewerArea = new JTextArea();
-        setTextAreaSetting(this.saveToViewerArea);
-        this.saveToViewerArea.setColumns(textAreaWidth);
+        this.saveToViewer = new JTextArea();
+        setTextAreaSetting(this.saveToViewer);
+        this.saveToViewer.setColumns(textAreaWidth);
 
         // Scripts loader
         final String scriptPathString = conf.scripts.getAbsolutePath();
         this.lines = new ArrayList<>();
         readFile(scriptPathString);
-        this.scriptsPathViewerArea = new JTextArea(
-            "Scripts:  " + scriptPathString
+        this.scriptsPathViewer = new JTextArea(
+            "Scripts: " + scriptPathString
         );
-        setTextAreaSetting(this.scriptsPathViewerArea);
-        this.scriptsPathViewerArea.setColumns(textAreaWidth);
-        this.scriptsPathViewerArea.setBorder(
+        setTextAreaSetting(this.scriptsPathViewer);
+        this.scriptsPathViewer.setColumns(textAreaWidth);
+        this.scriptsPathViewer.setBorder(
             new EmptyBorder(0, 0, 5, 0)
         );
 
@@ -85,15 +94,15 @@ class ScriptsManager extends JPanel {
         this.updateText();
     }
 
-    public void nextLine() {
+    private final void nextLine() {
         currentIndex[0]++;
-        if(lines.size() <= currentIndex[0]) {
+        if (lines.size() <= currentIndex[0]) {
             currentIndex[0] = 0;
         }
         updateText();
     }
 
-    public void prevLine() {
+    private final void prevLine() {
         if (currentIndex[0] <= 0) {
             currentIndex[0] = lines.size();
         }
@@ -101,15 +110,15 @@ class ScriptsManager extends JPanel {
         updateText();
     }
 
-    private void updateText() {
+    private final void updateText() {
         final int num = currentIndex[0] + 1;
         final String saveToString = recorder.getSavePath(num).getAbsolutePath();
         indexLabel.setText(String.valueOf(num));
         scriptViewer.setText(lines.get(currentIndex[0]));
-        saveToViewerArea.setText("Save to:  " + saveToString);
+        saveToViewer.setText("Save to: " + saveToString);
     }
 
-    private void readFile(final String filePath) {
+    private final void readFile(final String filePath) {
         try (final var sc = new Scanner(new File(filePath))) {
             while (sc.hasNextLine()) {
                 final String[] parts = sc.nextLine().split("[\t,:]");
@@ -120,7 +129,7 @@ class ScriptsManager extends JPanel {
                 lines.add(sb.toString());
             }
         } catch (IOException e) {
-            final String errorString = "Error in reading file";
+            final String errorString = "Error: Can't read script file.";
             lines.clear();
             lines.add(errorString);
         }
@@ -132,7 +141,7 @@ class ScriptsManager extends JPanel {
         }
     }
 
-    private static void setTextAreaSetting(JTextArea textArea) {
+    private static final void setTextAreaSetting(JTextArea textArea) {
         textArea.setWrapStyleWord(true);   
         textArea.setLineWrap(true);        
         textArea.setEditable(false);   
