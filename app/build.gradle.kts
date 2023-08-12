@@ -26,6 +26,7 @@ dependencies {
 
     // for application
     // implementation("groupID:artifactID:version")
+    implementation("com.gitlab.f-matano44:jfloatwavio:1.4.0a")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -37,7 +38,7 @@ java {
 
 application {
     mainModule.set("jp.f_matano44.mreccorpus2")
-    mainClass.set("jp.f_matano44.mreccorpus2.mRecCorpus2")
+    mainClass.set("jp.f_matano44.mreccorpus2.MatanosRecorderForCorpus2")
 }
 
 tasks.named<Test>("test") {

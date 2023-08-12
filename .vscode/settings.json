@@ -1,4 +1,8 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.checkstyle.version": "10.12.2",
+    "cSpell.words": [
+        "Matanos"
+    ]
 }
