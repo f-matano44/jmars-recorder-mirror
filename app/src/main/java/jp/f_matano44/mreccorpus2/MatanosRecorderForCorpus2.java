@@ -24,7 +24,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import javax.sound.sampled.AudioFormat;
+import java.awt.event.ActionEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -42,10 +42,13 @@ public final class MatanosRecorderForCorpus2 extends JFrame {
     final RecorderBody recorder = new RecorderBody(conf, currentIndex);
     final ScriptsManager sm = new ScriptsManager(recorder, conf, currentIndex);
 
-    /** Main-Constructor. */
-    public MatanosRecorderForCorpus2() {
+    private MatanosRecorderForCorpus2() {
         // Window title
         super("mRecCorpus2");
+
+        // set menu-bar
+        TopBarMenu menuBar = new TopBarMenu(conf);
+        this.setJMenuBar(menuBar);
 
         // main panel setting
         final JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -59,15 +62,11 @@ public final class MatanosRecorderForCorpus2 extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        xPanels[0].add(this.configPanel(conf.format), gbc);
-        gbc.gridy++;
-        xPanels[0].add(recorder.recInfoViewer, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
         xPanels[1].add(sm.scriptsPathViewer, gbc);
         gbc.gridy++;
-        xPanels[1].add(sm.scriptViewer, gbc);
+        xPanels[1].add(sm.scrollPane, gbc);
+        gbc.gridy++;
+        xPanels[1].add(sm.indexSlider, gbc);
         gbc.gridy++;
         xPanels[1].add(this.new ScriptChooserPanel(), gbc);
         gbc.gridy++;
@@ -75,12 +74,10 @@ public final class MatanosRecorderForCorpus2 extends JFrame {
         gbc.gridy++;
         xPanels[1].add(recorder.sse, gbc);
         gbc.gridy++;
-        xPanels[1].add(sm.saveToViewer, gbc);
+        xPanels[1].add(recorder.saveToViewer, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        mainPanel.add(xPanels[0], gbc);
-        gbc.gridx++;
         mainPanel.add(xPanels[1], gbc);
         changeFont(mainPanel, AppConfig.fontSet);
         this.add(mainPanel);
@@ -91,32 +88,6 @@ public final class MatanosRecorderForCorpus2 extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-    }
-
-
-    private final InfoTextArea configPanel(AudioFormat format) {
-        final int fs = (int) format.getSampleRate();
-        final int nbits = format.getSampleSizeInBits();
-        final int channels = format.getChannels();
-
-        final StringBuilder sb = new StringBuilder();
-        sb.append("Sampling rate (Fs)\n");
-        sb.append("> " + fs + " [Hz]\n");
-        sb.append("\n");
-        sb.append("Bit depth (nBits)\n");
-        sb.append("> " + nbits + " [bit]\n");
-        sb.append("\n");
-        sb.append("Channels\n");
-        sb.append("> " + channels + "\n");
-        sb.append("\n");
-        sb.append("Normalization\n");
-        if (conf.isNormalize) {
-            sb.append("> " + conf.isNormalize + " (" + conf.normalizationLevel + ")");
-        } else {
-            sb.append("> " + conf.isNormalize);
-        }
-
-        return new InfoTextArea("Config", sb.toString());
     }
 
 
@@ -132,10 +103,34 @@ public final class MatanosRecorderForCorpus2 extends JFrame {
 
     private final class RecorderPanel extends JPanel {
         public RecorderPanel(RecorderBody recorder) {
+            recorder.recordButton.setText(RecorderBody.startButtonString);
+            recorder.recordButton.addActionListener(
+                (ActionEvent e) -> this.recordButtonAction()
+            );
+
             this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            this.add(recorder.recordButton);
             this.add(recorder.playButton);
-            this.add(recorder.toggleButton);
-            this.add(recorder.saveButton);
+        }
+
+        private final void recordButtonAction() {
+            try {
+                if (!recorder.isRecording) {
+                    recorder.isRecording = true;
+                    recorder.recordButton.setText(RecorderBody.recordingString);
+                    recorder.startRecording();
+                } else {
+                    recorder.stopRecording();
+                    recorder.recordButton.setText(RecorderBody.startButtonString);
+                    recorder.isRecording = false;
+                }
+                // ボタンを有効化 or 無効化
+                recorder.playButton.setEnabled(!recorder.isRecording);
+                sm.prevButton.setEnabled(!recorder.isRecording);
+                sm.nextButton.setEnabled(!recorder.isRecording);
+            } catch (Exception e) {
+                recorder.enforceStopRecording(e);
+            }
         }
     }
 
