@@ -25,7 +25,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -42,12 +41,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -60,74 +57,28 @@ final class RecorderBody {
     private final AudioFormat format;
     private final int[] currentIndex;
 
-    public static final String startButtonString = "Start recording";
-    public static final String recordingString   = " Stop and Save ";
     private TargetDataLine line;
     private ByteArrayOutputStream outStream;
     private byte[] signal;
     public boolean isRecording = false;
 
-    public final JTextArea recInfoViewer;
-    public final JButton playButton;
-    public final JToggleButton recordButton;
     public final SpeechSectionEstimator sse;
-    public final JTextArea saveToViewer;
 
     public RecorderBody(AppConfig conf, int[] currentIndex) {
         this.conf = conf;
         this.format = conf.format;
         this.currentIndex = currentIndex;
 
-        // SNR viewer
-        this.recInfoViewer = new JTextArea(
-            getRecInfo("------", "------")
-        );
-        this.recInfoViewer.setEditable(false);   
-        this.recInfoViewer.setBackground(null);
-        this.recInfoViewer.setBorder(null);
-        this.recInfoViewer.setLineWrap(false);
-        this.recInfoViewer.setAutoscrolls(false);
-        this.recInfoViewer.setColumns(60);
-
-        // play button
-        this.playButton = new JButton("Play");
-        this.playButton.setEnabled(false);
-        this.playButton.addActionListener((ActionEvent e) -> this.playSignal());
-
-        // recording button
-        this.recordButton = new JToggleButton();
-
         // Speech section
-        this.sse = new SpeechSectionEstimator();
-
-        // saveTo Panel
-        this.saveToViewer = new JTextArea();
-        ScriptsManager.setTextAreaSetting(this.saveToViewer);
-        this.saveToViewer.setColumns(ScriptsManager.textAreaWidth);
-    }
-
-    public final File getSavePath(final int number) {
-        return new File(
-            conf.saveTo, 
-            "corpus_" + String.format("%04d", number) + ".wav"
-        );
-    }
-
-    public void update() {
-        final int num = currentIndex[0] + 1;
-        final String saveToString = this.getSavePath(num).getAbsolutePath();
-        this.saveToViewer.setText("Save to: " + saveToString);
+        this.sse = new SpeechSectionEstimator(conf);
     }
 
     public final void startRecording() throws Exception {
         // determine buffer-size
-        final int fs = (int) format.getSampleRate();
-        final int nBits = format.getSampleSizeInBits();
-        final int channels = format.getChannels();
-        final double recordingTime = 0.05;
-        final int baseBufferSize = (int) (fs * nBits * channels * recordingTime / 8.0);
         final int frameSize = format.getFrameSize();
-        final int bufferSize = (int) (baseBufferSize / frameSize) * frameSize;
+        final float frameRate = format.getFrameRate();
+        final double recordingTime = 0.1;
+        final int bufferSize = (int) (frameSize * frameRate * recordingTime);
 
         this.outStream = new ByteArrayOutputStream();
         line = AudioSystem.getTargetDataLine(this.format);
@@ -147,58 +98,32 @@ final class RecorderBody {
     public final void stopRecording() {
         if (line != null) {
             this.line.close();
-            final byte[] byteSignal = this.conf.isNormalize
-                ? normalization(this.outStream.toByteArray(), conf)
-                : this.outStream.toByteArray();
-            try {
-                final double snr = getSignalNoiseRatio(byteSignal, conf.format);
-                this.recInfoViewer.setText(getRecInfo(
-                    String.format("%.4f", snr),
-                    String.valueOf(isClip(this.outStream.toByteArray()))
-                ));
-            } catch (ArithmeticException e) {
-                this.recInfoViewer.setText(getRecInfo(
-                    "-Inf",
-                    String.valueOf(isClip(this.outStream.toByteArray()))
-                ));
-            } catch (Exception e) {
-                return;
+            byte[] byteSignal = this.outStream.toByteArray();
+            if (byteSignal.length != 0) {
+                this.signal = this.conf.isNormalize
+                    ? RecorderBody.normalization(byteSignal, conf)
+                    : byteSignal.clone();
+                this.sse.update(this.outStream.toByteArray());
+                this.saveAsWav();
             }
-
-            this.signal = byteSignal;
-            this.sse.update();
-            this.saveAsWav();
         }
     }
 
-    public final void enforceStopRecording(Exception e) {
+    public final void enforceStopRecording() {
         if (this.line != null) {
             this.line.close();
         }
         this.signal = null;
-        this.recordButton.setText(startButtonString);
-        this.recordButton.setSelected(false);
-        this.playButton.setEnabled(false);
         this.isRecording = false;
-        this.recInfoViewer.setText(getRecInfo(
-            "------", 
-            "------"
-        ));
         sse.reset();
-        JOptionPane.showMessageDialog(
-            null, e.getMessage(),
-            "Error", JOptionPane.ERROR_MESSAGE
-        );
     }
 
-    private final void playSignal() {
+    public final void playSignal() {
         final AudioFormat format = this.format;
-        final byte[] audio = this.signal;
-
         try (
             final var ais = new AudioInputStream(
-                new ByteArrayInputStream(audio), 
-                format, audio.length / format.getFrameSize());
+                new ByteArrayInputStream(this.signal), 
+                format, this.signal.length / format.getFrameSize());
         ) {
             // 再生終了は観測しない (特にする意味がない)
             final Clip clip = AudioSystem.getClip();
@@ -212,7 +137,26 @@ final class RecorderBody {
         }
     }
 
-    private final static byte[] normalization(byte[] byteSignal, AppConfig conf) {
+    private final void saveAsWav() {
+        final File file = conf.getSavePath(this.currentIndex[0] + 1);
+        final byte[] audio = this.signal;
+
+        try (
+            final AudioInputStream ais = new AudioInputStream(
+                new ByteArrayInputStream(audio),
+                this.format, audio.length / this.format.getFrameSize()
+            )
+        ) {
+            AudioSystem.write(ais, AudioFileFormat.Type.WAVE, file);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                null, e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private static final byte[] normalization(byte[] byteSignal, AppConfig conf) {
         // get format
         final int nBits = conf.format.getSampleSizeInBits();
         final boolean isBigEndian = conf.format.isBigEndian();
@@ -237,96 +181,25 @@ final class RecorderBody {
         }
     }
 
-    private final static double getSignalNoiseRatio(
-        byte[] byteSignal, AudioFormat format
-    ) {
-        // get signal format
-        final int nBits = format.getSampleSizeInBits();
-        final boolean isBigEndian = format.isBigEndian();
-        // set Window size (width: 150ms, shift: 75ms)
-        final double width = 0.150;  // [s] = 150 [ms]
-        final double shift = 0.075; // [s] =  75 [ms]
-        final double fs = format.getSampleRate();
-        final double t = 1 / fs;
-        final int windowSize = (int) (width / t);
-        final int shiftSize = (int) (shift / t);
-
-        final double[] dSignal = Converter.byte2double(byteSignal, nBits, isBigEndian);
-        final List<Double> power = new ArrayList<>();
-        try {
-            for (int i = 0; i < dSignal.length; i += shiftSize) {
-                double thisPower = 0.0;
-                for (int j = 0; j < windowSize; j++) {
-                    thisPower += Math.pow(dSignal[i + j], 2);
-                }
-                thisPower /= windowSize;
-                power.add(thisPower);
-            }
-        } catch (IndexOutOfBoundsException e) {
-            // Finish!!!
-        }
-
-        final double signalPower = Collections.max(power);
-        final double noisePower = Collections.min(power);
-        // System.out.println("S " + signalPower);
-        // System.out.println("N " + noisePower);
-
-        if (noisePower == 0) {
-            throw new ArithmeticException();
-        } else {
-            return 10 * Math.log10(signalPower / noisePower);
-        }
-    }
-
-    private boolean isClip(byte[] signal) {
-        // get signal format
-        final int nBits = conf.format.getSampleSizeInBits();
-        final boolean isBigEndian = conf.format.isBigEndian();
-        // get double signal
-        final double[] dSignal = Converter.byte2double(signal, nBits, isBigEndian);
-        for (int i = 0; i < dSignal.length; i++) {
-            dSignal[i] = Math.abs(dSignal[i]);
-        }
-
-        final double max = Arrays.stream(dSignal).max().getAsDouble();
-        return 0.99 < max ? true : false;
-    }
-
-    private final void saveAsWav() {
-        final File file = this.getSavePath(this.currentIndex[0] + 1);
-        final byte[] audio = this.signal;
-
-        try (
-            final AudioInputStream ais = new AudioInputStream(
-                new ByteArrayInputStream(audio),
-                this.format, audio.length / this.format.getFrameSize()
-            )
-        ) {
-            AudioSystem.write(ais, AudioFileFormat.Type.WAVE, file);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                null, e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-    private static final String getRecInfo(String snr, String clip) {
-        return "S/N: " + snr + "[dB] / Cliping: " + clip;
-    }
-
     private final class SpeechSectionEstimator extends JPanel {
         private static final int defaultMin = 0;
         private static final int defaultMax = 100000;
         private static final int defaultStart = 30000;
         private static final int defaultEnd = 70000;
+        private final AppConfig conf;
+
         private final JSlider startSlider;
         private final JSlider endSlider;
         private final SignalPanel sPanel;
+        private final JTextArea recInfoViewer;
     
-        public SpeechSectionEstimator() {
+        public SpeechSectionEstimator(AppConfig conf) {
+            Utility.setLookAndFeel();
+            this.conf = conf;
+
             startSlider = new JSlider(
                 JSlider.HORIZONTAL, defaultMin, defaultMax, defaultStart);
+
             startSlider.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
@@ -348,10 +221,15 @@ final class RecorderBody {
 
             // signal viewer
             sPanel = new SignalPanel();
+
+            // SNR viewer
+            this.recInfoViewer = new JTextArea();
+            Utility.setTextAreaSetting(this.recInfoViewer);
+            this.recInfoViewer.setColumns(Constant.textAreaWidth);
     
             // determine size
             final Dimension preferredSize = startSlider.getPreferredSize();
-            preferredSize.width = 500;
+            preferredSize.width = Constant.panelWidth;
             startSlider.setPreferredSize(preferredSize);
             endSlider.setPreferredSize(preferredSize);
 
@@ -366,7 +244,8 @@ final class RecorderBody {
             gbc.gridy++;
             this.add(this.sPanel, gbc);
             gbc.gridy++;
-            this.add(recInfoViewer, gbc);
+            this.add(this.recInfoViewer, gbc);
+
             final Border lineBorder = BorderFactory.createLineBorder(
                 Color.BLACK, 1
             );
@@ -377,15 +256,36 @@ final class RecorderBody {
                 new EmptyBorder(0, 0, 5, 0)
             );
             this.setBorder(border);
+
+            // initialization
+            this.reset();
         }
-    
-        public void update() {
+
+        public void update(byte[] originalByteSignal) {
+            byte[] normalizedSignal = this.conf.isNormalize
+                ? RecorderBody.normalization(originalByteSignal, conf)
+                : originalByteSignal;
             final int nbits = format.getSampleSizeInBits();
             final boolean isBigEndian = format.isBigEndian();
-            final double[] dSignal = Converter.byte2double(signal, nbits, isBigEndian);
+            final double[] dSignal = Converter.byte2double(normalizedSignal, nbits, isBigEndian);
             startSlider.setMaximum(dSignal.length);
             endSlider.setMaximum(dSignal.length);
             sPanel.updateSignal(dSignal);
+
+            try {
+                final double snr = getSignalNoiseRatio(originalByteSignal, conf.format);
+                this.recInfoViewer.setText(getRecInfo(
+                    String.format("%.4f", snr),
+                    String.valueOf(isClip(originalByteSignal))
+                ));
+            } catch (ArithmeticException e) {
+                this.recInfoViewer.setText(getRecInfo(
+                    "-Inf",
+                    String.valueOf(isClip(originalByteSignal))
+                ));
+            } catch (Exception e) {
+                return;
+            }
         }
 
         public void reset() {
@@ -399,10 +299,71 @@ final class RecorderBody {
             startSlider.setMaximum(defaultMax);
             startSlider.setValue(defaultStart);
             sPanel.resetSignal();
+            this.recInfoViewer.setText(getRecInfo(
+                "------", 
+                "------"
+            ));
+        }
+
+        private static final double getSignalNoiseRatio(
+            byte[] byteSignal, AudioFormat format
+        ) {
+            // get signal format
+            final int nBits = format.getSampleSizeInBits();
+            final boolean isBigEndian = format.isBigEndian();
+            // set Window size (width: 150ms, shift: 75ms)
+            final double width = 0.150; // [s] = 150 [ms]
+            final double shift = 0.075; // [s] =  75 [ms]
+            final double fs = format.getSampleRate();
+            final double t = 1 / fs;
+            final int windowSize = (int) (width / t);
+            final int shiftSize = (int) (shift / t);
+
+            final double[] dSignal = Converter.byte2double(byteSignal, nBits, isBigEndian);
+            final List<Double> power = new ArrayList<>();
+            try {
+                for (int i = 0; i < dSignal.length; i += shiftSize) {
+                    double thisPower = 0.0;
+                    for (int j = 0; j < windowSize; j++) {
+                        thisPower += Math.pow(dSignal[i + j], 2);
+                    }
+                    thisPower /= windowSize;
+                    power.add(thisPower);
+                }
+            } catch (IndexOutOfBoundsException e) {
+                // Finish!!!
+            }
+
+            final double signalPower = Collections.max(power);
+            final double noisePower = Collections.min(power);
+
+            if (noisePower == 0) {
+                throw new ArithmeticException();
+            } else {
+                return 10 * Math.log10(signalPower / noisePower);
+            }
+        }
+
+        private boolean isClip(byte[] signal) {
+            // get signal format
+            final int nBits = conf.format.getSampleSizeInBits();
+            final boolean isBigEndian = conf.format.isBigEndian();
+            // get double signal
+            final double[] dSignal = Converter.byte2double(signal, nBits, isBigEndian);
+            for (int i = 0; i < dSignal.length; i++) {
+                dSignal[i] = Math.abs(dSignal[i]);
+            }
+
+            final double max = Arrays.stream(dSignal).max().getAsDouble();
+            return 0.99 < max ? true : false;
+        }
+
+        private static final String getRecInfo(String snr, String clip) {
+            return "S/N: " + snr + "[dB] / Cliping: " + clip;
         }
 
         private class SignalPanel extends JPanel {
-            private static final int WIDTH = 475;
+            private static final int WIDTH = Constant.panelWidth - 10;
             private static final int HEIGHT = 150;
             private static final double[] defaultSignal = new double[0];
             private double[] signal;

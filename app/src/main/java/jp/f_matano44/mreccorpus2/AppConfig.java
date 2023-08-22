@@ -1,19 +1,18 @@
 package jp.f_matano44.mreccorpus2;
 
-import java.awt.Font;
 import java.io.File;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
-class AppConfig extends JFrame {
+final class AppConfig extends JFrame {
     public final AudioFormat format;
-    public final File scripts;
+    public final File script;
     public final File saveTo;
+    public final File preference;
     public final boolean isNormalize;
     public final double normalizationLevel; // 0.05 ~ 0.95
-    public static final Font fontSet = new Font(Font.MONOSPACED, Font.PLAIN, 14);
 
     public AppConfig() {
         super("Config");
@@ -25,7 +24,7 @@ class AppConfig extends JFrame {
             // audio format
             final int channels = 1;
             final int nbits = 24;
-            final int fs = 44100;
+            final int fs = 96000;
             this.format = new AudioFormat(fs, nbits, channels, true, false);
 
             // path setting
@@ -36,10 +35,11 @@ class AppConfig extends JFrame {
             } else {
                 basePath = new File(System.getProperty("user.home"));
             }
-            this.scripts = new File(basePath, "scripts.txt");
+            this.script = new File(basePath, "script.txt");
             this.saveTo = new File(basePath, "corpus/");
+            this.preference = new File(basePath, "preference/");
 
-            this.normalizationLevel = 0.9;
+            this.normalizationLevel = 1.0;
         }
         if (!this.saveTo.exists()) {
             this.saveTo.mkdirs();
@@ -69,9 +69,6 @@ class AppConfig extends JFrame {
         final JTextArea textArea = new JTextArea(sb.toString());
         final int blank = 20;
         textArea.setEditable(false);   
-        textArea.setBackground(null);
-        textArea.setLineWrap(false);
-        textArea.setAutoscrolls(false);
         textArea.setBorder(new EmptyBorder(blank, blank, blank, blank));
         this.add(textArea);
 
@@ -81,5 +78,12 @@ class AppConfig extends JFrame {
         this.setMinimumSize(getSize());
         this.setLocationRelativeTo(null);
         this.setVisible(false);
+    }
+
+    public final File getSavePath(final int number) {
+        return new File(
+            this.saveTo, 
+            "corpus_" + String.format("%04d", number) + ".wav"
+        );
     }
 }
