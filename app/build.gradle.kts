@@ -21,12 +21,13 @@ repositories {
 
 dependencies {
     // Use JUnit Jupiter for testing.
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    //testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    //testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // for application
     // implementation("groupID:artifactID:version")
     implementation("com.gitlab.f-matano44:jfloatwavio:1.4.0a")
+    implementation("uk.co.caprica:vlcj:4.8.2")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

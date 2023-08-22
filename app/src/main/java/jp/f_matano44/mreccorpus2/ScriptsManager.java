@@ -18,109 +18,44 @@
 
 package jp.f_matano44.mreccorpus2;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 
 
 final class ScriptsManager extends JPanel {
-    public static final int textAreaWidth = 60;
-    private final RecorderBody recorder;
     private final int[] currentIndex;
     private final List<String> lines;
 
-    public final JTextArea scriptsPathViewer;
-    public final JTextArea scriptViewer;
-    public final JButton prevButton;
-    public final JLabel indexLabel;
-    public final JButton nextButton;
-    public final JSlider indexSlider;
-    public final JScrollPane scrollPane;
-
-    public ScriptsManager(
-        RecorderBody recorder, AppConfig conf, int[] currentIndex
-    ) {
-        this.recorder = recorder;
+    public ScriptsManager(AppConfig conf, int[] currentIndex) {
         this.currentIndex = currentIndex;
-
-        // Index label
-        this.indexLabel = new JLabel();
-        this.indexLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // Control button
-        prevButton = new JButton("<< Prev");
-        prevButton.addActionListener((ActionEvent e) -> this.prevLine());
-        nextButton = new JButton("Next >>");
-        nextButton.addActionListener((ActionEvent e) -> this.nextLine());
-
-        // Script viewer
-        this.scriptViewer = new JTextArea();
-        setTextAreaSetting(this.scriptViewer);
-        this.scriptViewer.setColumns(textAreaWidth);
-        this.scriptViewer.setRows(7); // ここの数字は決め打ち
-        this.scrollPane = new JScrollPane(this.scriptViewer);
-        this.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        this.scrollPane.setBackground(null);
-        this.scrollPane.getViewport().setBackground(null);
-
-        // Scripts loader
-        final String scriptPathString = conf.scripts.getAbsolutePath();
         this.lines = new ArrayList<>();
-        readFile(scriptPathString);
-        this.scriptsPathViewer = new JTextArea(
-            "Scripts: " + scriptPathString
-        );
-        setTextAreaSetting(this.scriptsPathViewer);
-        this.scriptsPathViewer.setColumns(textAreaWidth);
-        this.scriptsPathViewer.setBorder(
-            new EmptyBorder(0, 0, 5, 0)
-        );
-
-        // index slider
-        indexSlider = new JSlider(JSlider.HORIZONTAL, 0, lines.size() - 1, 0);
-        indexSlider.addChangeListener(e -> changeSlider());
-        final Dimension preferredSize = indexSlider.getPreferredSize();
-        preferredSize.width = 500;
-        indexSlider.setPreferredSize(preferredSize);
-
-        // set default value
-        this.updateText();
+        this.readFile(conf.script.getAbsolutePath());
     }
 
-    private final void nextLine() {
+    public final void nextLine() {
         currentIndex[0]++;
         if (lines.size() <= currentIndex[0]) {
             currentIndex[0] = 0;
         }
-        updateText();
     }
 
-    private final void prevLine() {
+    public final void prevLine() {
         if (currentIndex[0] <= 0) {
             currentIndex[0] = lines.size();
         }
         currentIndex[0]--;
-        updateText();
     }
 
-    private final void updateText() {
-        final int num = currentIndex[0] + 1;
-        this.indexSlider.setValue(currentIndex[0]);
-        indexLabel.setText(String.valueOf(num));
-        scriptViewer.setText(lines.get(currentIndex[0]));
-        recorder.update();
+    public final String getScriptText() {
+        return lines.get(currentIndex[0]);
+    }
+
+    public final int getScriptSize() {
+        return lines.size();
     }
 
     private final void readFile(final String filePath) {
@@ -140,20 +75,7 @@ final class ScriptsManager extends JPanel {
 
         if (lines.isEmpty()) {
             lines.clear();
-            scriptViewer.setText("Error: Can't read script file.");
+            lines.add("Error: Can't read script file.");
         }
-    }
-
-    private void changeSlider() {
-        this.currentIndex[0] = this.indexSlider.getValue();
-        this.updateText();
-    }
-
-    public static final void setTextAreaSetting(JTextArea textArea) {
-        textArea.setWrapStyleWord(true);   
-        textArea.setLineWrap(true);        
-        textArea.setEditable(false);   
-        textArea.setBackground(null);
-        textArea.setBorder(null);
     }
 }
