@@ -25,6 +25,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -41,50 +43,46 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import jp.f_matano44.jfloatwavio.Converter;
 
 final class RecorderBody {
-    private final AppConfig conf;
     private final AudioFormat format;
-    private final int[] currentIndex;
 
+    private final ByteArrayOutputStream outStream;
     private TargetDataLine line;
-    private ByteArrayOutputStream outStream;
-    private byte[] signal;
+    private byte[] originalByteSignal = new byte[0];
+    private byte[] byteSignal = new byte[0];
     public boolean isRecording = false;
 
     public final SpeechSectionEstimator sse;
 
-    public RecorderBody(AppConfig conf, int[] currentIndex) {
-        this.conf = conf;
-        this.format = conf.format;
-        this.currentIndex = currentIndex;
+    public RecorderBody() {
+        this.format = AppConfig.format;
+        this.outStream = new ByteArrayOutputStream();
 
         // Speech section
-        this.sse = new SpeechSectionEstimator(conf);
+        this.sse = new SpeechSectionEstimator();
+    }
+
+    public boolean isNotRecording() {
+        return !this.isRecording;
     }
 
     public final void startRecording() throws Exception {
-        // determine buffer-size
-        final int frameSize = format.getFrameSize();
-        final float frameRate = format.getFrameRate();
+        // determine recording thread
         final double recordingTime = 0.1;
-        final int bufferSize = (int) (frameSize * frameRate * recordingTime);
-
-        this.outStream = new ByteArrayOutputStream();
-        line = AudioSystem.getTargetDataLine(this.format);
-        line.open(this.format);
-        line.start();
-        new Thread(() -> {
+        final int bufferSize =
+            (int) (format.getFrameSize() * format.getFrameRate() * recordingTime);
+        final Thread recordThread = new Thread(() -> {
             final byte[] buffer = new byte[bufferSize];
             while (line.isOpen()) {
                 final int count = line.read(buffer, 0, buffer.length);
@@ -92,55 +90,37 @@ final class RecorderBody {
                     outStream.write(buffer, 0, count);
                 }
             }
-        }).start();
+        });
+        recordThread.setPriority(Thread.MAX_PRIORITY);
+        // start recording
+        outStream.reset();
+        line = AudioSystem.getTargetDataLine(this.format);
+        line.open(this.format);
+        line.start();
+        recordThread.start();
     }
 
-    public final void stopRecording() {
+    public final void stopRecordingAndSave(final int index) {
         if (line != null) {
             this.line.close();
-            byte[] byteSignal = this.outStream.toByteArray();
-            if (byteSignal.length != 0) {
-                this.signal = this.conf.isNormalize
-                    ? RecorderBody.normalization(byteSignal, conf)
-                    : byteSignal.clone();
-                this.sse.update(this.outStream.toByteArray());
-                this.saveAsWav();
+            this.originalByteSignal = this.outStream.toByteArray();
+            final int fs = (int) AppConfig.format.getSampleRate();
+            final int nBits = AppConfig.format.getSampleSizeInBits();
+            final double signalLength_s =
+                (double) this.originalByteSignal.length / ((nBits / 8) * fs);
+            if (0.2 /* s */ <= signalLength_s) {
+                this.byteSignal = AppConfig.isNormalize
+                    ? RecorderBody.normalization(this.originalByteSignal)
+                    : this.originalByteSignal.clone();
+                this.sse.update();
+                this.saveAllSignalAsWav(index);
             }
         }
     }
 
-    public final void enforceStopRecording() {
-        if (this.line != null) {
-            this.line.close();
-        }
-        this.signal = null;
-        this.isRecording = false;
-        sse.reset();
-    }
-
-    public final void playSignal() {
-        final AudioFormat format = this.format;
-        try (
-            final var ais = new AudioInputStream(
-                new ByteArrayInputStream(this.signal), 
-                format, this.signal.length / format.getFrameSize());
-        ) {
-            // 再生終了は観測しない (特にする意味がない)
-            final Clip clip = AudioSystem.getClip();
-            clip.open(ais);
-            clip.start();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                null, e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-    private final void saveAsWav() {
-        final File file = conf.getSavePath(this.currentIndex[0] + 1);
-        final byte[] audio = this.signal;
-
+    private final void saveAllSignalAsWav(final int index) {
+        final File file = AppConfig.getSavePath(index);
+        final byte[] audio = this.byteSignal;
         try (
             final AudioInputStream ais = new AudioInputStream(
                 new ByteArrayInputStream(audio),
@@ -156,10 +136,36 @@ final class RecorderBody {
         }
     }
 
-    private static final byte[] normalization(byte[] byteSignal, AppConfig conf) {
+    public final void enforceStopRecording() {
+        if (this.line != null) {
+            this.line.close();
+        }
+        this.originalByteSignal = new byte[0];
+        this.byteSignal = new byte[0];
+        this.isRecording = false;
+        // sse.reset();
+    }
+
+    public final void playSavedSignal(final int index) {
+        final File wavFile = AppConfig.getSavePath(index);
+        try (
+            final var ais = AudioSystem.getAudioInputStream(wavFile);
+        ) {
+            final Clip clip = AudioSystem.getClip();
+            clip.open(ais);
+            clip.start();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                null, e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private static final byte[] normalization(byte[] byteSignal) {
         // get format
-        final int nBits = conf.format.getSampleSizeInBits();
-        final boolean isBigEndian = conf.format.isBigEndian();
+        final int nBits = AppConfig.format.getSampleSizeInBits();
+        final boolean isBigEndian = AppConfig.format.isBigEndian();
         try {
             final double[] dSignal = 
                 Converter.byte2double(byteSignal, nBits, isBigEndian);
@@ -170,10 +176,10 @@ final class RecorderBody {
             }
             final double max = Arrays.stream(dSignalAbs).max().getAsDouble();
             // exec normalization
-            final double level = conf.normalizationLevel;
+            final double level = AppConfig.normalizationLevel;
             for (int i = 0; i < dSignal.length; i++) {
-                dSignal[i] /= max;
                 dSignal[i] *= level; 
+                dSignal[i] /= max;
             }
             return Converter.double2byte(dSignal, nBits, isBigEndian);
         } catch (Exception e) {
@@ -182,23 +188,52 @@ final class RecorderBody {
     }
 
     private final class SpeechSectionEstimator extends JPanel {
-        private static final int defaultMin = 0;
-        private static final int defaultMax = 100000;
-        private static final int defaultStart = 30000;
-        private static final int defaultEnd = 70000;
-        private final AppConfig conf;
+        private static final int sPanelWidth = Constant.panelWidth - 14;
+        private static final int sPanelHeight = 150;
+        private static final int sliderMin = 0;
+        private static final int sliderMax = sPanelWidth;
+        private static final int defaultStart = sliderMax / 4;
+        private static final int defaultEnd = sliderMax * 3 / 4;
 
-        private final JSlider startSlider;
-        private final JSlider endSlider;
-        private final SignalPanel sPanel;
-        private final JTextArea recInfoViewer;
+        private final JCheckBox trimmingCheckBox = new JCheckBox("Trimming");
+        private final JTextField noticeLabel = new JTextField(
+            "Saving adds 0.5s of silence before and after trimmed audio.");
+        private final JSlider startSlider = new JSlider(
+            JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
+        private final JSlider endSlider = new JSlider(
+            JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
+        private final SignalPanel sPanel = new SignalPanel();
+        private final JTextArea recInfoViewer = new JTextArea();
     
-        public SpeechSectionEstimator(AppConfig conf) {
-            Utility.setLookAndFeel();
-            this.conf = conf;
+        public SpeechSectionEstimator() {
 
-            startSlider = new JSlider(
-                JSlider.HORIZONTAL, defaultMin, defaultMax, defaultStart);
+            trimmingCheckBox.setSelected(true);
+            trimmingCheckBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    startSlider.setValue(defaultStart);
+                    endSlider.setValue(defaultEnd);
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        startSlider.setEnabled(true);
+                        endSlider.setEnabled(true);
+                    } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                        startSlider.setEnabled(false);
+                        endSlider.setEnabled(false);
+                    }
+                    if (byteSignal.length != 0) {
+                        update();
+                    } else {
+                        reset();
+                    }
+                }
+            });
+
+            this.noticeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            this.noticeLabel.setBackground(null);
+            this.noticeLabel.setEditable(false);
+            this.noticeLabel.setFocusable(false);
+            this.noticeLabel.setBorder(null);      
+            this.noticeLabel.setAutoscrolls(false);
 
             startSlider.addChangeListener(new ChangeListener() {
                 @Override
@@ -206,24 +241,21 @@ final class RecorderBody {
                     if (endSlider.getValue() <= startSlider.getValue()) {
                         endSlider.setValue(startSlider.getValue() + 1);
                     }
+                    repaint();
                 }
             });
-            endSlider = new JSlider(
-                JSlider.HORIZONTAL, defaultMin, defaultMax, defaultEnd);
+
             endSlider.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     if (endSlider.getValue() <= startSlider.getValue()) {
                         startSlider.setValue(endSlider.getValue() - 1);
                     }
+                    repaint();
                 }
             });
 
-            // signal viewer
-            sPanel = new SignalPanel();
-
             // SNR viewer
-            this.recInfoViewer = new JTextArea();
             Utility.setTextAreaSetting(this.recInfoViewer);
             this.recInfoViewer.setColumns(Constant.textAreaWidth);
     
@@ -233,11 +265,22 @@ final class RecorderBody {
             startSlider.setPreferredSize(preferredSize);
             endSlider.setPreferredSize(preferredSize);
 
+            // Script chooser panel setting
+            final JPanel trimmingPanel = new JPanel(new GridBagLayout());
+            final GridBagConstraints trimmingGbc = new GridBagConstraints();
+            trimmingGbc.insets = Constant.insets;
+            trimmingGbc.gridx = 0;
+            trimmingPanel.add(trimmingCheckBox, trimmingGbc);
+
             // set panel layout
             this.setLayout(new GridBagLayout());
             final GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
+            // this.add(trimmingPanel, gbc);
+            // gbc.gridy++;
+            // this.add(this.noticeLabel, gbc);
+            // gbc.gridy++;
             this.add(this.startSlider, gbc);
             gbc.gridy++;
             this.add(this.endSlider, gbc);
@@ -246,58 +289,45 @@ final class RecorderBody {
             gbc.gridy++;
             this.add(this.recInfoViewer, gbc);
 
-            final Border lineBorder = BorderFactory.createLineBorder(
-                Color.BLACK, 1
-            );
-            final CompoundBorder border = new CompoundBorder(
-                BorderFactory.createTitledBorder(
-                    lineBorder, "Speech Section: Start / End"
-                ),
-                new EmptyBorder(0, 0, 5, 0)
-            );
-            this.setBorder(border);
+            this.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                "Trimming silent sections: semi-auto estimation"
+            ));
 
             // initialization
             this.reset();
         }
 
-        public void update(byte[] originalByteSignal) {
-            byte[] normalizedSignal = this.conf.isNormalize
-                ? RecorderBody.normalization(originalByteSignal, conf)
-                : originalByteSignal;
+        public void update() {
             final int nbits = format.getSampleSizeInBits();
             final boolean isBigEndian = format.isBigEndian();
-            final double[] dSignal = Converter.byte2double(normalizedSignal, nbits, isBigEndian);
-            startSlider.setMaximum(dSignal.length);
-            endSlider.setMaximum(dSignal.length);
+            final double[] dSignal =
+                Converter.byte2double(byteSignal, nbits, isBigEndian);
             sPanel.updateSignal(dSignal);
 
             try {
-                final double snr = getSignalNoiseRatio(originalByteSignal, conf.format);
+                final double snr = getSignalNoiseRatio();
                 this.recInfoViewer.setText(getRecInfo(
                     String.format("%.4f", snr),
-                    String.valueOf(isClip(originalByteSignal))
+                    String.valueOf(isClip())
                 ));
             } catch (ArithmeticException e) {
                 this.recInfoViewer.setText(getRecInfo(
                     "-Inf",
-                    String.valueOf(isClip(originalByteSignal))
+                    String.valueOf(isClip())
                 ));
             } catch (Exception e) {
-                return;
+                this.recInfoViewer.setText(getRecInfo(
+                    "Unknown ERROR",
+                    "Look printed StackTrace"
+                ));
+                e.printStackTrace();
             }
         }
 
         public void reset() {
-            startSlider.setMinimum(defaultMin);
-            startSlider.setMaximum(defaultMax);
             startSlider.setValue(defaultStart);
-            endSlider.setMinimum(defaultMin);
-            endSlider.setMaximum(defaultMax);
             endSlider.setValue(defaultEnd);
-            startSlider.setMinimum(defaultMin);
-            startSlider.setMaximum(defaultMax);
-            startSlider.setValue(defaultStart);
             sPanel.resetSignal();
             this.recInfoViewer.setText(getRecInfo(
                 "------", 
@@ -305,23 +335,23 @@ final class RecorderBody {
             ));
         }
 
-        private static final double getSignalNoiseRatio(
-            byte[] byteSignal, AudioFormat format
-        ) {
+        private final double getSignalNoiseRatio() {
+            final byte[] byteSignal = originalByteSignal.clone();
             // get signal format
-            final int nBits = format.getSampleSizeInBits();
-            final boolean isBigEndian = format.isBigEndian();
-            // set Window size (width: 150ms, shift: 75ms)
-            final double width = 0.150; // [s] = 150 [ms]
-            final double shift = 0.075; // [s] =  75 [ms]
-            final double fs = format.getSampleRate();
-            final double t = 1 / fs;
-            final int windowSize = (int) (width / t);
-            final int shiftSize = (int) (shift / t);
+            final int nBits = AppConfig.format.getSampleSizeInBits();
+            final boolean isBigEndian = AppConfig.format.isBigEndian();
+            final double[] dSignal =
+                Converter.byte2double(byteSignal, nBits, isBigEndian);
 
-            final double[] dSignal = Converter.byte2double(byteSignal, nBits, isBigEndian);
             final List<Double> power = new ArrayList<>();
             try {
+                // set Window size (width: 150ms, shift: 75ms)
+                final double width = 0.150; // [s] = 150 [ms]
+                final double shift = 0.075; // [s] =  75 [ms]
+                final double fs = AppConfig.format.getSampleRate();
+                final int windowSize = (int) (width * fs);
+                final int shiftSize = (int) (shift * fs);
+
                 for (int i = 0; i < dSignal.length; i += shiftSize) {
                     double thisPower = 0.0;
                     for (int j = 0; j < windowSize; j++) {
@@ -344,12 +374,14 @@ final class RecorderBody {
             }
         }
 
-        private boolean isClip(byte[] signal) {
+        private boolean isClip() {
+            final byte[] byteSignal = originalByteSignal.clone();
             // get signal format
-            final int nBits = conf.format.getSampleSizeInBits();
-            final boolean isBigEndian = conf.format.isBigEndian();
+            final int nBits = AppConfig.format.getSampleSizeInBits();
+            final boolean isBigEndian = AppConfig.format.isBigEndian();
             // get double signal
-            final double[] dSignal = Converter.byte2double(signal, nBits, isBigEndian);
+            final double[] dSignal = 
+                Converter.byte2double(byteSignal, nBits, isBigEndian);
             for (int i = 0; i < dSignal.length; i++) {
                 dSignal[i] = Math.abs(dSignal[i]);
             }
@@ -363,14 +395,12 @@ final class RecorderBody {
         }
 
         private class SignalPanel extends JPanel {
-            private static final int WIDTH = Constant.panelWidth - 10;
-            private static final int HEIGHT = 150;
             private static final double[] defaultSignal = new double[0];
             private double[] signal;
         
             public SignalPanel() {
                 this.signal = defaultSignal;
-                setPreferredSize(new Dimension(WIDTH, HEIGHT));
+                setPreferredSize(new Dimension(sPanelWidth, sPanelHeight));
             }
 
             public void resetSignal() {
@@ -386,25 +416,33 @@ final class RecorderBody {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 final BufferedImage bi = new BufferedImage(
-                    WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+                    sPanelWidth, sPanelHeight, BufferedImage.TYPE_INT_RGB);
                 final Graphics2D g2d = bi.createGraphics();
 
                 // set background
                 g2d.setColor(Color.LIGHT_GRAY);
-                g2d.fillRect(0, 0, WIDTH, HEIGHT);
+                g2d.fillRect(0, 0, sPanelWidth, sPanelHeight);
+
+                // set speech-section
+                if (trimmingCheckBox.isSelected()) {
+                    final int ssStart = startSlider.getValue();
+                    final int ssWidth = endSlider.getValue() - startSlider.getValue();
+                    g2d.setColor(Color.GRAY);
+                    g2d.fillRect(ssStart, 0, ssWidth, sPanelHeight);
+                }
 
                 // y = 0
                 g2d.setColor(Color.RED);
                 g2d.setStroke(new BasicStroke(1));
-                g2d.drawLine(0, HEIGHT / 2, WIDTH, HEIGHT / 2);
+                g2d.drawLine(0, sPanelHeight / 2, sPanelWidth, sPanelHeight / 2);
                 
                 if (this.signal != null && 1 < this.signal.length) {
                     final Path2D path = new Path2D.Double();
-                    final double y0 = HEIGHT / 2.0 - (HEIGHT * signal[0]) / 2.0;
+                    final double y0 = sPanelHeight / 2.0 - (sPanelHeight * signal[0]) / 2.0;
                     path.moveTo(0, y0);
                     for (int i = 1; i < signal.length; i++) {
-                        int x = (int) Math.round((double) i / (signal.length - 1) * WIDTH);
-                        double y = HEIGHT / 2.0 - (HEIGHT * signal[i]) / 2.0;
+                        int x = (int) Math.round((double) i / (signal.length - 1) * sPanelWidth);
+                        double y = sPanelHeight / 2.0 - (sPanelHeight * signal[i]) / 2.0;
                         path.lineTo(x, y);
                     }
                     g2d.setColor(Color.BLACK);

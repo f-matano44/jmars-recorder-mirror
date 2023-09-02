@@ -25,6 +25,7 @@ import java.awt.Dimension;
 // import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -43,148 +44,198 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 
 /** Main-Class. */
 public final class MatanosRecorderForCorpus2 extends JFrame {
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MatanosRecorderForCorpus2());
+    /** main-function. */
+    public static final void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Utility.setLookAndFeel();
+            new MatanosRecorderForCorpus2();
+        });
     }
-
-    private final int[] currentIndex = {0};
-    private final AppConfig conf = new AppConfig();
-    private final PreferencePlayer pp = new PreferencePlayer(conf, currentIndex);
-    private final RecorderBody recorder = new RecorderBody(conf, currentIndex);
-    private final ScriptsManager sm = new ScriptsManager(conf, currentIndex);
-    private final UnreadScripts us = new UnreadScripts(conf, sm.getScriptSize());
-    final Dimension defaultDimension;
 
     private static final String startButtonString = "Start recording";
     private static final String recordingString   = " Stop and Save ";
+    final Dimension defaultDimension;
 
-    private final JTextArea scriptPathViewer;
-    private final JTextArea scriptTextArea;
-    private final JScrollPane scriptPanel;
-    private final JSlider indexSlider;
-    private final JButton prevButton;
-    private final JTextField indexLabel;
-    private final JButton nextButton;
-    private final JButton prefButton;
-    private final JToggleButton recordButton;
-    private final JButton playButton;
-    private final JTextArea saveToViewer;
+    private int currentIndex = 0;
+    private final NativeDiscovery vlc = new NativeDiscovery();
+    private final AppConfig conf = new AppConfig();
+    private final PreferencePlayer pp = new PreferencePlayer();
+    private final RecorderBody recorder = new RecorderBody();
+    private final ScriptsManager sm = new ScriptsManager();
+    private final UnreadSentences us = new UnreadSentences(sm.getScriptSize());
+
+    private final JTextArea scriptTextArea = new JTextArea();
+    private final JScrollPane scriptPanel = new JScrollPane(this.scriptTextArea);
+    private final JSlider indexSlider = new JSlider();
+    private final JButton prevButton = new JButton("<< Prev");
+    private final JTextField indexLabel = new JTextField();
+    private final JButton nextButton = new JButton("Next >>");
+    private final JButton prefButton = new JButton("Play Preference Sound");
+    private final JButton cancelButton = new JButton("Cancel");
+    private final JToggleButton recordButton = new JToggleButton(startButtonString);
+    private final JButton playButton = new JButton("Play");
 
     private MatanosRecorderForCorpus2() {
-        // Window title
+        // Window config
         super("mRecCorpus2");
-        Utility.setLookAndFeel();
-
-        // set menu-bar
-        TopBarMenu menuBar = new TopBarMenu(conf, this);
+        final TopBarMenu menuBar = new TopBarMenu(conf, this);
         this.setJMenuBar(menuBar);
 
-        final String scriptPathString = "Scripts: " + conf.script.getAbsolutePath();
-        this.scriptPathViewer = new JTextArea(scriptPathString);
-        Utility.setTextAreaSetting(this.scriptPathViewer);
-        this.scriptPathViewer.setColumns(Constant.textAreaWidth);
-        this.scriptPathViewer.setBorder(new EmptyBorder(0, 0, 5, 0));
-
-        this.scriptTextArea = new JTextArea();
+        // Script viewer
         Utility.setTextAreaSetting(this.scriptTextArea);
         this.scriptTextArea.setColumns(Constant.textAreaWidth);
         this.scriptTextArea.setRows(9); // ここの数字は決め打ち
         this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-        this.scriptPanel = new JScrollPane(this.scriptTextArea);
         this.scriptPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         this.scriptPanel.setBackground(null);
         this.scriptPanel.getViewport().setBackground(null);
         this.scriptPanel.setBorder(new LineBorder(Color.BLACK, 1));
 
-        this.indexSlider = new JSlider(0, this.sm.getScriptSize() - 1);
+        // Index slider
+        this.indexSlider.setMinimum(0);
+        this.indexSlider.setMaximum(this.sm.getScriptSize() - 1);
         this.indexSlider.addChangeListener((ChangeEvent e) -> {
-            this.currentIndex[0] = this.indexSlider.getValue();
+            this.currentIndex = this.indexSlider.getValue();
             this.update();
         });
         final Dimension sliderSize = indexSlider.getPreferredSize();
         sliderSize.width = Constant.panelWidth;
         this.indexSlider.setPreferredSize(sliderSize);
 
-        this.prevButton = new JButton("<< Prev");
+        // Previous button
         this.prevButton.addActionListener((ActionEvent e) -> {
-            this.sm.prevLine();
+            currentIndex = this.sm.prevLine(currentIndex);
             this.update();
         });
 
-        this.indexLabel = new JTextField();
+        // Index viewer
         this.indexLabel.setHorizontalAlignment(SwingConstants.CENTER);
         this.indexLabel.setColumns(Constant.textAreaWidth / 4);
         this.indexLabel.setBackground(null);
         this.indexLabel.setEditable(true);
+        this.indexLabel.setFocusable(true);
         this.indexLabel.setBorder(new LineBorder(Color.BLACK, 1));
         this.indexLabel.addActionListener((ActionEvent e) -> {
-            getIndexFromIndexViewer();
-            update();
+            this.getIndexFromIndexViewer();
+            this.update();
         });
         this.indexLabel.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
+            @Override public void focusLost(FocusEvent e) {
                 getIndexFromIndexViewer();
                 update();
             }
         });
 
-        this.nextButton = new JButton("Next >>");
+        // Next button
         this.nextButton.addActionListener((ActionEvent e) -> {
-            this.sm.nextLine();
+            currentIndex = this.sm.nextLine(currentIndex);
             this.update();
         });
 
-        this.prefButton = new JButton("Play Preference Sound");
-        this.prefButton.addActionListener((ActionEvent e) -> pp.playPreference());
+        // Preference player button
+        this.prefButton.addActionListener((ActionEvent e) -> 
+            pp.playPreference(currentIndex)
+        );
 
-        this.recordButton = new JToggleButton(startButtonString);
+        // Cancel recording button
+        this.cancelButton.setEnabled(true);
+        this.cancelButton.addActionListener((ActionEvent e) -> {
+            recorder.enforceStopRecording();
+            this.recorder.isRecording = false;
+            this.update();
+        });
+        final Dimension cancelDimension = this.cancelButton.getPreferredSize();
+        cancelDimension.height *= 2;
+        cancelDimension.width *= 2;
+        this.cancelButton.setPreferredSize(cancelDimension);
+
+        // Recording button
         final Dimension recordDimension = this.recordButton.getPreferredSize();
+        this.recordButton.addActionListener(
+            (ActionEvent e) -> {
+                try {
+                    if (this.recorder.isNotRecording()) {
+                        this.recorder.startRecording();
+                        this.recorder.isRecording = true;
+                        this.update();
+                    } else {
+                        this.recorder.stopRecordingAndSave(currentIndex);
+                        this.recorder.isRecording = false;
+                        this.update();
+                    }
+                } catch (Exception ex) {
+                    this.recorder.enforceStopRecording();
+                    this.recorder.isRecording = false;
+                    this.update();
+                    JOptionPane.showMessageDialog(
+                        null, ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        );
         recordDimension.height *= 2;
-        recordDimension.width *= 1.3;
+        recordDimension.width *= 2;
         this.recordButton.setPreferredSize(recordDimension);
 
-        this.playButton = new JButton("Play");
+        // Play button
         this.playButton.setEnabled(false);
-        this.playButton.addActionListener((ActionEvent e) -> recorder.playSignal());
-        final Dimension playDimension = this.playButton.getPreferredSize();
-        playDimension.height *= 2;
-        playDimension.width *= 1.3;
+        this.playButton.addActionListener((ActionEvent e) -> {
+            recorder.playSavedSignal(currentIndex);
+        });
+        final Dimension playDimension = cancelDimension.getSize();
         this.playButton.setPreferredSize(playDimension);
 
-        this.saveToViewer = new JTextArea();
-        Utility.setTextAreaSetting(this.saveToViewer);
-        this.saveToViewer.setColumns(Constant.textAreaWidth);
+        // Script chooser panel setting
+        final JPanel scriptChooserPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints scriptChooserGbc = new GridBagConstraints();
+        scriptChooserGbc.insets = Constant.insets;
+        scriptChooserGbc.gridx = 0;
+        scriptChooserPanel.add(this.prevButton, scriptChooserGbc);
+        scriptChooserGbc.gridx++;
+        scriptChooserPanel.add(this.indexLabel, scriptChooserGbc);
+        scriptChooserGbc.gridx++;
+        scriptChooserPanel.add(this.nextButton, scriptChooserGbc);
+
+        // Recorder panel setting
+        final JPanel recorderPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints recorderGbc = new GridBagConstraints();
+        recorderGbc.insets = Constant.insets;
+        recorderGbc.gridx = 0;
+        recorderPanel.add(this.cancelButton, recorderGbc);
+        recorderGbc.gridx++;
+        recorderPanel.add(this.recordButton, recorderGbc);
+        recorderGbc.gridx++;
+        recorderPanel.add(this.playButton, recorderGbc);
 
         // main panel setting
-        final JPanel mainPanel = new JPanel(new GridBagLayout());
         final JPanel[] xPanel = new JPanel[2];
         xPanel[0] = new JPanel(new GridBagLayout());
         xPanel[1] = new JPanel(new GridBagLayout());
         final GridBagConstraints gbc = new GridBagConstraints();
-        final EmptyBorder blank = new EmptyBorder(15, 20, 15, 20);
-        mainPanel.setBorder(blank);
         gbc.gridy = 0;
         xPanel[0].add(this.us, gbc);
         gbc.gridy = 0;
-        xPanel[1].add(this.scriptPathViewer, gbc);
-        gbc.gridy++;
         xPanel[1].add(this.scriptPanel, gbc);
         gbc.gridy++;
         xPanel[1].add(this.indexSlider, gbc);
         gbc.gridy++;
-        xPanel[1].add(this.scriptChooserPanel(), gbc);
+        xPanel[1].add(scriptChooserPanel, gbc);
+        gbc.insets = Constant.insets;
         gbc.gridy++;
         xPanel[1].add(this.prefButton, gbc);
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridy++;
-        xPanel[1].add(this.recorderPanel(), gbc);
+        xPanel[1].add(recorderPanel, gbc);
         gbc.gridy++;
         xPanel[1].add(recorder.sse, gbc);
-        gbc.gridy++;
-        xPanel[1].add(this.saveToViewer, gbc);
+        final JPanel mainPanel = new JPanel(new GridBagLayout());
+        final EmptyBorder blank = new EmptyBorder(15, 20, 15, 20);
+        mainPanel.setBorder(blank);
         mainPanel.add(xPanel[0]);
         mainPanel.add(xPanel[1]);
         Utility.changeFont(mainPanel);
@@ -202,101 +253,64 @@ public final class MatanosRecorderForCorpus2 extends JFrame {
         this.update();
     }
 
+    private void update() {
+        final File saveTo = AppConfig.getSavePath(currentIndex);
+        if (this.recorder.isRecording) {
+            this.recordButton.setText(recordingString);
+            this.indexSlider.setEnabled(false);
+            this.prefButton.setEnabled(false);
+            this.prevButton.setEnabled(false);
+            this.nextButton.setEnabled(false);
+            this.playButton.setEnabled(false);
+            this.recordButton.setSelected(true);
+        } else {
+            this.recordButton.setText(startButtonString);
+            this.indexSlider.setEnabled(true);
+            if (this.vlc.discover()
+                && this.pp.list.length > currentIndex
+                && this.pp.list[currentIndex].exists()
+            ) {
+                this.prefButton.setEnabled(true);
+            }
+            this.prevButton.setEnabled(true);
+            this.nextButton.setEnabled(true);
+            if (saveTo.exists()) {
+                this.playButton.setEnabled(true);
+            }
+            this.recordButton.setSelected(false);
+        }
+
+        this.scriptTextArea.setText(this.sm.getScriptText(currentIndex));
+        this.indexSlider.setValue(currentIndex);
+        this.indexLabel.setText((currentIndex + 1) + " / " + this.sm.getScriptSize());
+
+        if (saveTo.exists()) {
+            this.scriptTextArea.setBackground(new Color(220, 255, 220));
+        } else {
+            this.scriptTextArea.setBackground(null);
+        }
+
+        this.us.update();
+    }
+
+    private void getIndexFromIndexViewer() {
+        final int currentTemp = currentIndex;
+        try {
+            final String[] inputSt = indexLabel.getText()
+                .replace(" ", "").split("/");
+            currentIndex = Integer.parseInt(inputSt[0]) - 1;
+            if (currentIndex < 0 || sm.getScriptSize() <= currentIndex) {
+                throw new Exception("Too small or too big.");
+            }
+        } catch (Exception ex) {
+            currentIndex = currentTemp;
+        }
+    }
+
     // private static double getScreenScalingFactor() {
     //     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     //     GraphicsDevice[] gs = ge.getScreenDevices();
     //     GraphicsConfiguration[] gc = gs[0].getConfigurations();
     //     return gc[0].getDefaultTransform().getScaleX();
     // }
-
-    private void update() {
-        final int num = currentIndex[0] + 1;
-        final File saveTo = this.conf.getSavePath(num);
-        final String saveToString = saveTo.getAbsolutePath();
-        this.indexSlider.setValue(currentIndex[0]);
-        this.indexLabel.setText(this.indexStringBuilder(num));
-        this.scriptTextArea.setText(this.sm.getScriptText());
-        this.saveToViewer.setText("Save to: " + saveToString);
-        if (saveTo.exists()) {
-            this.scriptTextArea.setBackground(new Color(220, 255, 220));
-        } else {
-            this.scriptTextArea.setBackground(null);
-        }
-        this.us.update();
-    }
-
-    private void getIndexFromIndexViewer() {
-        final int current = currentIndex[0];
-        final String[] inputSt = indexLabel.getText()
-            .replace(" ", "").split("/");
-        try {
-            currentIndex[0] = Integer.parseInt(inputSt[0]) - 1;
-            if (currentIndex[0] < 0 || sm.getScriptSize() <= currentIndex[0]) {
-                throw new Exception("小さすぎ若しくはデカすぎ");
-            }
-        } catch (Exception ex) {
-            currentIndex[0] = current;
-        }
-        indexLabel.setText(indexStringBuilder(currentIndex[0]));
-    }
-
-    private String indexStringBuilder(int index) {
-        return index + " / " + this.sm.getScriptSize();
-    }
-
-    private JPanel scriptChooserPanel() { // GridBagLayout は NG
-        final JPanel panel = new JPanel(new GridBagLayout());
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        panel.add(this.prevButton, gbc);
-        gbc.gridx++;
-        panel.add(this.indexLabel, gbc);
-        gbc.gridx++;
-        panel.add(this.nextButton, gbc);
-        return panel;
-    }
-
-    private JPanel recorderPanel() {
-        this.recordButton.addActionListener(
-            (ActionEvent e) -> {
-                try {
-                    if (!this.recorder.isRecording) {
-                        this.recorder.isRecording = true;
-                        this.recordButton.setText(recordingString);
-                        this.recorder.startRecording();
-                    } else {
-                        this.recorder.stopRecording();
-                        this.recordButton.setText(startButtonString);
-                        this.recorder.isRecording = false;
-                        this.update();
-                    }
-                    // ボタンを有効化 or 無効化
-                    this.prefButton.setEnabled(!this.recorder.isRecording);
-                    this.playButton.setEnabled(!this.recorder.isRecording);
-                    this.prevButton.setEnabled(!this.recorder.isRecording);
-                    this.nextButton.setEnabled(!this.recorder.isRecording);
-                } catch (Exception ex) {
-                    this.prefButton.setEnabled(true);
-                    this.recorder.enforceStopRecording();
-                    this.recordButton.setText(startButtonString);
-                    this.recordButton.setSelected(false);
-                    this.playButton.setEnabled(false);
-                    this.update();
-                    JOptionPane.showMessageDialog(
-                        null, ex.getMessage(),
-                        "Error", JOptionPane.ERROR_MESSAGE
-                    );
-                }
-            }
-        );
-
-        final JPanel panel = new JPanel(new GridBagLayout());
-        // panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        panel.add(this.recordButton, gbc);
-        gbc.gridx++;
-        panel.add(this.playButton, gbc);
-        return panel;
-    }
 }

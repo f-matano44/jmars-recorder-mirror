@@ -7,23 +7,21 @@ import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
 class PreferencePlayer {
-    private final File[] list;
-    private final int[] currentIndex;
+    public final File[] list;
+    private final NativeDiscovery vlc;
     private final MediaPlayer mediaPlayer;
 
-    public PreferencePlayer(final AppConfig conf, int[] currentIndex) {
-        System.out.println("VLC Native Discovery: " + new NativeDiscovery().discover());
+    public PreferencePlayer() {
+        vlc = new NativeDiscovery();
+        System.out.println("VLC Native Discovery: " + vlc.discover());
 
-        this.currentIndex = currentIndex;
-        this.mediaPlayer = new MediaPlayerFactory().mediaPlayers().newMediaPlayer();
+        this.mediaPlayer = vlc.discover()
+            ? new MediaPlayerFactory().mediaPlayers().newMediaPlayer()
+            : null;
 
-        if (conf.preference.exists() && conf.preference.isDirectory()) {
-            list = conf.preference.listFiles((dir, file) -> {
-                if (file.toLowerCase().endsWith(".wav")) {
-                    return true;
-                } else {
-                    return false;
-                }
+        if (AppConfig.preference.exists() && AppConfig.preference.isDirectory()) {
+            list = AppConfig.preference.listFiles((dir, file) -> {
+                return file.toLowerCase().endsWith(".wav") ? true : false;
             });
         } else {
             list = new File[0];
@@ -34,7 +32,9 @@ class PreferencePlayer {
         }
     }
 
-    public void playPreference() {
-        this.mediaPlayer.media().play(list[currentIndex[0]].getAbsolutePath());
+    public void playPreference(final int currentIndex) {
+        if (this.mediaPlayer != null) {
+            this.mediaPlayer.media().play(list[currentIndex].getAbsolutePath());
+        }
     }
 }

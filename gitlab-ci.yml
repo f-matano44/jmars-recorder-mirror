@@ -1,0 +1,16 @@
+image: gradle:jdk17
+
+stages:
+  - build_and_test
+
+build_job:
+  only:
+    - main
+  stage: build_and_test
+  script:
+    - java -version
+    - gradlew build
+    - gradlew jar
+  artifacts:
+    paths:
+      - app/build/

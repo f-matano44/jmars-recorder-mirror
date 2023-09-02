@@ -5,7 +5,10 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.2/userguide/building_java_projects.html in the Gradle documentation.
  */
 
+val appName = "mRecCorpus2"
 val appVersion = "2.0.0"
+val mainModuleName = "jp.f_matano44.mreccorpus2"
+val mainClassName = "jp.f_matano44.mreccorpus2.MatanosRecorderForCorpus2"
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -38,13 +41,19 @@ java {
 }
 
 application {
-    mainModule.set("jp.f_matano44.mreccorpus2")
-    mainClass.set("jp.f_matano44.mreccorpus2.MatanosRecorderForCorpus2")
+    mainModule.set(mainModuleName)
+    mainClass.set(mainClassName)
 }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+tasks.jar {
+    archiveBaseName.set(appName)
+    archiveVersion.set(appVersion)
+    manifest.attributes["Main-Class"] = mainClassName
 }
 
 jlink {
@@ -58,15 +67,19 @@ jlink {
         }
         installerOptions = installerOptions.plus(listOf("--license-file", licenseFilePath))
 
-        // set package-identifier (for macOS)
-        if (osName.contains("mac")) {
+        // other options
+        if (osName.contains("win")) {
+            installerOptions = installerOptions.plus(
+                listOf("--win-shortcut", "--win-menu")
+            )
+        } else if (osName.contains("mac")) {
             installerOptions = installerOptions.plus(
                 listOf("--mac-package-identifier", "jp.f-matano44.mRecCorpus2")
             )
-        }
+        } 
     }
     launcher {
-        name = "mRecCorpus2"
+        name = appName
         version = appVersion
     }
 }
