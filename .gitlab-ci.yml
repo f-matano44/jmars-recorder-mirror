@@ -9,8 +9,8 @@ build_job:
   stage: build_and_test
   script:
     - java -version
-    - gradlew build
-    - gradlew jar
+    - ./gradlew build
+    - ./gradlew jar
   artifacts:
     paths:
       - app/build/
