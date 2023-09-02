@@ -1,4 +1,17 @@
-version 1.6.0
+# Version History
+
+## version 1.7.0
+
+* フォントの追加等デザインの微調整
+* キャンセルボタンの追加
+* GUI の調整
+* AppConfig の調整
+* クラス間依存関係の改善
+* GitLab ci-cd の追加
+* その他細々とした調整
+
+## version 1.6.0
+
 * ゼミの内容を反映2
   * ボタンの挙動を変更
   * 収録状況の表示パネル追加
@@ -8,33 +21,40 @@ version 1.6.0
   * ボタンサイズの変更
   * トップバーに色々追加
 
-version 1.5.0
+## version 1.5.0
+
 * ゼミの内容を反映
   * 設定の非表示
   * 波形表示の軽量化
   * save ボタンの削除
   * index 選択のスクロールバーを表示
 
-version 1.4.0
+## version 1.4.0
+
 * 波形制御に関する機能をいくつか追加
   * 正規化
   * SNR 計算
   * クリッピング判定
   * 波形表示
 
-version 1.3.0
+## version 1.3.0
+
 * ant -> gradle
 
-version 1.2.0
+## version 1.2.0
+
 * 設定の簡易化
 * クラス周りの整理
 
-version 1.1.0
+## version 1.1.0
+
 * ワンタッチ・セーブの実装
 
-version 1.0.1
+## version 1.0.1
+
 * クラス周りの整理
 * GUI の一部変更
 
-version 1.0.0
+## version 1.0.0
+
 * mRecCorpus の GUI 実装

@@ -27,31 +27,33 @@ import javax.swing.JPanel;
 
 
 final class ScriptsManager extends JPanel {
-    private final int[] currentIndex;
     private final List<String> lines;
+    private final int minOfIndex;
+    private final int maxOfIndex; 
 
-    public ScriptsManager(AppConfig conf, int[] currentIndex) {
-        this.currentIndex = currentIndex;
+    public ScriptsManager() {
         this.lines = new ArrayList<>();
-        this.readFile(conf.script.getAbsolutePath());
+        this.readFile(AppConfig.script.getAbsolutePath());
+        this.minOfIndex = 0;
+        this.maxOfIndex = lines.size() - 1;
     }
 
-    public final void nextLine() {
-        currentIndex[0]++;
-        if (lines.size() <= currentIndex[0]) {
-            currentIndex[0] = 0;
-        }
+    public final int prevLine(final int currentIndex) {
+        final int prevIndex = currentIndex - 1;
+        return minOfIndex <= prevIndex
+            ? prevIndex
+            : maxOfIndex;
     }
 
-    public final void prevLine() {
-        if (currentIndex[0] <= 0) {
-            currentIndex[0] = lines.size();
-        }
-        currentIndex[0]--;
+    public final int nextLine(final int currentIndex) {
+        final int nextIndex = currentIndex + 1;
+        return nextIndex <= maxOfIndex
+            ? nextIndex
+            : minOfIndex;
     }
 
-    public final String getScriptText() {
-        return lines.get(currentIndex[0]);
+    public final String getScriptText(final int currentIndex) {
+        return lines.get(currentIndex);
     }
 
     public final int getScriptSize() {
@@ -61,7 +63,7 @@ final class ScriptsManager extends JPanel {
     private final void readFile(final String filePath) {
         try (final var sc = new Scanner(new File(filePath))) {
             while (sc.hasNextLine()) {
-                final String[] parts = sc.nextLine().split("[\t,:]");
+                final String[] parts = sc.nextLine().split(AppConfig.splitChars);
                 final StringBuilder sb = new StringBuilder();
                 for (final String temp : parts) {
                     sb.append(temp + "\n");
