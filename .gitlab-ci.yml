@@ -5,6 +5,7 @@ stages:
 
 build:
   only: 
+    - main
     - tags
   stage: build
   script:
