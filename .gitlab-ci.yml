@@ -6,7 +6,6 @@ build_job:
   image: gradle:jdk17
   only: 
     - main
-    - tags
   stage: build
   script:
     - java -version
