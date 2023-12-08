@@ -4,8 +4,8 @@ stages:
   - build
 
 build:
-  only:
-    main
+  only: 
+    - tags
   stage: build
   script:
     # build
