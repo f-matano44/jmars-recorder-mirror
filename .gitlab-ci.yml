@@ -2,21 +2,33 @@ image: gradle:jdk17
 
 stages:
   - build
+  - deploy
 
-build:
+build_job:
   only: 
     - main
     - tags
   stage: build
   script:
-    # build
     - java -version
     - gradle jar
-    # publish
+    # ---
     - mkdir jMARS_Recorder
     - mv app/build/libs/jMARS_Recorder-*.jar jMARS_Recorder/
     - mv README.md jMARS_Recorder/README.md
-    - ls
+    - mv LICENSE.txt jMARS_Recorder/LICENSE.txt
+    - tar -zcvf jMARS_Recorder-latest.tar.gz jMARS_Recorder/
   artifacts:
     paths:
-      - jMARS_Recorder/
+      - jMARS_Recorder-latest.tar.gz
+
+pages:
+  stage: deploy
+  script:
+    - mkdir public
+    - mv jMARS_Recorder-latest.tar.gz public/
+  dependencies:
+    - build_job
+  artifacts:
+    paths:
+      - public
