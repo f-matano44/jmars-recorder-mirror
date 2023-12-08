@@ -1,5 +1,6 @@
 # jMARS Recorder
-（自分の考える最強の）音声コーパス収録用レコーダー
+（自分の考える最強の）音声コーパス収録用レコーダー  
+Download: https://f-matano44.gitlab.io/jmars-recorder/jMARS_Recorder-latest.zip
 
 <img src="doc/imgs/screenshot.png" width="40%">
 
@@ -15,8 +16,7 @@
 * https://adoptium.net/temurin/releases/?package=jre&version=17
 
 ### jMARS のダウンロード
-以下のリンクからダウンロード及び解答し，`jMARS_Recorder-x.y.z.jar` を好きな場所に移動してください．本アプリは直接実行する形式のため，インストールの必要はありません．
-* https://f-matano44.gitlab.io/jmars-recorder/jMARS_Recorder-latest.tar.gz
+一番上のリンクからダウンロード及び解答し，`jMARS_Recorder-x.y.z.jar` を好きな場所に移動してください．本アプリは直接実行する形式のため，インストールの必要はありません．
 
 ### 実行
 jar ファイルをダブルクリックして実行します．
