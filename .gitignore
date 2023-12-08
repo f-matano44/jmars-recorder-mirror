@@ -2,4 +2,14 @@
 build
 bin
 
+# binary-extension
+*.app
+*.exe
+*.msi
+*.rpm
+*.deb
+*.pkg
+*.dmg
+*.properties
+
 !/**/.gitkeep

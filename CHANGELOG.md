@@ -1,6 +1,22 @@
 # Version History
 
-## version 1.7.0
+## version 0.8.0
+
+* アプリ名の変更 (mRecCorpus2 -> jMARS Recorder)
+    * バージョン命名規則の遡及的変更 (1.x.y -> 0.x.y)
+* ボタンサイズの調整
+* GitLab ci-cd の大幅改善 (えらい)
+* jpackage コマンドの削除 (jar で配布)
+* 正規化の削除
+* 設定ファイルの定義
+* デフォルトコーパスを ROHAN に
+* 他にも色々あると思うけど忘れた
+
+## version 0.7.1, 0.7.2
+
+* ci-cd の調整
+
+## version 0.7.0
 
 * フォントの追加等デザインの微調整
 * キャンセルボタンの追加
@@ -10,7 +26,7 @@
 * GitLab ci-cd の追加
 * その他細々とした調整
 
-## version 1.6.0
+## version 0.6.0
 
 * ゼミの内容を反映2
   * ボタンの挙動を変更
@@ -21,7 +37,7 @@
   * ボタンサイズの変更
   * トップバーに色々追加
 
-## version 1.5.0
+## version 0.5.0
 
 * ゼミの内容を反映
   * 設定の非表示
@@ -29,7 +45,7 @@
   * save ボタンの削除
   * index 選択のスクロールバーを表示
 
-## version 1.4.0
+## version 0.4.0
 
 * 波形制御に関する機能をいくつか追加
   * 正規化
@@ -37,24 +53,24 @@
   * クリッピング判定
   * 波形表示
 
-## version 1.3.0
+## version 0.3.0
 
 * ant -> gradle
 
-## version 1.2.0
+## version 0.2.0
 
 * 設定の簡易化
 * クラス周りの整理
 
-## version 1.1.0
+## version 0.1.0
 
 * ワンタッチ・セーブの実装
 
-## version 1.0.1
+## version 0.0.1
 
 * クラス周りの整理
 * GUI の一部変更
 
-## version 1.0.0
+## version 0.0.0
 
 * mRecCorpus の GUI 実装

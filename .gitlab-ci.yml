@@ -1,16 +1,24 @@
 image: gradle:jdk17
 
 stages:
-  - build_and_test
+  - build
 
-build_job:
+build:
   only:
-    - main
-  stage: build_and_test
+    refs:
+      - main
+    variables:
+      - $CI_COMMIT_TAG
+  stage: build
   script:
+    # build
     - java -version
-    - ./gradlew build
-    - ./gradlew jar
+    - gradle jar
+    # publish
+    - mkdir jMARS_Recorder
+    - mv app/build/libs/jMARS_Recorder-*.jar jMARS_Recorder/
+    - mv README.md jMARS_Recorder/README.md
+    - ls
   artifacts:
     paths:
-      - app/build/
+      - jMARS_Recorder/
