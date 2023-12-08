@@ -5,10 +5,7 @@ stages:
 
 build:
   only:
-    refs:
-      - main
-    variables:
-      - $CI_COMMIT_TAG
+    tags
   stage: build
   script:
     # build
