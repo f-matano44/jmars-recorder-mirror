@@ -1,9 +1,10 @@
+image: gradle:jdk17
+
 stages:
   - build
   - deploy
 
 build_job:
-  image: gradle:jdk17
   only: 
     - main
   stage: build

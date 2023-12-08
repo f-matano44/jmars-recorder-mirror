@@ -16,7 +16,7 @@ import java.util.Properties
 
 val appShortName = "jMARS"
 val appFullName = "jMARS_Recorder"
-val appVersion = "1.0.0beta20231208"
+val appVersion = "v20231209"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
 val javaVersion = 17
 val license = "GPLv3 (or later)"
