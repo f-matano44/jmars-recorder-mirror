@@ -16,7 +16,7 @@
 
 ### jMARS のダウンロード
 以下のリンクからダウンロード及び解答し，`jMARS_Recorder-x.y.z.jar` を好きな場所に移動してください．本アプリは直接実行する形式のため，インストールの必要はありません．
-* https://www.f-matano44.jp/jmars-recorder/jMARS_Recorder-latest.tar.gz
+* https://f-matano44.gitlab.io/jmars-recorder/jMARS_Recorder-latest.tar.gz
 
 ### 実行
 jar ファイルをダブルクリックして実行します．
