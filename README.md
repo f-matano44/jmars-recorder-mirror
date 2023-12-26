@@ -3,7 +3,7 @@
 * （俺の考えた最強の）音声コーパス収録用レコーダー
 * ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
 
-<img src="doc/imgs/screenshot.png" width="40%">
+<img src="doc/imgs/screenshot.png">
 
 ## 起動方法
 ### 動作環境
