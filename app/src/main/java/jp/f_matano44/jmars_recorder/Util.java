@@ -21,12 +21,12 @@ package jp.f_matano44.jmars_recorder;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.FontFormatException;
+// import java.awt.FontFormatException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
+// import java.net.URL;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
@@ -45,20 +45,21 @@ final class Util {
     }
 
     public static final void changeFont(Component component) {
-        final URL fontURL = Util.class.getClassLoader()
-            .getResource("SourceHanCodeJP-Medium.otf");
-        try (final InputStream is = fontURL.openStream()) {
-            final Font font = Font.createFont(Font.TRUETYPE_FONT, is)
-                .deriveFont(14f);
-            component.setFont(font);
-            if (component instanceof Container) {
-                for (Component child : ((Container) component).getComponents()) {
-                    changeFont(child);
-                }
+        // final URL fontURL = Util.class.getClassLoader()
+        //     .getResource("SourceHanCodeJP-Medium.otf");
+        // try (final InputStream is = fontURL.openStream()) {
+            // final Font font = Font.createFont(Font.TRUETYPE_FONT, is)
+            //     .deriveFont(14f);
+        final Font font = new Font(Font.MONOSPACED, Font.PLAIN, 15);
+        component.setFont(font);
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                changeFont(child);
             }
-        } catch (IOException | FontFormatException e) {
-            e.printStackTrace();
         }
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
     public static final void setTextAreaSetting(JTextArea textArea) {

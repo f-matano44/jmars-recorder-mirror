@@ -131,7 +131,7 @@ final class TopBarMenu extends JMenuBar {
 
             final StringBuilder sb = new StringBuilder();
             final String[] libs
-                = {"ROHAN", "SourceHanCodeJP", "jFloatWavIO", "vlcj", "SnakeYAML"};
+                = {"ROHAN", "jFloatWavIO", "vlcj", "SnakeYAML"};
             for (final String lib : libs) {
                 final InputStream is = TopBarMenu.class.getClassLoader()
                     .getResourceAsStream("3rdPartyNOTICEs/" + lib + ".txt");
