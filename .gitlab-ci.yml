@@ -23,6 +23,8 @@ build_job:
       - jMARS_Recorder-latest.zip
 
 pages:
+  only: 
+    - main
   stage: deploy
   script:
     - mkdir public
