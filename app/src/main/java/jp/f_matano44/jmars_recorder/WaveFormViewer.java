@@ -46,11 +46,12 @@ import javax.swing.event.ChangeListener;
 
 final class WaveFormViewer extends JPanel {
     private static final int sPanelWidth = Main.panelWidth - 14;
-    private static final int sPanelHeight = 150;
+    private static final int sPanelHeight = 225;
     private static final int sliderMin = 0;
     private static final int sliderMax = sPanelWidth;
     private static final int defaultStart = sliderMax / 4;
     private static final int defaultEnd = sliderMax * 3 / 4;
+    private static final double[] defaultSignal = new double[0];
 
     private int recsIndex = 0;
     public final List<RecorderBody> recs = new ArrayList<>();
@@ -148,8 +149,8 @@ final class WaveFormViewer extends JPanel {
         }
 
         // Script chooser panel setting
-        final var recorderChooserPanel = new JPanel(new GridBagLayout());
-        final var recorderChooserGbc = new GridBagConstraints();
+        final JPanel recorderChooserPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints recorderChooserGbc = new GridBagConstraints();
         recorderChooserGbc.insets = Main.insets;
         recorderChooserGbc.gridx = 0;
         recorderChooserPanel.add(this.prevButton, recorderChooserGbc);
@@ -235,7 +236,7 @@ final class WaveFormViewer extends JPanel {
 
             try {
                 this.recInfoViewer.setText(getRecInfo(
-                    String.format("%.4f", recorder.getSignalNoiseRatio()),
+                    String.format("%.1f", recorder.getSignalNoiseRatio()),
                     String.valueOf(recorder.isClipping())
                 ));
             } catch (ArithmeticException e) {
@@ -262,8 +263,8 @@ final class WaveFormViewer extends JPanel {
         this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
         this.sPanel.resetSignal();
         this.recInfoViewer.setText(getRecInfo(
-            "------", 
-            "------"
+            "----", 
+            "----"
         ));
         this.indexLabel.setText("0 / 0");
     }
@@ -273,7 +274,6 @@ final class WaveFormViewer extends JPanel {
     }
 
     private class SignalPanel extends JPanel {
-        private static final double[] defaultSignal = new double[0];
         private double[] signal;
     
         public SignalPanel() {

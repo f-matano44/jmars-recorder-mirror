@@ -19,6 +19,7 @@
 package jp.f_matano44.jmars_recorder;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
@@ -44,11 +45,31 @@ class ReferencePlayer {
         }
     }
 
-    public void playPreference(final int currentIndex) {
+    public void playMyReference() {
+        final File dir = new File(AppConfig.saveTo.getAbsolutePath());
+        final String[] wavFiles = dir.list(new FilenameFilter() {
+            public boolean accept(final File dir, final String name) {
+                return name.toLowerCase().endsWith(".wav");
+            }
+        });
+
+        Arrays.sort(wavFiles);
+        final String playWavPath = new File(dir, wavFiles[0]).getAbsolutePath();
+
+        try {
+            this.mediaPlayer.media().play(playWavPath);
+        } catch (Exception e) {
+            // media-player cannot work.
+        }
+    }
+
+    public void playReference(final int currentIndex) {
         try {
             this.mediaPlayer.media().play(this.list[currentIndex].getAbsolutePath());
         } catch (NullPointerException | IndexOutOfBoundsException e) {
             // media-player cannot work.
+        } catch (Exception e) {
+            e.printStackTrace(AppConfig.logTargetStream);
         }
     }
 }

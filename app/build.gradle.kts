@@ -14,11 +14,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
 
-val appShortName = "jMARS"
 val appFullName = "jMARS_Recorder"
-val appVersion = "v20231229"
+val appVersion = "20240101"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
-val javaVersion = 17
+val javaRuntimeVersion = 8
 val license = "GPLv3 (or later)"
 val copyright = "Copyright (C) 2023  Fumiyoshi MATANO"
 
@@ -31,22 +30,27 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
-    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://www.jitpack.io") }
 }
 
 dependencies {
     // for application
     // implementation("groupID:artifactID:version")
-    implementation("com.gitlab.f-matano44:jfloatwavio:1.4.0a")
-    implementation("uk.co.caprica:vlcj:4.8.2")
-    implementation("org.yaml:snakeyaml:1.8")
+    implementation("com.gitlab.f-matano44:jfloatwavio:2.0.0")
+    implementation("uk.co.caprica:vlcj:4.7.3")
+    implementation("org.yaml:snakeyaml:2.2")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
+}
+
+tasks.withType<JavaCompile> {
+    options.release.set(javaRuntimeVersion)
 }
 
 application {
@@ -67,10 +71,9 @@ tasks.jar {
     val buildPropertiesFile = "app/src/main/resources/build-info.properties"
     val props = Properties()
     props.setProperty("app.name", appFullName)
-    props.setProperty("app.short.name", appShortName)
     props.setProperty("app.version", appVersion)
     val currentDateTime = Date()
-    val formatter = SimpleDateFormat("yyyyMMdd'T'HHmmssXX")
+    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX")
     val formattedDateTime = formatter.format(currentDateTime)
     props.setProperty("build.date", formattedDateTime)
     val userName = System.getProperty("user.name")
@@ -78,7 +81,6 @@ tasks.jar {
     props.setProperty("build.by", userName + "@" + hostName)
     props.setProperty("copyright", copyright)
     props.setProperty("git.head", getGitCommitHash(short = true))
-    props.setProperty("java.version", javaVersion.toString())
     props.setProperty("license", license)
     File(buildPropertiesFile).outputStream().use {
         props.store(it, null)

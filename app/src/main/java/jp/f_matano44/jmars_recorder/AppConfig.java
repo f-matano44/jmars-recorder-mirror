@@ -21,9 +21,12 @@ package jp.f_matano44.jmars_recorder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
@@ -31,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 final class AppConfig extends JFrame {
@@ -71,7 +75,7 @@ final class AppConfig extends JFrame {
         Boolean tr = null;
         try {    
             @SuppressWarnings("unchecked") // もう少し良い方法がありそう
-            Map<String, Object> conf = (Map<String, Object>) new Yaml().load(
+            final Map<String, Object> conf = (Map<String, Object>) new Yaml().load(
                 new FileInputStream(confFile)
             );
 
@@ -84,44 +88,46 @@ final class AppConfig extends JFrame {
             sa = new File((String) conf.get(saveToKey));
             tr = (Boolean) conf.get(isTrimmingKey);
         } catch (FileNotFoundException e) {
-            try (final var fw = new FileWriter(confFile, StandardCharsets.UTF_8)) {
-                fo = new AudioFormat(defaultFs, defaultNbits,
-                    1, true, false);
-                sc = defaultScript;
-                re = defaultReference;
-                sa = defaultSaveTo;
-                tr = defaultTrimming;
-
-                fw.write(fsKey + ": " + defaultFs + "\n");
-                fw.write(nbitsKey + ": " + defaultNbits + "\n");
-                fw.write(scriptKey + ": " + defaultScript.toString() + "\n");
-                fw.write(referenceKey + ": " + defaultReference.toString() + "\n");
-                fw.write(saveToKey + ": " + defaultSaveTo + "\n");
-                fw.write(isTrimmingKey + ": " + defaultTrimming + "\n");
+            fo = new AudioFormat(defaultFs, defaultNbits, 1, true, false);
+            sc = defaultScript;
+            re = defaultReference;
+            sa = defaultSaveTo;
+            tr = defaultTrimming;
+            try (
+                final Writer fw = new OutputStreamWriter(
+                    new FileOutputStream(confFile), StandardCharsets.UTF_8)
+            ) {
+                final Map<String, Object> map = new HashMap<>();
+                map.put(fsKey, defaultFs);
+                map.put(nbitsKey, defaultNbits);
+                map.put(scriptKey, defaultScript.toString());
+                map.put(referenceKey, defaultReference.toString());
+                map.put(saveToKey, defaultSaveTo.toString());
+                map.put(isTrimmingKey, defaultTrimming);
+                final DumperOptions options = new DumperOptions();
+                options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+                new Yaml(options).dump(map, fw); // write out
             } catch (Exception ex) {
                 unexpectedError(ex);
             }
-        } catch (ClassCastException e) {
+        } catch (NullPointerException | ClassCastException e) {
             e.printStackTrace(logTargetStream);
             String[] messages = {
-                "Configuration file (${HOME}/" + confFileName + ") is corrupted.\n",
-                "Therefore, this application will start in default setting.\n",
-                "\n",
-                "If you wish to resolve this issue, delete the config file\n",
-                "and restart the application.\n", 
-                "Then, this app will start correctly.\n"
+                "Configuration file (${HOME}/" + confFileName + ") is corrupted.",
+                "Therefore, this application will start in default setting.",
+                "",
+                "If you wish to resolve this issue, delete the config file",
+                "and restart the application. Then, this app will start correctly."
             };
-            String message = "";
+            StringBuilder message = new StringBuilder();
             for (String m : messages) {
-                message += m;
+                Util.appendLn(message, m);
             }
             JOptionPane.showMessageDialog(
-                null, message,
-                "Error", JOptionPane.ERROR_MESSAGE
+                null, message, "Error", JOptionPane.ERROR_MESSAGE
             );
 
-            fo = new AudioFormat(defaultFs, defaultNbits,
-                1, true, false);
+            fo = new AudioFormat(defaultFs, defaultNbits, 1, true, false);
             sc = defaultScript;
             re = defaultReference;
             sa = defaultSaveTo;
@@ -142,7 +148,7 @@ final class AppConfig extends JFrame {
             }
 
             try {
-                Util.copyResourceToFile(
+                Util.copyResource(
                     "ENDSVILLE400.txt",
                     script.toString()
                 );
@@ -210,7 +216,7 @@ final class AppConfig extends JFrame {
 
     public static final File getSavePath(final int index) {
         final int num = index + 1;
-        final var fileString = "corpus_" + String.format("%04d", num) + ".wav";
+        final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
         return new File(saveTo, fileString);
     }
 

@@ -45,11 +45,6 @@ final class Util {
     }
 
     public static final void changeFont(Component component) {
-        // final URL fontURL = Util.class.getClassLoader()
-        //     .getResource("SourceHanCodeJP-Medium.otf");
-        // try (final InputStream is = fontURL.openStream()) {
-            // final Font font = Font.createFont(Font.TRUETYPE_FONT, is)
-            //     .deriveFont(14f);
         final Font font = new Font(Font.MONOSPACED, Font.PLAIN, 15);
         component.setFont(font);
         if (component instanceof Container) {
@@ -57,9 +52,6 @@ final class Util {
                 changeFont(child);
             }
         }
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
     }
 
     public static final void setTextAreaSetting(JTextArea textArea) {
@@ -85,13 +77,13 @@ final class Util {
         final StringBuilder sb = new StringBuilder(text);
         int i = 30;
         while (i < sb.length()) {
-            sb.insert(i, '\n');
+            sb.insert(i, System.lineSeparator());
             i += 31;
         }
         return sb.toString();
     }
 
-    public static void copyResourceToFile(
+    public static void copyResource(
         final String resourcePath, final String absolutePath
     ) throws IOException {
         try (
