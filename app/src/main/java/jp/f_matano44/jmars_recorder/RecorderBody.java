@@ -240,7 +240,7 @@ final class RecorderBody implements Cloneable {
         final double startPercent, final double endPercent
     ) {
         try (
-            final var ais = new AudioInputStream(
+            final AudioInputStream ais = new AudioInputStream(
                 new ByteArrayInputStream(this.getPartOfByteSignal(startPercent, endPercent)),
                 AppConfig.format, this.byteSignal.length / AppConfig.format.getFrameSize());
         ) {

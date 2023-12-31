@@ -1,5 +1,12 @@
 # Version History
 
+## version 202401??
+
+* Java 17 から Java 8 への移行
+* 過去の自分の音声を再生する機能を追加
+* 描画周りの全体の微調整
+* アプリの関連ディレクトリを表示する機能を追加
+
 ## version 20231229
 
 * SourceHanCodeJP の削除

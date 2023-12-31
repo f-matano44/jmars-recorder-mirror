@@ -18,7 +18,9 @@
 
 package jp.f_matano44.jmars_recorder;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 import javax.swing.JFrame;
@@ -39,14 +41,44 @@ final class TopBarMenu extends JMenuBar {
 
     public TopBarMenu(Main mainFrame) {
         this.mainFrame = mainFrame;
-        this.add(new JMARS());
-        this.add(new Window());
-        this.add(new Help());
+        this.add(new FileTab());
+        this.add(new WindowTab());
+        this.add(new HelpTab());
     }
 
-    private class JMARS extends JMenu {
-        public JMARS() {
-            super(Main.appShortName);
+    private class FileTab extends JMenu {
+        public FileTab() {
+            super("File");
+
+            final JMenuItem openScriptDirItem = new JMenuItem("Open Script File");
+            openScriptDirItem.addActionListener((ActionEvent e) -> {
+                try {
+                    Desktop.getDesktop().open(new File(AppConfig.script.getParent()));
+                } catch (final Exception ex) {
+                    ex.printStackTrace(AppConfig.logTargetStream);
+                }
+            });
+            this.add(openScriptDirItem);
+
+            final JMenuItem openRefDirItem = new JMenuItem("Open Reference Directory");
+            openRefDirItem.addActionListener((ActionEvent e) -> {
+                try {
+                    Desktop.getDesktop().open(AppConfig.reference);
+                } catch (final Exception ex) {
+                    ex.printStackTrace(AppConfig.logTargetStream);
+                }
+            });
+            this.add(openRefDirItem);
+
+            final JMenuItem openSaveDirItem = new JMenuItem("Open Save Directory");
+            openSaveDirItem.addActionListener((ActionEvent e) -> {
+                try {
+                    Desktop.getDesktop().open(AppConfig.saveTo);
+                } catch (final Exception ex) {
+                    ex.printStackTrace(AppConfig.logTargetStream);
+                }
+            });
+            this.add(openSaveDirItem);
 
             final JMenuItem openNewWindowItem = new JMenuItem("Configuration...");
             openNewWindowItem.addActionListener((ActionEvent e) -> new AppConfig());
@@ -58,8 +90,8 @@ final class TopBarMenu extends JMenuBar {
         }
     }
 
-    private class Window extends JMenu {
-        public Window() {
+    private class WindowTab extends JMenu {
+        public WindowTab() {
             super("Window");
 
             final JMenuItem resetWindowSize = new JMenuItem("Reset window size");
@@ -69,8 +101,8 @@ final class TopBarMenu extends JMenuBar {
         }
     }
 
-    private class Help extends JMenu {
-        public Help() {
+    private class HelpTab extends JMenu {
+        public HelpTab() {
             super("Help");
 
             final JMenuItem appInfoItem = new JMenuItem("About " + Main.appName);
@@ -91,12 +123,12 @@ final class TopBarMenu extends JMenuBar {
             Util.appendLn(sb, Main.appName);
             Util.appendLn(sb, "");
             Util.appendLn(sb,
-                "version: " + Main.appVersion + " (" + Main.gitHEAD + ")");
+                "Version: " + Main.appVersion + " (" + Main.gitHEAD + ")");
             Util.appendLn(sb,
-                "build by: " + Util.insertNewLines(Main.buildBy));
-            Util.appendLn(sb, "build date: " + Main.buildDate);
+                "Build by: " + Util.insertNewLines(Main.buildBy));
+            Util.appendLn(sb, "Build date: " + Main.buildDate);
             Util.appendLn(sb, "");
-            Util.appendLn(sb, "license: " + Main.license);
+            Util.appendLn(sb, "License: " + Main.license);
             sb.append(Main.copyright);
 
             final JTextPane textPane = new JTextPane();

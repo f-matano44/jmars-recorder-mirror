@@ -18,6 +18,7 @@
 
 package jp.f_matano44.jmars_recorder;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,22 +45,26 @@ final class ScriptsManager {
     }
 
     private static final List<String> readFile() {
-        List<String> lines = new ArrayList<>();
+        final List<String> lines = new ArrayList<>();
 
-        try (final var sc = new Scanner(AppConfig.script, StandardCharsets.UTF_8)) {
-            final String splitChars = "[\t,:]";
+        try (
+            final Scanner sc = new Scanner(
+                new FileInputStream(AppConfig.script),
+                StandardCharsets.UTF_8.name())
+            ) {
             while (sc.hasNextLine()) {
-                final String[] parts = sc.nextLine().split(splitChars);
-                final StringBuilder sb = new StringBuilder();
-                for (final String temp : parts) {
-                    Util.appendLn(sb, temp);
+                final String str = sc.nextLine();
+                if (!str.isEmpty()) {
+                    lines.add(str
+                        .replace(":", System.lineSeparator())
+                        .replace(",", System.lineSeparator())
+                    );
                 }
-                lines.add(sb.toString());
             }
         } catch (IOException e) {
             // StackTrace to String
-            final var sw = new StringWriter();
-            final var pw = new PrintWriter(sw);
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             final String stacktrace = sw.toString();
 

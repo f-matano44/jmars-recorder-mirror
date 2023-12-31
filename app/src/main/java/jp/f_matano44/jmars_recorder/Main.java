@@ -67,7 +67,8 @@ public final class Main extends JFrame {
     private final JSlider indexSlider = new JSlider();
     private final JTextField indexLabel = new JTextField("0 / 0");
     private final JButton nextButton = new JButton("Next >>");
-    private final JButton prefButton = new JButton("Play Ref.");
+    private final JButton refButton = new JButton("Play Ref.");
+    private final JButton myRefButton = new JButton("Play My Ref.");
     private final JToggleButton recordButton = new JToggleButton(startButtonString);
     private final JButton playButton = new JButton("Play Rec.");
 
@@ -79,20 +80,18 @@ public final class Main extends JFrame {
     final Dimension defaultWindowDimension;
     public static final int oneRowHeight;
     public static final int textAreaWidth = 60;
-    public static final int panelWidth = 630;
+    public static final int panelWidth = 750;
     public static final Insets defaultInsets = new Insets(0, 0, 0, 0);
     private static final int insetsNum = 4;
     public static final Insets insets
         = new Insets(insetsNum, insetsNum, insetsNum, insetsNum);
     /* application info */
     public static final String appName;
-    public static final String appShortName;
     public static final String appVersion;
     public static final String buildBy;
     public static final String buildDate;
     public static final String gitHEAD;
     public static final String copyright;
-    public static final String javaVersion;
     public static final String license;
 
     static {
@@ -102,13 +101,11 @@ public final class Main extends JFrame {
         oneRowHeight = sampleTextArea.getFontMetrics(sampleTextArea.getFont()).getHeight();
 
         String tempAppName = "unknown";
-        String tempAppShortName = "unknown";
         String tempAppVersion = "unknown";
         String tempBuildBy = "unknown";
         String tempBuildDate = "unknown";
         String tempGitHEAD = "Unknown";
         String tempCopyright = "unknown";
-        String tempJavaVersion = "unknown";
         String tempLicense = "unknown";
         try (InputStream input = Main.class.getClassLoader()
             .getResourceAsStream("build-info.properties")
@@ -116,25 +113,21 @@ public final class Main extends JFrame {
             final Properties prop = new Properties();
             prop.load(input);
             tempAppName = prop.getProperty("app.name");
-            tempAppShortName = prop.getProperty("app.short.name");
             tempAppVersion = prop.getProperty("app.version");
             tempBuildBy = prop.getProperty("build.by");
             tempBuildDate = prop.getProperty("build.date");
             tempGitHEAD = prop.getProperty("git.head");
             tempCopyright = prop.getProperty("copyright");
-            tempJavaVersion = prop.getProperty("java.version");
             tempLicense = prop.getProperty("license");
         } catch (final IOException e) {
             e.printStackTrace();
         }
         appName = tempAppName;
-        appShortName = tempAppShortName;
         appVersion = tempAppVersion;
         buildBy = tempBuildBy;
         buildDate = tempBuildDate;
         gitHEAD = tempGitHEAD;
         copyright = tempCopyright;
-        javaVersion = tempJavaVersion;
         license = tempLicense;
     }
 
@@ -142,7 +135,7 @@ public final class Main extends JFrame {
     private Main() {
         // Window config
         super(Main.appName + " - " + Main.appVersion);
-        final var menuBar = new TopBarMenu(this);
+        final TopBarMenu menuBar = new TopBarMenu(this);
         this.setJMenuBar(menuBar);
 
         this.setComponentAction();
@@ -150,7 +143,7 @@ public final class Main extends JFrame {
         // Script viewer
         Util.setTextAreaSetting(this.scriptTextArea);
         this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-        final var scriptPanel = new JScrollPane(this.scriptTextArea);
+        final JScrollPane scriptPanel = new JScrollPane(this.scriptTextArea);
         scriptPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scriptPanel.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
         final int rows = 9; // ここの数字は決め打ち
@@ -173,11 +166,13 @@ public final class Main extends JFrame {
         this.indexLabel.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
 
         // Recorder panel setting
-        final var recorderPanel = new JPanel(new GridBagLayout());
-        final var recorderGbc = new GridBagConstraints();
+        final JPanel recorderPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints recorderGbc = new GridBagConstraints();
         recorderGbc.insets = Main.insets;
         recorderGbc.gridx = 0;
-        recorderPanel.add(this.prefButton, recorderGbc);
+        recorderPanel.add(this.refButton, recorderGbc);
+        recorderGbc.gridx++;
+        recorderPanel.add(this.myRefButton, recorderGbc);
         recorderGbc.gridx++;
         recorderPanel.add(this.recordButton, recorderGbc);
         recorderGbc.gridx++;
@@ -186,9 +181,9 @@ public final class Main extends JFrame {
         recorderPanel.add(this.nextButton, recorderGbc);
 
         // main panel setting
-        final var mainPanel = new JPanel(new GridBagLayout());
+        final JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
-        final var gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
@@ -205,10 +200,14 @@ public final class Main extends JFrame {
         // Component size setting
         final double buttonHeightRatio = 2.0;
         final double buttonWidthRatio = 1.1;
-        final Dimension prefDimension = this.prefButton.getPreferredSize();
-        prefDimension.height *= buttonHeightRatio;
-        prefDimension.width *= buttonWidthRatio;
-        this.prefButton.setPreferredSize(prefDimension);
+        final Dimension refDimension = this.refButton.getPreferredSize();
+        refDimension.height *= buttonHeightRatio;
+        refDimension.width *= buttonWidthRatio;
+        this.refButton.setPreferredSize(refDimension);
+        final Dimension myRefDimension = this.myRefButton.getPreferredSize();
+        myRefDimension.height *= buttonHeightRatio;
+        myRefDimension.width *= buttonWidthRatio;
+        this.myRefButton.setPreferredSize(myRefDimension);
         final Dimension recordDimension = this.recordButton.getPreferredSize();
         recordDimension.height *= buttonHeightRatio;
         recordDimension.width *= buttonWidthRatio;
@@ -248,7 +247,7 @@ public final class Main extends JFrame {
         this.indexLabel.setEditable(!RecorderBody.isRecording());
         this.indexLabel.setBackground(null);
 
-        this.prefButton.setEnabled(
+        this.refButton.setEnabled(
             !RecorderBody.isRecording()
             && this.pp.isPlayerExist
             && this.pp.list.length > currentIndex
@@ -299,8 +298,12 @@ public final class Main extends JFrame {
             }
         });
 
-        this.prefButton.addActionListener((ActionEvent e) -> 
-            pp.playPreference(currentIndex)
+        this.refButton.addActionListener((ActionEvent e) -> 
+            pp.playReference(currentIndex)
+        );
+
+        this.myRefButton.addActionListener((ActionEvent e) -> 
+            pp.playMyReference()
         );
 
         this.recordButton.addActionListener((ActionEvent e) -> {
