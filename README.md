@@ -7,6 +7,9 @@
 
 ![screenshot](doc/imgs/screenshot.png)
 
+* リポジトリ: https://gitlab.com/f-matano44/jmars-recorder
+* ミラー: https://github.com/f-matano44/jmars-recorder-mirror
+
 
 ## お知らせ
 version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．申し訳ありません．そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
