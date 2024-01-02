@@ -36,7 +36,7 @@ repositories {
 dependencies {
     // for application
     // implementation("groupID:artifactID:version")
-    implementation("com.gitlab.f-matano44:jfloatwavio:2.0.0")
+    implementation("com.gitlab.f-matano44:jfloatwavio:4.0.0")
     implementation("uk.co.caprica:vlcj:4.7.3")
     implementation("org.yaml:snakeyaml:2.2")
 }

@@ -236,7 +236,7 @@ public final class Main extends JFrame {
 
     private void update() {
         this.scriptTextArea.setText(this.sm.getScriptText(currentIndex));
-        final File saveTo = AppConfig.getSavePath(currentIndex);
+        final File saveTo = AppConfig.getSaveFile(currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
         this.scriptTextArea.setBackground(saveTo.exists() ? lightGreen : null);
 

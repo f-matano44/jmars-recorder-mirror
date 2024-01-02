@@ -214,7 +214,7 @@ final class AppConfig extends JFrame {
         this.setVisible(true);
     }
 
-    public static final File getSavePath(final int index) {
+    public static final File getSaveFile(final int index) {
         final int num = index + 1;
         final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
         return new File(saveTo, fileString);
