@@ -3,6 +3,7 @@
 **j**ava **MA**tano's user\-f**R**iendly corpu**S** **Recorder**
 
 * （俺の考えた最強の）音声コーパス収録用レコーダー
+* [JMARS](https://jmars.asu.edu/) などの組織とは関係のない独立したリポジトリです
 * ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
 
 ![screenshot](doc/imgs/screenshot.png)
@@ -11,16 +12,12 @@
 * ミラー: https://github.com/f-matano44/jmars-recorder-mirror
 
 
-## お知らせ
-version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．申し訳ありません．そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
-
-
 ## 起動方法
 
 ### 動作環境
 * Java 8 が動作する GUI 環境（Windows, macOS, Linux etc.）
     * ダウンロード・インストールはこちらから → [\[java.com\]](https://www.java.com/ja/)
-* 後述するリファレンス音声の再生機能を使用するには VLC media player が必要です
+* 後述するリファレンス音声の再生機能を使用するには VLC のインストールが必要です
     * ダウンロード・インストールはこちらから → [\[videolan.org\]](https://www.videolan.org/vlc/index.ja.html)
 * 注意: macOS において，セキュリティ機能によりマイク等が適切に認識されない場合があります．
     * その場合はターミナルから `java -jar` コマンドから実行してください．
@@ -71,6 +68,10 @@ OS 上で設定されたマイク，スピーカーを使用します．PC 上�
 
 ## ライセンス
 ![GPLv3+](doc/imgs/gplv3-or-later.svg)
+
+
+### お知らせ
+version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．申し訳ありません．そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
 
 
 ## 開発者向け情報
