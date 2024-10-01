@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -68,7 +68,7 @@ public final class Main extends JFrame {
     private final JTextField indexLabel = new JTextField("0 / 0");
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
-    private final JButton myRefButton = new JButton("Play My Ref.");
+    private final JButton myRefButton = new JButton("Play No.001");
     private final JToggleButton recordButton = new JToggleButton(startButtonString);
     private final JButton playButton = new JButton("Play Rec.");
 
@@ -256,8 +256,8 @@ public final class Main extends JFrame {
 
         this.recordButton.setSelected(RecorderBody.isRecording());
         this.recordButton.setText(
-            !RecorderBody.isRecording() 
-            ? startButtonString 
+            !RecorderBody.isRecording()
+            ? startButtonString
             : recordingString
         );
 
@@ -298,11 +298,11 @@ public final class Main extends JFrame {
             }
         });
 
-        this.refButton.addActionListener((ActionEvent e) -> 
+        this.refButton.addActionListener((ActionEvent e) ->
             pp.playReference(currentIndex)
         );
 
-        this.myRefButton.addActionListener((ActionEvent e) -> 
+        this.myRefButton.addActionListener((ActionEvent e) ->
             pp.playMyReference()
         );
 

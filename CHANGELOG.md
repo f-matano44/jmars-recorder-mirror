@@ -1,6 +1,11 @@
 # Version History
 
-## version 202401??
+## version 20241001
+
+* UI の修正
+* その他軽微な修正
+
+## version 20240101
 
 * Java 17 から Java 8 への移行
 * 過去の自分の音声を再生する機能を追加

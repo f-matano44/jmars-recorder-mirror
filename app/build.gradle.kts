@@ -15,14 +15,14 @@ import java.util.Date
 import java.util.Properties
 
 val appFullName = "jMARS_Recorder"
-val appVersion = "20240101"
+val appVersion = "20241001"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
 val javaRuntimeVersion = 8
 val license = "GPLv3 (or later)"
 val copyright = "Copyright (C) 2023  Fumiyoshi MATANO"
 
 plugins {
-    // Apply the application plugin 
+    // Apply the application plugin
     // to add support for building a CLI application in Java.
     application
 }
@@ -88,7 +88,7 @@ tasks.jar {
 
     // fat-jar setting
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(configurations.runtimeClasspath.get().map{ 
+    from(configurations.runtimeClasspath.get().map{
         if (it.isDirectory) it else zipTree(it)
     })
 }
