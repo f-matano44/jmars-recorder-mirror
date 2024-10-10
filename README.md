@@ -132,6 +132,7 @@ Git の log を見るとバージョンの命名規則が不規則になって�
 ### ビルド方法
 以下のコマンドを実行すると `app/build/libs/` に `jar` が生成されます．
 
-```
-gradle jar
+```sh
+gradle build  # ビルド情報の作成
+gradle jar  # jar バイナリの作成
 ```
