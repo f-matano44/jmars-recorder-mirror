@@ -58,7 +58,7 @@ public final class Main extends JFrame {
 
     /* member variable */
     static int currentIndex = 0;
-    private final ReferencePlayer pp = new ReferencePlayer();
+    private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final RecorderBody recorder = new RecorderBody();
     private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
@@ -68,7 +68,7 @@ public final class Main extends JFrame {
     private final JTextField indexLabel = new JTextField("0 / 0");
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
-    private final JButton myRefButton = new JButton("Play No.001");
+    private final JButton no001Button = new JButton("Play No.001");
     private final JToggleButton recordButton = new JToggleButton(startButtonString);
     private final JButton playButton = new JButton("Play Rec.");
 
@@ -170,7 +170,7 @@ public final class Main extends JFrame {
         final GridBagConstraints recorderGbc = new GridBagConstraints();
         recorderGbc.insets = Main.insets;
         recorderGbc.gridx = 0;
-        recorderPanel.add(this.myRefButton, recorderGbc);
+        recorderPanel.add(this.no001Button, recorderGbc);
         recorderGbc.gridx++;
         recorderPanel.add(this.refButton, recorderGbc);
         recorderGbc.gridx++;
@@ -204,10 +204,10 @@ public final class Main extends JFrame {
         refDimension.height *= buttonHeightRatio;
         refDimension.width *= buttonWidthRatio;
         this.refButton.setPreferredSize(refDimension);
-        final Dimension myRefDimension = this.myRefButton.getPreferredSize();
+        final Dimension myRefDimension = this.no001Button.getPreferredSize();
         myRefDimension.height *= buttonHeightRatio;
         myRefDimension.width *= buttonWidthRatio;
-        this.myRefButton.setPreferredSize(myRefDimension);
+        this.no001Button.setPreferredSize(myRefDimension);
         final Dimension recordDimension = this.recordButton.getPreferredSize();
         recordDimension.height *= buttonHeightRatio;
         recordDimension.width *= buttonWidthRatio;
@@ -251,9 +251,9 @@ public final class Main extends JFrame {
 
         this.refButton.setEnabled(
             !RecorderBody.isRecording()
-            && this.pp.isPlayerExist
-            && this.pp.list.length > currentIndex
-            && this.pp.list[currentIndex].exists()
+            && this.refPlayer.isPlayerExist
+            && this.refPlayer.list.length > currentIndex
+            && this.refPlayer.list[currentIndex].exists()
         );
 
         this.recordButton.setSelected(RecorderBody.isRecording());
@@ -301,11 +301,11 @@ public final class Main extends JFrame {
         });
 
         this.refButton.addActionListener((ActionEvent e) ->
-            pp.playReference(currentIndex)
+            refPlayer.playReference(currentIndex)
         );
 
-        this.myRefButton.addActionListener((ActionEvent e) ->
-            pp.playMyReference()
+        this.no001Button.addActionListener((ActionEvent e) ->
+            refPlayer.playNumber001()
         );
 
         this.recordButton.addActionListener((ActionEvent e) -> {
