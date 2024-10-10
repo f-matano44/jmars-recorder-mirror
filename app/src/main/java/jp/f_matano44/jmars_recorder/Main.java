@@ -224,6 +224,8 @@ public final class Main extends JFrame {
         // Window setting
         this.pack();
         this.defaultWindowDimension = getSize();
+        defaultWindowDimension.height *= 1.01;
+        defaultWindowDimension.width *= 1.01;
         this.setMinimumSize(this.defaultWindowDimension);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
