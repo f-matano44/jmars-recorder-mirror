@@ -19,7 +19,7 @@ val appVersion = "20241001"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
 val javaRuntimeVersion = 8
 val license = "GPLv3 (or later)"
-val copyright = "Copyright (C) 2023  Fumiyoshi MATANO"
+val copyright = "Copyright 2023 Fumiyoshi MATANO"
 
 plugins {
     // Apply the application plugin
