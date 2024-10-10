@@ -170,9 +170,9 @@ public final class Main extends JFrame {
         final GridBagConstraints recorderGbc = new GridBagConstraints();
         recorderGbc.insets = Main.insets;
         recorderGbc.gridx = 0;
-        recorderPanel.add(this.refButton, recorderGbc);
-        recorderGbc.gridx++;
         recorderPanel.add(this.myRefButton, recorderGbc);
+        recorderGbc.gridx++;
+        recorderPanel.add(this.refButton, recorderGbc);
         recorderGbc.gridx++;
         recorderPanel.add(this.recordButton, recorderGbc);
         recorderGbc.gridx++;
