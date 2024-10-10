@@ -63,6 +63,17 @@ class ReferencePlayer {
         }
     }
 
+    public boolean isNo001Exist() {
+        final File dir = new File(AppConfig.saveTo.getAbsolutePath());
+        final String[] wavFiles = dir.list(new FilenameFilter() {
+            public boolean accept(final File dir, final String name) {
+                return name.toLowerCase().endsWith(".wav");
+            }
+        });
+
+        return 1 <= wavFiles.length;
+    }
+
     public void playReference(final int currentIndex) {
         try {
             this.mediaPlayer.media().play(this.list[currentIndex].getAbsolutePath());

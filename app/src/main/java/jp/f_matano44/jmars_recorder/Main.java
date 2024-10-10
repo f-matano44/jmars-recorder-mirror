@@ -249,6 +249,12 @@ public final class Main extends JFrame {
         this.indexLabel.setEditable(!RecorderBody.isRecording());
         this.indexLabel.setBackground(null);
 
+        this.no001Button.setEnabled(
+            !RecorderBody.isRecording()
+            && this.refPlayer.isPlayerExist
+            && this.refPlayer.isNo001Exist()
+        );
+
         this.refButton.setEnabled(
             !RecorderBody.isRecording()
             && this.refPlayer.isPlayerExist
