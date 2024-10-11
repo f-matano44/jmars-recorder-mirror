@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -65,7 +65,7 @@ final class AppConfig extends JFrame {
         final File defaultReference = new File(basePath, "reference/");
         final File defaultSaveTo = new File(basePath, "wav/");
         final boolean defaultTrimming = true;
-    
+
         final File confFile = new File(System.getProperty("user.home"), confFileName);
 
         AudioFormat fo = null;
@@ -73,11 +73,9 @@ final class AppConfig extends JFrame {
         File re = null;
         File sa = null;
         Boolean tr = null;
-        try {    
-            @SuppressWarnings("unchecked") // もう少し良い方法がありそう
-            final Map<String, Object> conf = (Map<String, Object>) new Yaml().load(
-                new FileInputStream(confFile)
-            );
+        try {
+            final Map<Object, Object>
+                conf = new Yaml().load(new FileInputStream(confFile));
 
             final int fs = (Integer) conf.get(fsKey);
             final int nbits = (Integer) conf.get(nbitsKey);
@@ -87,7 +85,7 @@ final class AppConfig extends JFrame {
             re = new File((String) conf.get(referenceKey));
             sa = new File((String) conf.get(saveToKey));
             tr = (Boolean) conf.get(isTrimmingKey);
-        } catch (FileNotFoundException e) {
+        } catch (final FileNotFoundException e) {
             fo = new AudioFormat(defaultFs, defaultNbits, 1, true, false);
             sc = defaultScript;
             re = defaultReference;
@@ -107,20 +105,20 @@ final class AppConfig extends JFrame {
                 final DumperOptions options = new DumperOptions();
                 options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
                 new Yaml(options).dump(map, fw); // write out
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 unexpectedError(ex);
             }
-        } catch (NullPointerException | ClassCastException e) {
+        } catch (final NullPointerException | ClassCastException e) {
             e.printStackTrace(logTargetStream);
-            String[] messages = {
+            final String[] messages = {
                 "Configuration file (${HOME}/" + confFileName + ") is corrupted.",
                 "Therefore, this application will start in default setting.",
                 "",
                 "If you wish to resolve this issue, delete the config file",
                 "and restart the application. Then, this app will start correctly."
             };
-            StringBuilder message = new StringBuilder();
-            for (String m : messages) {
+            final StringBuilder message = new StringBuilder();
+            for (final String m : messages) {
                 Util.appendLn(message, m);
             }
             JOptionPane.showMessageDialog(
@@ -132,7 +130,7 @@ final class AppConfig extends JFrame {
             re = defaultReference;
             sa = defaultSaveTo;
             tr = defaultTrimming;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             unexpectedError(e);
         }
         format = fo;
@@ -194,7 +192,7 @@ final class AppConfig extends JFrame {
         Util.appendLn(sb, "");
         Util.appendLn(sb, "Trimming");
         Util.appendLn(sb, ">> " + AppConfig.isTrimming);
-        
+
         final JTextArea textArea = new JTextArea(sb.toString());
         Util.changeFont(textArea);
         Util.setTextAreaSetting(textArea);
@@ -220,8 +218,8 @@ final class AppConfig extends JFrame {
         return new File(saveTo, fileString);
     }
 
-    public static void unexpectedError(Exception e) {
-        String[] messages = {
+    public static void unexpectedError(final Exception e) {
+        final String[] messages = {
             "An unexpected error has occurred in loading configure.",
             "Please send the following information to the author:",
             "OS information, Java version, the outputted StackTrace",
@@ -230,7 +228,7 @@ final class AppConfig extends JFrame {
             "X/Twitter: @f_matano44"
         };
         final StringBuilder message = new StringBuilder();
-        for (String m : messages) {
+        for (final String m : messages) {
             Util.appendLn(message, m);
         }
 

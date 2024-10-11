@@ -135,8 +135,7 @@ public final class Main extends JFrame {
     private Main() {
         // Window config
         super(Main.appName + " - " + Main.appVersion);
-        final TopBarMenu menuBar = new TopBarMenu(this);
-        this.setJMenuBar(menuBar);
+        this.setJMenuBar(new TopBarMenu(this));
 
         this.setComponentAction();
 
@@ -283,7 +282,7 @@ public final class Main extends JFrame {
             if (Main.currentIndex < 0 || sm.getScriptSize() <= Main.currentIndex) {
                 throw new Exception("Too small or too big.");
             }
-        } catch (Exception ex) {
+        } catch (final Exception e) {
             Main.currentIndex = currentIdxTemp;
         }
     }
@@ -306,15 +305,15 @@ public final class Main extends JFrame {
             }
         });
 
-        this.refButton.addActionListener((ActionEvent e) ->
+        this.refButton.addActionListener((final ActionEvent e) ->
             refPlayer.playReference(currentIndex)
         );
 
-        this.no001Button.addActionListener((ActionEvent e) ->
+        this.no001Button.addActionListener((final ActionEvent e) ->
             refPlayer.playNumber001()
         );
 
-        this.recordButton.addActionListener((ActionEvent e) -> {
+        this.recordButton.addActionListener((final ActionEvent e) -> {
             try {
                 if (!RecorderBody.isRecording()) {
                     this.recorder.startRecording();
@@ -323,7 +322,7 @@ public final class Main extends JFrame {
                     wfv.add(recorder);
                 }
                 this.update();
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 this.recorder.enforceStopRecording();
                 this.update();
                 ex.printStackTrace(AppConfig.logTargetStream);
