@@ -21,10 +21,11 @@
 
 
 #### 既知の不具合
-* セキュリティ機能によりマイク等が認識されない現象が確認されています（macOS）
+* セキュリティ機能によりマイク等が認識されない現象が確認されました \(macOS\)
     * その場合はターミナルから `java -jar` で実行してください
     * 例：`$ java -jar jMARS_Recorder-20240101.jar`
-* 倍率変更されたディスプレイにおいて表示が崩れる現象が確認されています
+* 倍率変更されたディスプレイにおいて表示が崩れる現象が確認されました \(全環境\)
+    * `Window` \> `Reset window size` で初期状態に復帰します
 
 
 ### jMARS のダウンロード
@@ -37,26 +38,28 @@ jar ファイルをダブルクリックして起動します．
 
 
 ## 収録方法
-本アプリでは専用の保存形式を使用しません．
-標準設定ではデスクトップ（Windows，macOSのみ．それ以外はホームフォルダ）上に `jMARS_Recorder/` フォルダ（以下，プロジェクトフォルダ）と，その内部に保存用フォルダ `jMARS_Recorder/wav/` を生成します．
-収録した音声は保存用フォルダに，番号が割り振られた `wav` 形式として保存します．
+本アプリの標準設定では，デスクトップ（Windows，macOSのみ．それ以外はホームフォルダ）上に
+`jMARS_Recorder/` \(以下，プロジェクトフォルダ\) と，
+`jMARS_Recorder/wav/` \(以下，保存用フォルダ\) を生成します．
+収録された音声は保存用フォルダに，`wav` 形式として保存します．
 
 
 ### マイク・スピーカーの選択方法
 OS 上で設定されたマイク，スピーカーを使用します．
-PC 上の設定アプリから使用する機器を設定してください．
+そのため PC の設定アプリから使用する機器を設定してください．
 アプリ起動中の設定変更も可能です．
 
 
 ### 収録用文章について
-初期設定ではモーラバランスの取れた ROHAN コーパス\[森勢，2023\] の ENDSVILLE400 サブセットを読み込みます．
+初期設定ではモーラバランスの取れた ROHAN コーパス \[森勢，2023\] の ENDSVILLE400 サブセットを読み込みます．
 もし変更したい場合はプロジェクトフォルダ内の `script.txt` を変更してください．
 現在は ITA コーパス形式にのみ対応しています．
 
 
 ### リファレンス音声の再生
-収録を進めているとカタカナ語のような「どのように発音すればよいかわからない」単語に遭遇する場合があります．
-その場合は，すでに収録された音声コーパスをダウンロードし，プロジェクトフォルダ内の `reference/` に `reference/corpus_0001.wav` のような形式で展開してください．
+コーパス収録の際にカタカナ語のような「どのように発音すればよいかわからない」単語が出現する場合があります．
+その場合は，すでに収録された音声コーパスをダウンロードし，
+プロジェクトフォルダ内の `reference/` に `reference/corpus_0001.wav` のような形式で展開してください．
 すると `Play ref.` ボタンが有効化され，リファレンス音声を再生できるようになります．
 
 収録済みの ROHAN コーパスとしては，以下のようなものが挙げられます．
@@ -91,7 +94,7 @@ PC 上の設定アプリから使用する機器を設定してください．
 ## ライセンス
 [![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
-[\[JMARS\]](https://jmars.asu.edu/) や [\[日本メイラード学会（JMARS）\]](http://www.maillard.umin.jp/) などの似た名称の組織・プロジェクト等とは関係ありません.
+[\[JMARS\]](https://jmars.asu.edu/) や [\[日本メイラード学会（JMARS）\]](http://www.maillard.umin.jp/) などの組織・プロジェクトとは関係ありません.
 
 ### 含まれる外部リソース(アルファベット順)
 * [\[Checkstyle for Java / Google Java Style (Apache License Version 2.0)](https://github.com/checkstyle/checkstyle/blob/1de91bc2e79d13860f841e8cddd85fdc54d4c1a4/src/main/resources/google_checks.xml)
@@ -101,18 +104,20 @@ PC 上の設定アプリから使用する機器を設定してください．
 * [\[vlcj (GNU GPL Version 3)\]](https://github.com/caprica/vlcj)
 
 
-### お知らせ
-version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．申し訳ありません．そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
+### 旧バージョン（v20231209）についてのお詫び
+version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．
+申し訳ありません．
+そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
 
 
-## 引用 / Citation
+## 引用するには / Citation
 
-### 日本語 / Japanese
+### 日本語
 > 俣野文義, 森勢将雅,
 ``jMARS Recorder: コーパス朗読に特化した音声収録アプリの制作と検討,’’
 日本音響学会 第 151 回 (2024 年春季) 研究発表会, pp.1061--1062 (2024.03).
 
-### 英語 / English
+### English
 > F. Matano, M. Morise,
 ``jMARS Recorder: Development and consideration of a speech-database-focused recording application,''
 Proceedings of the 2024 Spring meeting of the Acoustical Society of Japan, pp.1061--1062 (2024.03) (in Japanese).
