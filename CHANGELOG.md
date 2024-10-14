@@ -1,9 +1,9 @@
 # Version History
 
-## version 20241001
+## version 20241014
 
 * UI の修正
-* その他軽微な修正
+* その他軽微な修正・バグフィクス
 
 ## version 20240101
 
