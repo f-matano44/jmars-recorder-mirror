@@ -2,7 +2,7 @@
 
 **j**ava **MA**tano's user\-f**R**iendly corpu**S** **Recorder**
 
-* （俺の考えた最強の）音声コーパス収録用レコーダー
+* 音声コーパス収録用レコーダー
 * ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
 
 ![screenshot](doc/imgs/screenshot.png)
@@ -11,85 +11,133 @@
 * ミラー: https://github.com/f-matano44/jmars-recorder-mirror
 
 
-## お知らせ
-version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．申し訳ありません．そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
-
-
 ## 起動方法
 
 ### 動作環境
 * Java 8 が動作する GUI 環境（Windows, macOS, Linux etc.）
-    * ダウンロード・インストールはこちらから → [\[java.com\]](https://www.java.com/ja/)
-* 後述するリファレンス音声の再生機能を使用するには VLC media player が必要です
-    * ダウンロード・インストールはこちらから → [\[videolan.org\]](https://www.videolan.org/vlc/index.ja.html)
-* 注意: macOS において，セキュリティ機能によりマイク等が適切に認識されない場合があります．
-    * その場合はターミナルから `java -jar` コマンドから実行してください．
-    * 例：`java -jar ~/Downloads/jMARS_Recorder-vyyyyMMdd.jar`
+    * ダウンロードはこちらから → [\[java.com\]](https://www.java.com/ja/)
+* リファレンス音声の再生機能を使用するには VLC のインストールが必要です
+    * ダウンロードはこちらから → [\[videolan.org\]](https://www.videolan.org/vlc/index.ja.html)
+
+
+#### 既知の不具合
+* セキュリティ機能によりマイク等が認識されない現象が確認されました \(macOS\)
+    * その場合はターミナルから `java -jar` で実行してください
+    * 例：`$ java -jar jMARS_Recorder-20240101.jar`
+* 倍率変更されたディスプレイにおいて表示が崩れる現象が確認されました \(全環境\)
+    * `Window` \> `Reset window size` で初期状態に復帰します
 
 
 ### jMARS のダウンロード
-一番上のリンクからダウンロード及び解答し，`jMARS_Recorder-vyyyyMMdd.jar` を好きな場所に移動してください．本アプリは直接実行する形式のため，インストールの必要はありません．
+アプリをダウンロード及び展開し，jar ファイルを好きな場所に配置してください．
+本アプリは直接実行する形式のため，インストールはされません．
 
 
 ### 実行
-jar ファイルをダブルクリックして実行します．
+jar ファイルをダブルクリックして起動します．
 
 
 ## 収録方法
-本アプリでは専用の保存形式を使用しません．標準設定ではデスクトップ（Windows，macOSのみ．それ以外はホームフォルダ）上に `jMARS_Recorder/` フォルダ（以下，これをプロジェクトフォルダと呼びます）とその内部に保存用フォルダ `jMARS_Recorder/wav/` を生成して，その中に収録番号を割り振った `wav` を保存します．
+本アプリの標準設定では，デスクトップ（Windows，macOSのみ．それ以外はホームフォルダ）上に
+`jMARS_Recorder/` \(以下，プロジェクトフォルダ\) と，
+`jMARS_Recorder/wav/` \(以下，保存用フォルダ\) を生成します．
+収録された音声は保存用フォルダに，`wav` 形式として保存します．
 
 
 ### マイク・スピーカーの選択方法
-OS 上で設定されたマイク，スピーカーを使用します．PC 上の設定アプリから使用する機器を設定してください．アプリ起動中の設定変更も可能です．
+OS 上で設定されたマイク，スピーカーを使用します．
+そのため PC の設定アプリから使用する機器を設定してください．
+アプリ起動中の設定変更も可能です．
 
 
 ### 収録用文章について
-初期設定ではモーラバランスの取れた ROHAN コーパス\[1\] の ENDSVILLE400 サブセットが起動時に読み込まれます．もし変更したい場合はプロジェクトフォルダ内の `script.txt` を変更してください．現在は ITA コーパス形式にのみ対応しています．
+初期設定ではモーラバランスの取れた ROHAN コーパス \[森勢，2023\] の ENDSVILLE400 サブセットを読み込みます．
+もし変更したい場合はプロジェクトフォルダ内の `script.txt` を変更してください．
+現在は ITA コーパス形式にのみ対応しています．
 
 
 ### リファレンス音声の再生
-収録を進めているとカタカナ語のような「どのように発音すればよいかわからない」単語に出くわす場合があります．その場合は，すでに収録された音声コーパスをダウンロードし，プロジェクトフォルダ内の `reference/` に `reference/corpus_0001.wav` のような形式で展開してください．すると `Play ref.` ボタンが有効化され，リファレンス音声を再生できるようになります．
+コーパス収録の際にカタカナ語のような「どのように発音すればよいかわからない」単語が出現する場合があります．
+その場合は，すでに収録された音声コーパスをダウンロードし，
+プロジェクトフォルダ内の `reference/` に `reference/corpus_0001.wav` のような形式で展開してください．
+すると `Play ref.` ボタンが有効化され，リファレンス音声を再生できるようになります．
 
-収録済みの ROHAN コーパスとしては，以下のようなものが挙げられます．ライセンスの関係上アプリに添付できないため，もし必要な場合は各自でダウンロード・展開してください．
+収録済みの ROHAN コーパスとしては，以下のようなものが挙げられます．
+ライセンス上添付できないため，必要な場合は御自身でダウンロードしてください．
+
 * https://zunko.jp/multimodal_dev/login.php
 * https://voiceseven.com/7rdev/login.php
 
 
 ### 収録
-`Start recording` ボタンを押すと録音開始され，もう一度押すと録音終了します．録音終了時，音声は自動的に発話区間を推定し，保存されます．もし，推定された発話区間が誤っている場合はスライダーを調整して修正してください．`Play` ボタンを押すと，収録された音声の（推定・調整された）発話区間のみが再生されます．
+`Start recording` ボタンを押すと録音開始され，もう一度押すと録音終了します．
+録音終了時，音声は自動的に発話区間を推定し，保存されます．
+もし，推定された発話区間が誤っている場合はスライダーを調整して修正してください．
+`Play` ボタンを押すと，収録された音声の（推定・調整された）発話区間のみが再生されます．
 
-再度録音する場合はもう一度 `Start recording` ボタンを押してください．その時，先に収録したデータはメモリ上に蓄積されたままとなります．聴き比べる場合は `<< Prev` & `Next >>` ボタンを使用してください．過去の収録を呼び出した場合，現在表示されている波形のデータが自動的に保存されます．
+再度録音する場合はもう一度 `Start recording` ボタンを押してください．
+その時，先に収録したデータはメモリ上に蓄積されたままとなります．
+聴き比べる場合は `< Prev` ボタン， `Next >` ボタンを使用してください．
+過去の収録を呼び出した場合も，現在表示されている波形のデータが自動的に保存されます．
 
 
 ### Next >>
-次の文を収録する場合は `Next >>` ボタンを押してください．ただし現在の文章に対する録音データは保存されたもの（つまり現在表示されているもの）以外は破棄されます．
+次の文を収録する場合は `Next >>` ボタンを押してください．
+ただし現在の文章に対する録音データは保存されたもの（つまり現在表示されているもの）以外は破棄されます．
 
 
-## 上級者向け情報
-アプリの設定を変更したい場合は `${HOME}/.jmars_recorder.yaml` を編集してください．ただしこちらの設定に関しては，再起動するまで有効化されません．設定変更後，再起動してください．
+### 上級者向け情報
+アプリの設定を変更したい場合は `${HOME}/.jmars_recorder.yaml` を編集してください．
+設定変更後は再起動の必要があります．
 
 
 ## ライセンス
-![GPLv3+](doc/imgs/gplv3-or-later.svg)
+[![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+
+[\[JMARS\]](https://jmars.asu.edu/) や [\[日本メイラード学会（JMARS）\]](http://www.maillard.umin.jp/) などの組織・プロジェクトとは関係ありません.
+
+### 含まれる外部リソース(アルファベット順)
+* [\[Checkstyle for Java / Google Java Style (Apache License Version 2.0)](https://github.com/checkstyle/checkstyle/blob/1de91bc2e79d13860f841e8cddd85fdc54d4c1a4/src/main/resources/google_checks.xml)
+* [\[jFloatWavIO (GNU LGPL Version 3)\]](https://gitlab.com/f-matano44/jfloatwavio)
+* [\[ROHAN コーパス (CC0)\]](https://github.com/mmorise/rohan4600)
+* [\[SnakeYAML (Apache License Version 2.0)\]](https://bitbucket.org/snakeyaml/snakeyaml/)
+* [\[vlcj (GNU GPL Version 3)\]](https://github.com/caprica/vlcj)
+
+
+### 旧バージョン（v20231209）についてのお詫び
+version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．
+申し訳ありません．
+そのためお手数ですが，version 20231209 を使用している方がいらっしゃいましたらアプリの更新（jar ファイルの置き換え）をお願いします．
+
+
+## 引用するには / Citation
+
+### 日本語
+> 俣野文義, 森勢将雅,
+``jMARS Recorder: コーパス朗読に特化した音声収録アプリの制作と検討,’’
+日本音響学会 第 151 回 (2024 年春季) 研究発表会, pp.1061--1062 (2024.03).
+
+### English
+> F. Matano, M. Morise,
+``jMARS Recorder: Development and consideration of a speech-database-focused recording application,''
+Proceedings of the 2024 Spring meeting of the Acoustical Society of Japan, pp.1061--1062 (2024.03) (in Japanese).
 
 
 ## 開発者向け情報
-Git の log を見るとバージョンの命名規則が最悪なことになっていますが，それは開発時のアプリ名が現在と違ったこと（と公開直前まで命名規則に悩んでいたこと）に由来します．またソースコード内に違ったアプリ名があった場合も同じです．あまり気にしないでください，
+Git の log を見るとバージョンの命名規則が不規則になっていますが，開発時は現在と違ったこと（及び公開直前まで命名規則に悩んでいたこと）に由来します．
+またソースコード内に違ったアプリ名があった場合も同様ですので，気にしないでください，
 
 
 ### 開発環境
-* macOS 14
 * Gradle \(Kotlin DSL\)
-* Java 8 Compatibility Mode in Java 17
-* [VSCodium](https://github.com/VSCodium/vscodium) + [Checkstyle for Java](https://github.com/jdneo/vscode-checkstyle)
+* Java 8 互換モード \(Java 17\)
+* [\[VSCodium\]](https://github.com/VSCodium/vscodium) + [\[Checkstyle for Java\]](https://github.com/jdneo/vscode-checkstyle)
 
 
 ### ビルド方法
-以下のコマンドを実行すると `app/build/libs/` に jar が生成されます．
+以下のコマンドを実行すると `app/build/libs/` に `jar` が生成されます．
 
+```sh
+gradle build  # ビルド情報の作成
+gradle jar  # jar バイナリの作成
 ```
-gradle jar
-``` 
-
-## 参考文献
-1. 森勢将雅：ROHAN：テキスト音声合成に向けたモーラバランス型日本語コーパス，日本音響学会誌, vol. 79, no. 1, pp. 9-17, Jan. 2023.

@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -58,7 +58,7 @@ public final class Main extends JFrame {
 
     /* member variable */
     static int currentIndex = 0;
-    private final ReferencePlayer pp = new ReferencePlayer();
+    private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final RecorderBody recorder = new RecorderBody();
     private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
@@ -68,7 +68,7 @@ public final class Main extends JFrame {
     private final JTextField indexLabel = new JTextField("0 / 0");
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
-    private final JButton myRefButton = new JButton("Play My Ref.");
+    private final JButton no001Button = new JButton("Play No.001");
     private final JToggleButton recordButton = new JToggleButton(startButtonString);
     private final JButton playButton = new JButton("Play Rec.");
 
@@ -135,8 +135,7 @@ public final class Main extends JFrame {
     private Main() {
         // Window config
         super(Main.appName + " - " + Main.appVersion);
-        final TopBarMenu menuBar = new TopBarMenu(this);
-        this.setJMenuBar(menuBar);
+        this.setJMenuBar(new TopBarMenu(this));
 
         this.setComponentAction();
 
@@ -170,9 +169,9 @@ public final class Main extends JFrame {
         final GridBagConstraints recorderGbc = new GridBagConstraints();
         recorderGbc.insets = Main.insets;
         recorderGbc.gridx = 0;
-        recorderPanel.add(this.refButton, recorderGbc);
+        recorderPanel.add(this.no001Button, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.myRefButton, recorderGbc);
+        recorderPanel.add(this.refButton, recorderGbc);
         recorderGbc.gridx++;
         recorderPanel.add(this.recordButton, recorderGbc);
         recorderGbc.gridx++;
@@ -204,10 +203,10 @@ public final class Main extends JFrame {
         refDimension.height *= buttonHeightRatio;
         refDimension.width *= buttonWidthRatio;
         this.refButton.setPreferredSize(refDimension);
-        final Dimension myRefDimension = this.myRefButton.getPreferredSize();
+        final Dimension myRefDimension = this.no001Button.getPreferredSize();
         myRefDimension.height *= buttonHeightRatio;
         myRefDimension.width *= buttonWidthRatio;
-        this.myRefButton.setPreferredSize(myRefDimension);
+        this.no001Button.setPreferredSize(myRefDimension);
         final Dimension recordDimension = this.recordButton.getPreferredSize();
         recordDimension.height *= buttonHeightRatio;
         recordDimension.width *= buttonWidthRatio;
@@ -224,6 +223,8 @@ public final class Main extends JFrame {
         // Window setting
         this.pack();
         this.defaultWindowDimension = getSize();
+        defaultWindowDimension.height *= 1.01;
+        defaultWindowDimension.width *= 1.01;
         this.setMinimumSize(this.defaultWindowDimension);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
@@ -236,7 +237,7 @@ public final class Main extends JFrame {
 
     private void update() {
         this.scriptTextArea.setText(this.sm.getScriptText(currentIndex));
-        final File saveTo = AppConfig.getSavePath(currentIndex);
+        final File saveTo = AppConfig.getSaveFile(currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
         this.scriptTextArea.setBackground(saveTo.exists() ? lightGreen : null);
 
@@ -247,17 +248,23 @@ public final class Main extends JFrame {
         this.indexLabel.setEditable(!RecorderBody.isRecording());
         this.indexLabel.setBackground(null);
 
+        this.no001Button.setEnabled(
+            !RecorderBody.isRecording()
+            && this.refPlayer.isPlayerExist
+            && this.refPlayer.isNo001Exist()
+        );
+
         this.refButton.setEnabled(
             !RecorderBody.isRecording()
-            && this.pp.isPlayerExist
-            && this.pp.list.length > currentIndex
-            && this.pp.list[currentIndex].exists()
+            && this.refPlayer.isPlayerExist
+            && this.refPlayer.list.length > currentIndex
+            && this.refPlayer.list[currentIndex].exists()
         );
 
         this.recordButton.setSelected(RecorderBody.isRecording());
         this.recordButton.setText(
-            !RecorderBody.isRecording() 
-            ? startButtonString 
+            !RecorderBody.isRecording()
+            ? startButtonString
             : recordingString
         );
 
@@ -275,7 +282,7 @@ public final class Main extends JFrame {
             if (Main.currentIndex < 0 || sm.getScriptSize() <= Main.currentIndex) {
                 throw new Exception("Too small or too big.");
             }
-        } catch (Exception ex) {
+        } catch (final Exception e) {
             Main.currentIndex = currentIdxTemp;
         }
     }
@@ -298,15 +305,15 @@ public final class Main extends JFrame {
             }
         });
 
-        this.refButton.addActionListener((ActionEvent e) -> 
-            pp.playReference(currentIndex)
+        this.refButton.addActionListener((final ActionEvent e) ->
+            refPlayer.playReference(currentIndex)
         );
 
-        this.myRefButton.addActionListener((ActionEvent e) -> 
-            pp.playMyReference()
+        this.no001Button.addActionListener((final ActionEvent e) ->
+            refPlayer.playNumber001()
         );
 
-        this.recordButton.addActionListener((ActionEvent e) -> {
+        this.recordButton.addActionListener((final ActionEvent e) -> {
             try {
                 if (!RecorderBody.isRecording()) {
                     this.recorder.startRecording();
@@ -315,7 +322,7 @@ public final class Main extends JFrame {
                     wfv.add(recorder);
                 }
                 this.update();
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 this.recorder.enforceStopRecording();
                 this.update();
                 ex.printStackTrace(AppConfig.logTargetStream);

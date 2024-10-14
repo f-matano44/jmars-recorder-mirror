@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -56,9 +56,9 @@ final class WaveFormViewer extends JPanel {
     private int recsIndex = 0;
     public final List<RecorderBody> recs = new ArrayList<>();
 
-    private final JButton prevButton = new JButton("<< Prev");
+    private final JButton prevButton = new JButton("< Prev");
     private final JTextField indexLabel = new JTextField("0 / 0");
-    private final JButton nextButton = new JButton("Next >>");
+    private final JButton nextButton = new JButton("Next >");
     private final JSlider startSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
     private final JSlider endSlider = new JSlider(
@@ -263,7 +263,7 @@ final class WaveFormViewer extends JPanel {
         this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
         this.sPanel.resetSignal();
         this.recInfoViewer.setText(getRecInfo(
-            "----", 
+            "----",
             "----"
         ));
         this.indexLabel.setText("0 / 0");
@@ -275,7 +275,7 @@ final class WaveFormViewer extends JPanel {
 
     private class SignalPanel extends JPanel {
         private double[] signal;
-    
+
         public SignalPanel() {
             this.signal = defaultSignal;
             setPreferredSize(new Dimension(sPanelWidth, sPanelHeight));
@@ -289,7 +289,7 @@ final class WaveFormViewer extends JPanel {
             this.signal = newSignal;
             repaint();
         }
-    
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -311,7 +311,7 @@ final class WaveFormViewer extends JPanel {
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(1));
             g2d.drawLine(0, sPanelHeight / 2, sPanelWidth, sPanelHeight / 2);
-            
+
             if (1 < this.signal.length) {
                 final Path2D path = new Path2D.Double();
                 final double y0 = sPanelHeight / 2.0 - (sPanelHeight * signal[0]) / 2.0;

@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JOptionPane;
 import jp.f_matano44.jfloatwavio.Converter;
+import jp.f_matano44.jfloatwavio.WavIO;
 
 final class RecorderBody implements Cloneable {
     /* Constant */
@@ -209,15 +209,16 @@ final class RecorderBody implements Cloneable {
     public final void saveSignalAsWav(
         final double startPercent, final double endPercent
     ) {
-        final byte[] signal = this.getPartOfByteSignal(startPercent, endPercent);
-        try (
-            final AudioInputStream ais = new AudioInputStream(
-                new ByteArrayInputStream(signal), AppConfig.format,
-                signal.length / AppConfig.format.getFrameSize()
-            )
-        ) {
-            final File file = AppConfig.getSavePath(Main.currentIndex);
-            AudioSystem.write(ais, AudioFileFormat.Type.WAVE, file);
+        final File targetFile = AppConfig.getSaveFile(Main.currentIndex);
+        final int nbits = AppConfig.format.getSampleSizeInBits();
+        final float fs = AppConfig.format.getSampleRate();
+        final double[] allSignal = this.getDoubleSignal();
+        final double[] saveSignal = Arrays.copyOfRange(
+            allSignal,
+            (int) (allSignal.length * startPercent),
+            (int) (allSignal.length * endPercent));
+        try {
+            WavIO.write(targetFile, nbits, fs, saveSignal);
         } catch (Exception e) {
             e.printStackTrace(AppConfig.logTargetStream);
             JOptionPane.showMessageDialog(

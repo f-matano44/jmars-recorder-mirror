@@ -15,14 +15,14 @@ import java.util.Date
 import java.util.Properties
 
 val appFullName = "jMARS_Recorder"
-val appVersion = "20240101"
+val appVersion = "20241014"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
 val javaRuntimeVersion = 8
 val license = "GPLv3 (or later)"
-val copyright = "Copyright (C) 2023  Fumiyoshi MATANO"
+val copyright = "Copyright 2023 Fumiyoshi MATANO"
 
 plugins {
-    // Apply the application plugin 
+    // Apply the application plugin
     // to add support for building a CLI application in Java.
     application
 }
@@ -36,9 +36,9 @@ repositories {
 dependencies {
     // for application
     // implementation("groupID:artifactID:version")
-    implementation("com.gitlab.f-matano44:jfloatwavio:2.0.0")
+    implementation("com.gitlab.f-matano44:jfloatwavio:4.0.0")
     implementation("uk.co.caprica:vlcj:4.7.3")
-    implementation("org.yaml:snakeyaml:2.2")
+    implementation("org.yaml:snakeyaml:2.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -88,7 +88,7 @@ tasks.jar {
 
     // fat-jar setting
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(configurations.runtimeClasspath.get().map{ 
+    from(configurations.runtimeClasspath.get().map{
         if (it.isDirectory) it else zipTree(it)
     })
 }
