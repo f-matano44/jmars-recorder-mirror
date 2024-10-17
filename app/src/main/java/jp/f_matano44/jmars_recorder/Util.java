@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -21,7 +21,7 @@ package jp.f_matano44.jmars_recorder;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-// import java.awt.FontFormatException;
+import java.awt.FontFormatException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,20 +44,31 @@ final class Util {
         }
     }
 
-    public static final void changeFont(Component component) {
-        final Font font = new Font(Font.MONOSPACED, Font.PLAIN, 15);
+    public static final void changeFont(Component component, final int fontSize) {
+        Font font = null;
+        try (
+            final InputStream input = Main.class.getClassLoader()
+                .getResourceAsStream("VL-PGothic-Regular.ttf")
+        ) {
+            font = Font.createFont(Font.TRUETYPE_FONT, input)
+                .deriveFont(Font.BOLD, (float) fontSize);
+        } catch (final FontFormatException | IOException e) {
+
+            font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
+        }
+
         component.setFont(font);
         if (component instanceof Container) {
             for (Component child : ((Container) component).getComponents()) {
-                changeFont(child);
+                changeFont(child, fontSize);
             }
         }
     }
 
     public static final void setTextAreaSetting(JTextArea textArea) {
-        Util.changeFont(textArea);
-        textArea.setWrapStyleWord(true);   
-        textArea.setLineWrap(true);        
+        Util.changeFont(textArea, AppConfig.fontSize);
+        textArea.setWrapStyleWord(true);
+        textArea.setLineWrap(true);
         textArea.setEditable(false);
         textArea.setFocusable(false);
         textArea.setBackground(null);
