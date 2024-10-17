@@ -96,12 +96,13 @@ OS 上で設定されたマイク，スピーカーを使用します．
 
 [\[JMARS\]](https://jmars.asu.edu/) や [\[日本メイラード学会（JMARS）\]](http://www.maillard.umin.jp/) などの組織・プロジェクトとは関係ありません.
 
-### 含まれる外部リソース(アルファベット順)
+### 含まれる外部プロジェクト(アルファベット順)
 * [\[Checkstyle for Java / Google Java Style (Apache License Version 2.0)](https://github.com/checkstyle/checkstyle/blob/1de91bc2e79d13860f841e8cddd85fdc54d4c1a4/src/main/resources/google_checks.xml)
 * [\[jFloatWavIO (GNU LGPL Version 3)\]](https://gitlab.com/f-matano44/jfloatwavio)
 * [\[ROHAN コーパス (CC0)\]](https://github.com/mmorise/rohan4600)
 * [\[SnakeYAML (Apache License Version 2.0)\]](https://bitbucket.org/snakeyaml/snakeyaml/)
 * [\[vlcj (GNU GPL Version 3)\]](https://github.com/caprica/vlcj)
+* [\[VL-PGothic (Modified BSD License)\]](https://github.com/daisukesuzuki/VLGothic/blob/main/LICENSE.ja)
 
 
 ### 旧バージョン（v20231209）についてのお詫び
