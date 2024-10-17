@@ -137,7 +137,7 @@ final class TopBarMenu extends JMenuBar {
             SimpleAttributeSet center = new SimpleAttributeSet();
             StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
             doc.setParagraphAttributes(0, doc.getLength(), center, false);
-            Util.changeFont(textPane);
+            Util.changeFont(textPane, AppConfig.fontSize);
             textPane.setEditable(false);
             textPane.setFocusable(false);
             textPane.setBackground(null);
@@ -163,7 +163,8 @@ final class TopBarMenu extends JMenuBar {
 
             final StringBuilder sb = new StringBuilder();
             final String[] libs
-                = {"jFloatWavIO", "ROHAN", "SnakeYAML", "vlcj"};
+                = {"jFloatWavIO", "LICENSE_E.mplus", "ROHAN",
+                    "SnakeYAML", "vlcj", "VLGothic.en"};
             for (final String lib : libs) {
                 final InputStream is = TopBarMenu.class.getClassLoader()
                     .getResourceAsStream("3rdPartyNOTICEs/" + lib + ".txt");
@@ -193,7 +194,7 @@ final class TopBarMenu extends JMenuBar {
             final int blank = 20;
             scrollPane.setBorder(new EmptyBorder(blank, blank, blank, blank));
 
-            Util.changeFont(scrollPane);
+            Util.changeFont(scrollPane, AppConfig.fontSize);
             this.add(scrollPane);
 
             // Window setting

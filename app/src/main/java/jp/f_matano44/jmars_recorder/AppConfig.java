@@ -44,6 +44,7 @@ final class AppConfig extends JFrame {
     public static final File saveTo;
     public static final boolean isTrimming;
     public static final PrintStream logTargetStream = System.out;
+    public static final int fontSize = 16;
     private static final String confFileName = "." + Main.appName + ".yaml";
 
     static {
@@ -194,7 +195,7 @@ final class AppConfig extends JFrame {
         Util.appendLn(sb, ">> " + AppConfig.isTrimming);
 
         final JTextArea textArea = new JTextArea(sb.toString());
-        Util.changeFont(textArea);
+        Util.changeFont(textArea, AppConfig.fontSize);
         Util.setTextAreaSetting(textArea);
         textArea.setWrapStyleWord(false);
         textArea.setEditable(false);
