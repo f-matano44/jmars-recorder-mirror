@@ -5,7 +5,7 @@
 * 音声コーパス収録用レコーダー
 * ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
 
-![screenshot](doc/imgs/screenshot.png)
+![macOS 上で動作している開発版アプリのスクリーンショット](doc/imgs/screenshot.png)
 
 * リポジトリ: https://gitlab.com/f-matano44/jmars-recorder
 * ミラー: https://github.com/f-matano44/jmars-recorder-mirror
@@ -104,6 +104,10 @@ OS 上で設定されたマイク，スピーカーを使用します．
 * [\[vlcj (GNU GPL Version 3)\]](https://github.com/caprica/vlcj)
 * [\[VL-PGothic (Modified BSD License)\]](https://github.com/daisukesuzuki/VLGothic/blob/main/LICENSE.ja)
 
+### アプリのスクリーンショットについて
+README 内のスクリーンショットは
+[\[Apple商標および著作権使用に関するガイドライン\]](https://www.apple.com/jp/legal/intellectual-property/guidelinesfor3rdparties.html)
+の **Apple製品の描写** に基づき使用しています。
 
 ### 旧バージョン（v20231209）についてのお詫び
 version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．
@@ -139,6 +143,5 @@ Git の log を見るとバージョンの命名規則が不規則になって�
 以下のコマンドを実行すると `app/build/libs/` に `jar` が生成されます．
 
 ```sh
-gradle build  # ビルド情報の作成
-gradle jar  # jar バイナリの作成
+gradle build jar
 ```
