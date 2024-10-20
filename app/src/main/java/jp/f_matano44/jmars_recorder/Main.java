@@ -63,6 +63,7 @@ public final class Main extends JFrame {
     private final ScriptsManager sm = new ScriptsManager();
 
     private final JTextArea scriptTextArea = new JTextArea();
+    private final JScrollPane scriptPanel = new JScrollPane();
     private final JSlider indexSlider = new JSlider();
     private final JTextField indexLabel = new JTextField("0 / 0");
     private final JButton nextButton = new JButton("Next >>");
@@ -150,7 +151,7 @@ public final class Main extends JFrame {
         // Script viewer
         Util.setTextAreaSetting(this.scriptTextArea);
         this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-        final JScrollPane scriptPanel = new JScrollPane(this.scriptTextArea);
+        scriptPanel.setViewportView(this.scriptTextArea);
         scriptPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scriptPanel.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
         final int rows = 9; // ここの数字は決め打ち
