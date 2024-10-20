@@ -56,8 +56,7 @@ public final class Main extends JFrame {
     }
 
 
-    /* member variable */
-    static int currentIndex = 0;
+    // MARK: Components
     private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final RecorderBody recorder = new RecorderBody();
     private final WaveFormViewer wfv = new WaveFormViewer();
@@ -73,9 +72,13 @@ public final class Main extends JFrame {
     private final JButton playButton = new JButton("Play Rec.");
 
 
-    /* constant */
+    // MARK: Member variable
+    static int currentIndex = 0;
+
+
+    // MARK: Constants
     private static final String startButtonString = "Start recording";
-    private static final String recordingString   = " Stop and Save ";
+    private static final String recordingString   = "Stop and Save";
     public static final int lineBorderThickness = 1;
     final Dimension defaultWindowDimension;
     public static final int oneRowHeight;
@@ -85,7 +88,9 @@ public final class Main extends JFrame {
     private static final int insetsNum = 4;
     public static final Insets insets
         = new Insets(insetsNum, insetsNum, insetsNum, insetsNum);
-    /* application info */
+
+
+    // MARK: application info
     public static final String appName;
     public static final String appVersion;
     public static final String buildBy;
@@ -94,6 +99,8 @@ public final class Main extends JFrame {
     public static final String copyright;
     public static final String license;
 
+
+    // MARK: Static initializer
     static {
         final JTextArea sampleTextArea = new JTextArea("Sample string");
         Util.setTextAreaSetting(sampleTextArea);
@@ -132,6 +139,7 @@ public final class Main extends JFrame {
     }
 
 
+    // MARK: Constructor
     private Main() {
         // Window config
         super(Main.appName + " - " + Main.appVersion);
@@ -235,6 +243,11 @@ public final class Main extends JFrame {
         this.update();
     }
 
+
+    // MARK: Def of component
+
+
+    // MARK: Method
     private void update() {
         this.scriptTextArea.setText(this.sm.getScriptText(currentIndex));
         final File saveTo = AppConfig.getSaveFile(currentIndex);
@@ -273,6 +286,7 @@ public final class Main extends JFrame {
         this.nextButton.setEnabled(!RecorderBody.isRecording());
     }
 
+
     private void setIndexFromIndexViewer() {
         final int currentIdxTemp = Main.currentIndex;
         try {
@@ -286,6 +300,7 @@ public final class Main extends JFrame {
             Main.currentIndex = currentIdxTemp;
         }
     }
+
 
     private void setComponentAction() {
         this.indexSlider.addChangeListener((ChangeEvent e) -> {
