@@ -62,8 +62,7 @@ public final class Main extends JFrame {
     private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
 
-    private final JTextArea scriptTextArea = new JTextArea();
-    private final JScrollPane scriptPanel = new JScrollPane();
+    private final ScriptPanel scriptPanel = new ScriptPanel();
     private final JSlider indexSlider = new JSlider();
     private final JTextField indexLabel = new JTextField("0 / 0");
     private final JButton nextButton = new JButton("Next >>");
@@ -147,18 +146,6 @@ public final class Main extends JFrame {
         this.setJMenuBar(new TopBarMenu(this));
 
         this.setComponentAction();
-
-        // Script viewer
-        Util.setTextAreaSetting(this.scriptTextArea);
-        this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-        scriptPanel.setViewportView(this.scriptTextArea);
-        scriptPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scriptPanel.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
-        final int rows = 9; // ここの数字は決め打ち
-        scriptPanel.setPreferredSize(
-            new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
-        // this.scriptTextArea.setRows(rows);
-        // this.scriptTextArea.setColumns(Main.textAreaWidth);
 
         // Index slider
         this.indexSlider.setMinimum(0);
@@ -246,14 +233,37 @@ public final class Main extends JFrame {
 
 
     // MARK: Def of component
+    private class ScriptPanel extends JScrollPane {
+        private final JTextArea scriptTextArea = new JTextArea();
+
+        public ScriptPanel() {
+            Util.setTextAreaSetting(this.scriptTextArea);
+            this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+            this.setViewportView(this.scriptTextArea);
+            this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
+            final int rows = 9; // ここの数字は決め打ち
+            this.setPreferredSize(new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
+            // this.scriptTextArea.setRows(rows);
+            // this.scriptTextArea.setColumns(Main.textAreaWidth);
+        }
+
+        public void updateText(final String str) {
+            this.scriptTextArea.setText(str);
+        }
+
+        public void updateColor(final Color color) {
+            this.scriptTextArea.setBackground(color);
+        }
+    }
 
 
     // MARK: Method
     private void update() {
-        this.scriptTextArea.setText(this.sm.getScriptText(currentIndex));
         final File saveTo = AppConfig.getSaveFile(currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
-        this.scriptTextArea.setBackground(saveTo.exists() ? lightGreen : null);
+        this.scriptPanel.updateText(this.sm.getScriptText(currentIndex));
+        this.scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
 
         this.indexSlider.setValue(currentIndex);
         this.indexSlider.setEnabled(!RecorderBody.isRecording());
