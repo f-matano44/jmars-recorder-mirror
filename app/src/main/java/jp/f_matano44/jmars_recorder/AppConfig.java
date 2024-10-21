@@ -44,7 +44,7 @@ final class AppConfig extends JFrame {
     public static final File saveTo;
     public static final boolean isTrimming;
     public static final PrintStream logTargetStream = System.out;
-    public static final int fontSize = 16;
+    public static final int fontSize = 15;
     private static final String confFileName = "." + Main.appName + ".yaml";
 
     static {

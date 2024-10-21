@@ -53,7 +53,6 @@ final class Util {
             font = Font.createFont(Font.TRUETYPE_FONT, input)
                 .deriveFont(Font.BOLD, (float) fontSize);
         } catch (final FontFormatException | IOException e) {
-
             font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
         }
 

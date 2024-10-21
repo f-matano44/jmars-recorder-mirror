@@ -46,7 +46,7 @@ import javax.swing.event.ChangeListener;
 
 final class WaveFormViewer extends JPanel {
     private static final int sPanelWidth = Main.panelWidth - 14;
-    private static final int sPanelHeight = 225;
+    private static final int sPanelHeight = 200;
     private static final int sliderMin = 0;
     private static final int sliderMax = sPanelWidth;
     private static final int defaultStart = sliderMax / 4;
