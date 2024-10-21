@@ -197,9 +197,12 @@ public final class Main extends JFrame {
         final int buttonHeight = this.recordButton.getPreferredSize().height * 2;
         // Set dimention: Start recording
         final double buttonWidthRatio = 1.1;
-        final Dimension recordDimension = this.recordButton.getPreferredSize();
+        final Dimension recordDimension = new Dimension();
         recordDimension.height = buttonHeight;
-        recordDimension.width *= buttonWidthRatio;
+        recordDimension.width = Math.max(
+            (int) (this.recordButton.getPreferredSize().width * buttonWidthRatio),
+            this.indexLabel.getPreferredSize().width
+        );
         this.recordButton.setPreferredSize(recordDimension);
         // Get other button width
         final int[] widthList = new int[4];
