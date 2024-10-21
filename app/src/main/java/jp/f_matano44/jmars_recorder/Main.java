@@ -64,6 +64,7 @@ public final class Main extends JFrame {
     private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
     // Swing
+    private final RecIndicator recIndicator = new RecIndicator();
     private final ScriptPanel scriptPanel = new ScriptPanel();
     private final IndexSlider indexSlider = new IndexSlider(this.sm.getScriptSize() - 1);
     private final IndexLabel indexLabel = new IndexLabel(this.sm.getScriptSize());
@@ -105,7 +106,7 @@ public final class Main extends JFrame {
     // MARK: Static initializer
     static {
         final JTextArea sampleTextArea = new JTextArea("Sample string");
-        Util.setTextAreaSetting(sampleTextArea);
+        Util.setTextViewerSetting(sampleTextArea);
         sampleTextArea.setRows(1);
         oneRowHeight = sampleTextArea.getFontMetrics(sampleTextArea.getFont()).getHeight();
 
@@ -167,9 +168,13 @@ public final class Main extends JFrame {
 
         // main panel setting
         final JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
+        mainPanel.setBorder(new EmptyBorder(10 - insetsNum, 15, 20, 15));
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
+        gbc.insets = Main.insets;
+        mainPanel.add(recIndicator, gbc);
+        gbc.gridy++;
+        gbc.insets = Main.defaultInsets;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
         mainPanel.add(this.indexSlider, gbc);
@@ -184,6 +189,11 @@ public final class Main extends JFrame {
         this.add(mainPanel);
 
         // Component size setting
+        // Recording indicator
+        final Dimension recIndicatorDimension = this.recIndicator.getPreferredSize();
+        recIndicatorDimension.height *= 1.2;
+        this.recIndicator.setPreferredSize(recIndicatorDimension);
+        // Buttons
         final int buttonHeight = this.recordButton.getPreferredSize().height * 2;
         // Set dimention: Start recording
         final double buttonWidthRatio = 1.1;
@@ -222,11 +232,33 @@ public final class Main extends JFrame {
 
 
     // MARK: Def of component
+    private static class RecIndicator extends JTextField {
+        public RecIndicator() {
+            this.setEditable(false);
+            this.setFocusable(false);
+            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
+            this.setColumns(Main.textAreaWidth / 3);
+        }
+
+        public void setRed() {
+            this.setHorizontalAlignment(SwingConstants.CENTER);
+            this.setText("** RECORDING **");
+            this.setForeground(Color.WHITE);
+            this.setBackground(Color.RED);
+        }
+
+        public void setNull() {
+            this.setText("");
+            this.setBackground(null);
+        }
+    }
+
+
     private static class ScriptPanel extends JScrollPane {
         private final JTextArea scriptTextArea = new JTextArea();
 
         public ScriptPanel() {
-            Util.setTextAreaSetting(this.scriptTextArea);
+            Util.setTextViewerSetting(this.scriptTextArea);
             this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
             this.setViewportView(this.scriptTextArea);
             this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -288,6 +320,12 @@ public final class Main extends JFrame {
 
     // MARK: Methods
     private void update() {
+        if (RecorderBody.isRecording()) {
+            recIndicator.setRed();
+        } else {
+            recIndicator.setNull();
+        }
+
         final File saveTo = AppConfig.getSaveFile(currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
         this.scriptPanel.updateText(this.sm.getScriptText(currentIndex));

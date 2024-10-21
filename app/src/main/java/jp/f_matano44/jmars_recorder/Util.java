@@ -64,7 +64,7 @@ final class Util {
         }
     }
 
-    public static final void setTextAreaSetting(JTextArea textArea) {
+    public static final void setTextViewerSetting(JTextArea textArea) {
         Util.changeFont(textArea, AppConfig.fontSize);
         textArea.setWrapStyleWord(true);
         textArea.setLineWrap(true);

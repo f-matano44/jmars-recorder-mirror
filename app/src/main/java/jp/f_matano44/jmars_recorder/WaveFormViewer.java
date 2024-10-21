@@ -160,7 +160,7 @@ final class WaveFormViewer extends JPanel {
         recorderChooserPanel.add(this.nextButton, recorderChooserGbc);
 
         // SNR viewer
-        Util.setTextAreaSetting(this.recInfoViewer);
+        Util.setTextViewerSetting(this.recInfoViewer);
         // set size
         this.recInfoViewer.setRows(1);
         this.recInfoViewer.setPreferredSize(

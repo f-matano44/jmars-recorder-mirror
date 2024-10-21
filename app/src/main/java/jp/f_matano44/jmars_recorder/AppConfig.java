@@ -196,7 +196,7 @@ final class AppConfig extends JFrame {
 
         final JTextArea textArea = new JTextArea(sb.toString());
         Util.changeFont(textArea, AppConfig.fontSize);
-        Util.setTextAreaSetting(textArea);
+        Util.setTextViewerSetting(textArea);
         textArea.setWrapStyleWord(false);
         textArea.setEditable(false);
         textArea.setColumns(Main.textAreaWidth);
