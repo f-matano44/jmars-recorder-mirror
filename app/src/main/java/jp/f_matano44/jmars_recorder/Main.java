@@ -189,12 +189,9 @@ public final class Main extends JFrame {
         final int buttonHeight = this.recordButton.getPreferredSize().height * 2;
         // Set dimention: Start recording
         final double buttonWidthRatio = 1.1;
-        final Dimension recordDimension = new Dimension();
+        final Dimension recordDimension = this.recordButton.getPreferredSize();
         recordDimension.height = buttonHeight;
-        recordDimension.width = Math.max(
-            (int) (this.recordButton.getPreferredSize().width * buttonWidthRatio),
-            this.indexLabel.getPreferredSize().width
-        );
+        recordDimension.width *= buttonWidthRatio;
         this.recordButton.setPreferredSize(recordDimension);
         // Get other button width
         final int[] widthList = new int[4];
@@ -270,7 +267,7 @@ public final class Main extends JFrame {
             super("0 / 0");
             this.labelMax = labelMax;
             this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setColumns(Main.textAreaWidth / 4);
+            this.setColumns(Main.textAreaWidth / 3);
             this.setFocusable(true);
             this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
         }
@@ -291,7 +288,7 @@ public final class Main extends JFrame {
 
         public void update(final int currentIdx, final int maxIdx) {
             final boolean isRecording = RecorderBody.isRecording();
-            this.setText(isRecording ? "RECORDING" : ((currentIndex + 1) + " / " + maxIdx));
+            this.setText(isRecording ? "** RECORDING **" : ((currentIndex + 1) + " / " + maxIdx));
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
