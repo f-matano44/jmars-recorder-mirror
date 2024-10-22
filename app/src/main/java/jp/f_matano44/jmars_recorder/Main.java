@@ -64,7 +64,6 @@ public final class Main extends JFrame {
     private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
     // Swing
-    private final RecIndicator recIndicator = new RecIndicator();
     private final ScriptPanel scriptPanel = new ScriptPanel();
     private final IndexSlider indexSlider = new IndexSlider(this.sm.getScriptSize() - 1);
     private final IndexLabel indexLabel = new IndexLabel(this.sm.getScriptSize());
@@ -168,12 +167,9 @@ public final class Main extends JFrame {
 
         // main panel setting
         final JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(new EmptyBorder(10 - insetsNum, 15, 20, 15));
+        mainPanel.setBorder(new EmptyBorder(20, 15, 20, 15));
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
-        gbc.insets = Main.insets;
-        mainPanel.add(recIndicator, gbc);
-        gbc.gridy++;
         gbc.insets = Main.defaultInsets;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
@@ -189,10 +185,6 @@ public final class Main extends JFrame {
         this.add(mainPanel);
 
         // Component size setting
-        // Recording indicator
-        final Dimension recIndicatorDimension = this.recIndicator.getPreferredSize();
-        recIndicatorDimension.height *= 1.2;
-        this.recIndicator.setPreferredSize(recIndicatorDimension);
         // Buttons
         final int buttonHeight = this.recordButton.getPreferredSize().height * 2;
         // Set dimention: Start recording
@@ -235,28 +227,6 @@ public final class Main extends JFrame {
 
 
     // MARK: Def of component
-    private static class RecIndicator extends JTextField {
-        public RecIndicator() {
-            this.setEditable(false);
-            this.setFocusable(false);
-            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
-            this.setColumns(Main.textAreaWidth / 3);
-        }
-
-        public void setRed() {
-            this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setText("** RECORDING **");
-            this.setForeground(Color.WHITE);
-            this.setBackground(Color.RED);
-        }
-
-        public void setNull() {
-            this.setText("");
-            this.setBackground(null);
-        }
-    }
-
-
     private static class ScriptPanel extends JScrollPane {
         private final JTextArea scriptTextArea = new JTextArea();
 
@@ -300,7 +270,7 @@ public final class Main extends JFrame {
             super("0 / 0");
             this.labelMax = labelMax;
             this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setColumns(Main.textAreaWidth / 4);
+            this.setColumns(Main.textAreaWidth / 3);
             this.setFocusable(true);
             this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
         }
@@ -318,28 +288,29 @@ public final class Main extends JFrame {
                 return currentIdxTemp;
             }
         }
+
+        public void update(final int currentIdx, final int maxIdx) {
+            final boolean isRecording = RecorderBody.isRecording();
+            this.setText(isRecording ? "RECORDING" : ((currentIndex + 1) + " / " + maxIdx));
+            this.setEditable(!isRecording);
+            this.setFocusable(!isRecording);
+            this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
+            this.setBackground(isRecording ? Color.RED : null);
+        }
     }
 
 
     // MARK: Methods
     private void update() {
-        if (RecorderBody.isRecording()) {
-            recIndicator.setRed();
-        } else {
-            recIndicator.setNull();
-        }
-
+        this.scriptPanel.updateText(this.sm.getScriptText(currentIndex));
         final File saveTo = AppConfig.getSaveFile(currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
-        this.scriptPanel.updateText(this.sm.getScriptText(currentIndex));
         this.scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
 
         this.indexSlider.setValue(currentIndex);
         this.indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        this.indexLabel.setText((currentIndex + 1) + " / " + this.sm.getScriptSize());
-        this.indexLabel.setEditable(!RecorderBody.isRecording());
-        this.indexLabel.setBackground(null);
+        this.indexLabel.update(currentIndex, this.sm.getScriptSize());
 
         this.no001Button.setEnabled(
             !RecorderBody.isRecording()
