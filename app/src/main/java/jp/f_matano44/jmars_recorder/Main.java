@@ -213,8 +213,8 @@ public final class Main extends JFrame {
         // Window setting
         this.pack();
         this.defaultWindowDimension = getSize();
-        defaultWindowDimension.height *= 1.01;
-        defaultWindowDimension.width *= 1.01;
+        defaultWindowDimension.height += 5;
+        defaultWindowDimension.width += 5;
         this.setMinimumSize(this.defaultWindowDimension);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
@@ -270,7 +270,7 @@ public final class Main extends JFrame {
             super("0 / 0");
             this.labelMax = labelMax;
             this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setColumns(Main.textAreaWidth / 3);
+            this.setColumns(Main.textAreaWidth / 4);
             this.setFocusable(true);
             this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
         }
