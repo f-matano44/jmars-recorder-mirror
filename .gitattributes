@@ -6,3 +6,4 @@
 # These are Windows script files and should use crlf
 *.bat           text eol=crlf
 *.ttf filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
