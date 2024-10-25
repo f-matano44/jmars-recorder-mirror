@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -29,7 +29,10 @@ import java.util.Scanner;
 
 final class ScriptsManager {
     private final List<String> lines = readFile();
-    private final int maxOfIndex = lines.size() - 1;
+    public final int minOfIndex = 0;
+    public final int maxOfIndex = lines.size() - 1;
+    public final int minOfLabel = 1;
+    public final int maxOfLabel = lines.size();
 
     public final int nextLine(final int currentIndex) {
         final int nextIndex = currentIndex + 1;
@@ -38,10 +41,6 @@ final class ScriptsManager {
 
     public final String getScriptText(final int currentIndex) {
         return lines.get(currentIndex);
-    }
-
-    public final int getScriptSize() {
-        return lines.size();
     }
 
     private static final List<String> readFile() {

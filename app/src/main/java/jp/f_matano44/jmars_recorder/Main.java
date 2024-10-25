@@ -65,8 +65,8 @@ public final class Main extends JFrame {
     private final ScriptsManager sm = new ScriptsManager();
     // Swing
     private final ScriptPanel scriptPanel = new ScriptPanel();
-    private final IndexSlider indexSlider = new IndexSlider(sm.getScriptSize() - 1);
-    private final IndexLabel indexLabel = new IndexLabel(sm.getScriptSize());
+    private final IndexSlider indexSlider = new IndexSlider(sm.maxOfIndex);
+    private final IndexLabel indexLabel = new IndexLabel(sm.maxOfLabel);
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
     private final JButton no001Button = new JButton("Play No.001");
@@ -86,10 +86,8 @@ public final class Main extends JFrame {
     public static final int oneRowHeight;
     public static final int textAreaWidth = 60;
     public static final int panelWidth = 750;
-    public static final Insets defaultInsets = new Insets(0, 0, 0, 0);
-    private static final int insetsNum = 4;
-    public static final Insets insets
-        = new Insets(insetsNum, insetsNum, insetsNum, insetsNum);
+    // public static final Insets zerosInsets = new Insets(0, 0, 0, 0);
+    public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
 
 
     // MARK: application info
@@ -153,7 +151,7 @@ public final class Main extends JFrame {
         // Recorder panel setting
         final JPanel recorderPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints recorderGbc = new GridBagConstraints();
-        recorderGbc.insets = Main.insets;
+        recorderGbc.insets = Main.defaultInsets;
         recorderGbc.gridx = 0;
         recorderPanel.add(no001Button, recorderGbc);
         recorderGbc.gridx++;
@@ -306,7 +304,7 @@ public final class Main extends JFrame {
         indexSlider.setValue(currentIndex);
         indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        indexLabel.update(currentIndex, this.sm.getScriptSize());
+        indexLabel.update(currentIndex, sm.maxOfLabel);
 
         no001Button.setEnabled(
             !RecorderBody.isRecording()

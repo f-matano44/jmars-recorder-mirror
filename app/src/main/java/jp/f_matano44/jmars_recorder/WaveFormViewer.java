@@ -151,7 +151,7 @@ final class WaveFormViewer extends JPanel {
         // Script chooser panel setting
         final JPanel recorderChooserPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints recorderChooserGbc = new GridBagConstraints();
-        recorderChooserGbc.insets = Main.insets;
+        recorderChooserGbc.insets = Main.defaultInsets;
         recorderChooserGbc.gridx = 0;
         recorderChooserPanel.add(this.prevButton, recorderChooserGbc);
         recorderChooserGbc.gridx++;
