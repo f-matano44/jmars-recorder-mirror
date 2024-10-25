@@ -1,5 +1,9 @@
 # Version History
 
+## version 20241025
+
+* UI の調整
+
 ## version 20241018
 
 * フォントを論理等幅フォントから VL-PGothic に変更

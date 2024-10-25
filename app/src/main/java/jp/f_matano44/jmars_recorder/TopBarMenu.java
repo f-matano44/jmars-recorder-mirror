@@ -180,7 +180,7 @@ final class TopBarMenu extends JMenuBar {
             }
 
             final JTextArea textArea = new JTextArea(sb.toString());
-            Util.setTextAreaSetting(textArea);
+            Util.setTextViewerSetting(textArea);
             textArea.setColumns(80);
             textArea.setRows(20);
             final JScrollPane scrollPane = new JScrollPane(textArea);

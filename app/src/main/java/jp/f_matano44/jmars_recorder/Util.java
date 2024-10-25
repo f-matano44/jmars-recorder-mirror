@@ -53,7 +53,6 @@ final class Util {
             font = Font.createFont(Font.TRUETYPE_FONT, input)
                 .deriveFont(Font.BOLD, (float) fontSize);
         } catch (final FontFormatException | IOException e) {
-
             font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
         }
 
@@ -65,7 +64,7 @@ final class Util {
         }
     }
 
-    public static final void setTextAreaSetting(JTextArea textArea) {
+    public static final void setTextViewerSetting(JTextArea textArea) {
         Util.changeFont(textArea, AppConfig.fontSize);
         textArea.setWrapStyleWord(true);
         textArea.setLineWrap(true);
