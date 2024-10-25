@@ -167,10 +167,9 @@ public final class Main extends JFrame {
 
         // main panel setting
         final JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(new EmptyBorder(20, 15, 20, 15));
+        mainPanel.setBorder(new EmptyBorder(15, 10, 15, 10));
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
-        gbc.insets = Main.defaultInsets;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
         mainPanel.add(this.indexSlider, gbc);
