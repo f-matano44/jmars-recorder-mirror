@@ -65,8 +65,8 @@ public final class Main extends JFrame {
     private final ScriptsManager sm = new ScriptsManager();
     // Swing
     private final ScriptPanel scriptPanel = new ScriptPanel();
-    private final IndexSlider indexSlider = new IndexSlider(this.sm.getScriptSize() - 1);
-    private final IndexLabel indexLabel = new IndexLabel(this.sm.getScriptSize());
+    private final IndexSlider indexSlider = new IndexSlider(sm.getScriptSize() - 1);
+    private final IndexLabel indexLabel = new IndexLabel(sm.getScriptSize());
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
     private final JButton no001Button = new JButton("Play No.001");
@@ -155,15 +155,15 @@ public final class Main extends JFrame {
         final GridBagConstraints recorderGbc = new GridBagConstraints();
         recorderGbc.insets = Main.insets;
         recorderGbc.gridx = 0;
-        recorderPanel.add(this.no001Button, recorderGbc);
+        recorderPanel.add(no001Button, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.refButton, recorderGbc);
+        recorderPanel.add(refButton, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.recordButton, recorderGbc);
+        recorderPanel.add(recordButton, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.playButton, recorderGbc);
+        recorderPanel.add(playButton, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.nextButton, recorderGbc);
+        recorderPanel.add(nextButton, recorderGbc);
 
         // main panel setting
         final JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -172,9 +172,9 @@ public final class Main extends JFrame {
         gbc.gridy = 0;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
-        mainPanel.add(this.indexSlider, gbc);
+        mainPanel.add(indexSlider, gbc);
         gbc.gridy++;
-        mainPanel.add(this.indexLabel, gbc);
+        mainPanel.add(indexLabel, gbc);
         gbc.gridy++;
         mainPanel.add(recorderPanel, gbc);
         gbc.gridy++;
@@ -185,33 +185,33 @@ public final class Main extends JFrame {
 
         // Component size setting
         // Buttons
-        final int buttonHeight = this.recordButton.getPreferredSize().height * 2;
-        // Set dimention: Start recording
+        final int buttonHeight = recordButton.getPreferredSize().height * 2;
+        // Set dimension: Start recording
         final double buttonWidthRatio = 1.1;
-        final Dimension recordDimension = this.recordButton.getPreferredSize();
+        final Dimension recordDimension = recordButton.getPreferredSize();
         recordDimension.height = buttonHeight;
         recordDimension.width *= buttonWidthRatio;
-        this.recordButton.setPreferredSize(recordDimension);
+        recordButton.setPreferredSize(recordDimension);
         // Get other button width
         final int[] widthList = new int[4];
-        widthList[0] = this.refButton.getPreferredSize().width;
-        widthList[1] = this.no001Button.getPreferredSize().width;
-        widthList[2] = this.playButton.getPreferredSize().width;
-        widthList[3] = this.nextButton.getPreferredSize().width;
+        widthList[0] = refButton.getPreferredSize().width;
+        widthList[1] = no001Button.getPreferredSize().width;
+        widthList[2] = playButton.getPreferredSize().width;
+        widthList[3] = nextButton.getPreferredSize().width;
         final int buttonWidth = Arrays.stream(widthList).max().getAsInt();
-        // Set dimention: Others
+        // Set dimension: Others
         final Dimension buttonDimension = new Dimension(buttonWidth, buttonHeight);
-        this.refButton.setPreferredSize(buttonDimension);
-        this.no001Button.setPreferredSize(buttonDimension);
-        this.playButton.setPreferredSize(buttonDimension);
-        this.nextButton.setPreferredSize(buttonDimension);
+        refButton.setPreferredSize(buttonDimension);
+        no001Button.setPreferredSize(buttonDimension);
+        playButton.setPreferredSize(buttonDimension);
+        nextButton.setPreferredSize(buttonDimension);
 
         // Window setting
         this.pack();
-        this.defaultWindowDimension = getSize();
+        defaultWindowDimension = this.getPreferredSize();
         defaultWindowDimension.height += 5;
         defaultWindowDimension.width += 5;
-        this.setMinimumSize(this.defaultWindowDimension);
+        this.setMinimumSize(defaultWindowDimension);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -227,9 +227,9 @@ public final class Main extends JFrame {
         private final JTextArea scriptTextArea = new JTextArea();
 
         public ScriptPanel() {
-            Util.setTextViewerSetting(this.scriptTextArea);
-            this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-            this.setViewportView(this.scriptTextArea);
+            Util.setTextViewerSetting(scriptTextArea);
+            scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+            this.setViewportView(scriptTextArea);
             this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
             final int rows = 10; // ここの数字は決め打ち
@@ -239,11 +239,11 @@ public final class Main extends JFrame {
         }
 
         public void updateText(final String str) {
-            this.scriptTextArea.setText(str);
+            scriptTextArea.setText(str);
         }
 
         public void updateColor(final Color color) {
-            this.scriptTextArea.setBackground(color);
+            scriptTextArea.setBackground(color);
         }
     }
 
@@ -298,79 +298,79 @@ public final class Main extends JFrame {
 
     // MARK: Methods
     private void update() {
-        this.scriptPanel.updateText(this.sm.getScriptText(currentIndex));
+        scriptPanel.updateText(sm.getScriptText(currentIndex));
         final File saveTo = AppConfig.getSaveFile(currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
-        this.scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
+        scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
 
-        this.indexSlider.setValue(currentIndex);
-        this.indexSlider.setEnabled(!RecorderBody.isRecording());
+        indexSlider.setValue(currentIndex);
+        indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        this.indexLabel.update(currentIndex, this.sm.getScriptSize());
+        indexLabel.update(currentIndex, this.sm.getScriptSize());
 
-        this.no001Button.setEnabled(
+        no001Button.setEnabled(
             !RecorderBody.isRecording()
             && this.refPlayer.isPlayerExist
             && this.refPlayer.isNo001Exist()
         );
 
-        this.refButton.setEnabled(
+        refButton.setEnabled(
             !RecorderBody.isRecording()
             && this.refPlayer.isPlayerExist
             && this.refPlayer.list.length > currentIndex
             && this.refPlayer.list[currentIndex].exists()
         );
 
-        this.recordButton.setSelected(RecorderBody.isRecording());
-        this.recordButton.setText(
+        recordButton.setSelected(RecorderBody.isRecording());
+        recordButton.setText(
             !RecorderBody.isRecording()
             ? startButtonString
             : recordingString
         );
 
-        this.playButton.setEnabled(this.wfv.isDataExist() && !RecorderBody.isRecording());
+        playButton.setEnabled(this.wfv.isDataExist() && !RecorderBody.isRecording());
 
-        this.nextButton.setEnabled(!RecorderBody.isRecording());
+        nextButton.setEnabled(!RecorderBody.isRecording());
     }
 
 
     private void setComponentAction() {
-        this.indexSlider.addChangeListener((ChangeEvent e) -> {
+        indexSlider.addChangeListener((ChangeEvent e) -> {
             Main.currentIndex = this.indexSlider.getValue();
             wfv.reset();
             this.update();
         });
 
-        this.indexLabel.addActionListener((ActionEvent e) -> {
+        indexLabel.addActionListener((ActionEvent e) -> {
             Main.currentIndex = this.indexLabel.getIndexNumber();
             this.update();
         });
-        this.indexLabel.addFocusListener(new FocusAdapter() {
+        indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 Main.currentIndex = indexLabel.getIndexNumber();
                 update();
             }
         });
 
-        this.refButton.addActionListener((final ActionEvent e) ->
+        refButton.addActionListener((final ActionEvent e) ->
             refPlayer.playReference(currentIndex)
         );
 
-        this.no001Button.addActionListener((final ActionEvent e) ->
+        no001Button.addActionListener((final ActionEvent e) ->
             refPlayer.playNumber001()
         );
 
-        this.recordButton.addActionListener((final ActionEvent e) -> {
+        recordButton.addActionListener((final ActionEvent e) -> {
             try {
                 if (!RecorderBody.isRecording()) {
-                    this.recorder.startRecording();
+                    recorder.startRecording();
                 } else {
-                    this.recorder.stopRecording();
+                    recorder.stopRecording();
                     wfv.add(recorder);
                 }
                 this.update();
             } catch (final Exception ex) {
-                this.recorder.enforceStopRecording();
+                recorder.enforceStopRecording();
                 this.update();
                 ex.printStackTrace(AppConfig.logTargetStream);
                 JOptionPane.showMessageDialog(
@@ -380,12 +380,12 @@ public final class Main extends JFrame {
             }
         });
 
-        this.playButton.addActionListener((ActionEvent e) -> {
+        playButton.addActionListener((ActionEvent e) -> {
             wfv.playSignal();
         });
 
-        this.nextButton.addActionListener((ActionEvent e) -> {
-            currentIndex = this.sm.nextLine(currentIndex);
+        nextButton.addActionListener((ActionEvent e) -> {
+            currentIndex = sm.nextLine(currentIndex);
             wfv.reset();
             this.update();
         });
