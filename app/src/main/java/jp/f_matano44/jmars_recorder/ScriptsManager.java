@@ -73,6 +73,10 @@ final class ScriptsManager {
             this.setMinimum(minOfIndex);
             this.setMaximum(maxOfIndex);
         }
+
+        public void updateValue() {
+            ScriptsManager.currentIndex = this.getValue();
+        }
     }
 
 
@@ -98,11 +102,11 @@ final class ScriptsManager {
             }
         }
 
-        public void update(final int currentIdx, final int maxIdx) {
+        public void updateValue() {
             final boolean isRecording = RecorderBody.isRecording();
             this.setText(isRecording
                 ? "** RECORDING **"
-                : ((ScriptsManager.currentIndex + 1) + " / " + maxIdx));
+                : ((ScriptsManager.currentIndex + 1) + " / " + maxOfLabel));
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
@@ -116,8 +120,8 @@ final class ScriptsManager {
         currentIndex = Math.min(nextIndex, maxOfIndex);
     }
 
-    public final String getScriptText(final int currentIndex) {
-        return lines.get(currentIndex);
+    public final String getScriptText() {
+        return lines.get(ScriptsManager.currentIndex);
     }
 
     private static final List<String> readFile() {

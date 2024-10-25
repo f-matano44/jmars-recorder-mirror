@@ -226,15 +226,15 @@ public final class Main extends JFrame {
 
     // MARK: Methods
     private void update() {
-        scriptPanel.updateText(sm.getScriptText(ScriptsManager.currentIndex));
+        scriptPanel.updateText(sm.getScriptText());
         final File saveTo = AppConfig.getSaveFile(ScriptsManager.currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
         scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
 
-        indexSlider.setValue(ScriptsManager.currentIndex);
+        indexSlider.updateValue();
         indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        indexLabel.update(ScriptsManager.currentIndex, sm.maxOfLabel);
+        indexLabel.updateValue();
 
         no001Button.setEnabled(
             !RecorderBody.isRecording()
@@ -267,7 +267,7 @@ public final class Main extends JFrame {
 
     private void setComponentAction() {
         indexSlider.addChangeListener((ChangeEvent e) -> {
-            ScriptsManager.currentIndex = indexSlider.getValue();
+            indexSlider.updateValue();
             wfv.reset();
             this.update();
         });
