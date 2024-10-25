@@ -74,10 +74,6 @@ public final class Main extends JFrame {
     private final JButton playButton = new JButton("Play Rec.");
 
 
-    // MARK: Member variable
-    static int currentIndex = 0;
-
-
     // MARK: Constants
     private static final String startButtonString = "Start recording";
     private static final String recordingString   = "Stop and Save";
@@ -270,7 +266,7 @@ public final class Main extends JFrame {
         }
 
         public int getIndexNumber() {
-            final int currentIdxTemp = Main.currentIndex;
+            final int currentIdxTemp = ScriptsManager.currentIndex;
             try {
                 final String[] inputSt = this.getText().replace(" ", "").split("/");
                 final int ans = Integer.parseInt(inputSt[0]) - 1;
@@ -285,7 +281,9 @@ public final class Main extends JFrame {
 
         public void update(final int currentIdx, final int maxIdx) {
             final boolean isRecording = RecorderBody.isRecording();
-            this.setText(isRecording ? "** RECORDING **" : ((currentIndex + 1) + " / " + maxIdx));
+            this.setText(isRecording
+                ? "** RECORDING **"
+                : ((ScriptsManager.currentIndex + 1) + " / " + maxIdx));
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
@@ -296,15 +294,15 @@ public final class Main extends JFrame {
 
     // MARK: Methods
     private void update() {
-        scriptPanel.updateText(sm.getScriptText(currentIndex));
-        final File saveTo = AppConfig.getSaveFile(currentIndex);
+        scriptPanel.updateText(sm.getScriptText(ScriptsManager.currentIndex));
+        final File saveTo = AppConfig.getSaveFile(ScriptsManager.currentIndex);
         final Color lightGreen = new Color(220, 255, 220);
         scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
 
-        indexSlider.setValue(currentIndex);
+        indexSlider.setValue(ScriptsManager.currentIndex);
         indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        indexLabel.update(currentIndex, sm.maxOfLabel);
+        indexLabel.update(ScriptsManager.currentIndex, sm.maxOfLabel);
 
         no001Button.setEnabled(
             !RecorderBody.isRecording()
@@ -315,8 +313,8 @@ public final class Main extends JFrame {
         refButton.setEnabled(
             !RecorderBody.isRecording()
             && this.refPlayer.isPlayerExist
-            && this.refPlayer.list.length > currentIndex
-            && this.refPlayer.list[currentIndex].exists()
+            && this.refPlayer.list.length > ScriptsManager.currentIndex
+            && this.refPlayer.list[ScriptsManager.currentIndex].exists()
         );
 
         recordButton.setSelected(RecorderBody.isRecording());
@@ -330,31 +328,31 @@ public final class Main extends JFrame {
 
         nextButton.setEnabled(
             !RecorderBody.isRecording()
-            && Main.currentIndex < sm.maxOfIndex
+            && ScriptsManager.currentIndex < sm.maxOfIndex
         );
     }
 
 
     private void setComponentAction() {
         indexSlider.addChangeListener((ChangeEvent e) -> {
-            Main.currentIndex = this.indexSlider.getValue();
+            ScriptsManager.currentIndex = indexSlider.getValue();
             wfv.reset();
             this.update();
         });
 
         indexLabel.addActionListener((ActionEvent e) -> {
-            Main.currentIndex = this.indexLabel.getIndexNumber();
+            ScriptsManager.currentIndex = this.indexLabel.getIndexNumber();
             this.update();
         });
         indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
-                Main.currentIndex = indexLabel.getIndexNumber();
+                ScriptsManager.currentIndex = indexLabel.getIndexNumber();
                 update();
             }
         });
 
         refButton.addActionListener((final ActionEvent e) ->
-            refPlayer.playReference(currentIndex)
+            refPlayer.playReference(ScriptsManager.currentIndex)
         );
 
         no001Button.addActionListener((final ActionEvent e) ->
@@ -386,7 +384,7 @@ public final class Main extends JFrame {
         });
 
         nextButton.addActionListener((ActionEvent e) -> {
-            currentIndex = sm.nextLine(currentIndex);
+            sm.nextLine();
             wfv.reset();
             this.update();
         });

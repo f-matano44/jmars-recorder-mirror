@@ -33,10 +33,11 @@ final class ScriptsManager {
     public final int maxOfIndex = lines.size() - 1;
     public final int minOfLabel = 1;
     public final int maxOfLabel = lines.size();
+    public static int currentIndex = 0;
 
-    public final int nextLine(final int currentIndex) {
+    public final void nextLine() {
         final int nextIndex = currentIndex + 1;
-        return Math.min(nextIndex, maxOfIndex);
+        currentIndex = Math.min(nextIndex, maxOfIndex);
     }
 
     public final String getScriptText(final int currentIndex) {
