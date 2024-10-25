@@ -35,16 +35,14 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
+import jp.f_matano44.jmars_recorder.ScriptsManager.ScriptPanel;
+import jp.f_matano44.jmars_recorder.ScriptsManager.IndexLabel;
+import jp.f_matano44.jmars_recorder.ScriptsManager.IndexSlider;
 
 
 /** Main-Class. */
@@ -64,9 +62,9 @@ public final class Main extends JFrame {
     private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
     // Swing
-    private final ScriptPanel scriptPanel = new ScriptPanel();
-    private final IndexSlider indexSlider = new IndexSlider(sm.maxOfIndex);
-    private final IndexLabel indexLabel = new IndexLabel(sm.maxOfLabel);
+    private final ScriptPanel scriptPanel = sm.new ScriptPanel();
+    private final IndexSlider indexSlider = sm.new IndexSlider();
+    private final IndexLabel indexLabel = sm.new IndexLabel();
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
     private final JButton no001Button = new JButton("Play No.001");
@@ -178,6 +176,16 @@ public final class Main extends JFrame {
         this.add(mainPanel);
 
         // Component size setting
+        // Script panel
+        final int rows = 10; // ここの数字は決め打ち
+        scriptPanel.setPreferredSize(
+            new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
+        // Index Label
+        indexLabel.setColumns(Main.textAreaWidth / 3);
+        // Slider
+        final Dimension sliderSize = indexSlider.getPreferredSize();
+        sliderSize.width = Main.panelWidth;
+        indexSlider.setPreferredSize(sliderSize);
         // Buttons
         final int buttonHeight = recordButton.getPreferredSize().height * 2;
         // Set dimension: Start recording
@@ -213,82 +221,6 @@ public final class Main extends JFrame {
         // initialize panel
         this.indexSlider.setValue(0);
         this.update();
-    }
-
-
-    // MARK: Def of component
-    private static class ScriptPanel extends JScrollPane {
-        private final JTextArea scriptTextArea = new JTextArea();
-
-        public ScriptPanel() {
-            Util.setTextViewerSetting(scriptTextArea);
-            scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-            this.setViewportView(scriptTextArea);
-            this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
-            final int rows = 10; // ここの数字は決め打ち
-            this.setPreferredSize(new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
-            // this.scriptTextArea.setRows(rows);
-            // this.scriptTextArea.setColumns(Main.textAreaWidth);
-        }
-
-        public void updateText(final String str) {
-            scriptTextArea.setText(str);
-        }
-
-        public void updateColor(final Color color) {
-            scriptTextArea.setBackground(color);
-        }
-    }
-
-
-    private static class IndexSlider extends JSlider {
-        public IndexSlider(final int sliderMax) {
-            this.setMinimum(0);
-            this.setMaximum(sliderMax);
-            final Dimension sliderSize = this.getPreferredSize();
-            sliderSize.width = Main.panelWidth;
-            this.setPreferredSize(sliderSize);
-        }
-    }
-
-
-    private static class IndexLabel extends JTextField {
-        private final int labelMax;
-
-        public IndexLabel(final int labelMax) {
-            super("0 / 0");
-            this.labelMax = labelMax;
-            this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setColumns(Main.textAreaWidth / 3);
-            this.setFocusable(true);
-            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
-        }
-
-        public int getIndexNumber() {
-            final int currentIdxTemp = ScriptsManager.currentIndex;
-            try {
-                final String[] inputSt = this.getText().replace(" ", "").split("/");
-                final int ans = Integer.parseInt(inputSt[0]) - 1;
-                if (ans < 0 || labelMax <= ans) {
-                    throw new Exception("Too small or too big.");
-                }
-                return ans;
-            } catch (final Exception e) {
-                return currentIdxTemp;
-            }
-        }
-
-        public void update(final int currentIdx, final int maxIdx) {
-            final boolean isRecording = RecorderBody.isRecording();
-            this.setText(isRecording
-                ? "** RECORDING **"
-                : ((ScriptsManager.currentIndex + 1) + " / " + maxIdx));
-            this.setEditable(!isRecording);
-            this.setFocusable(!isRecording);
-            this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
-            this.setBackground(isRecording ? Color.RED : null);
-        }
     }
 
 
@@ -341,12 +273,12 @@ public final class Main extends JFrame {
         });
 
         indexLabel.addActionListener((ActionEvent e) -> {
-            ScriptsManager.currentIndex = this.indexLabel.getIndexNumber();
+            indexLabel.updateIndexNumber();
             this.update();
         });
         indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
-                ScriptsManager.currentIndex = indexLabel.getIndexNumber();
+                indexLabel.updateIndexNumber();
                 update();
             }
         });

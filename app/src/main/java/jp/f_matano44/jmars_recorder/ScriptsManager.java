@@ -18,6 +18,7 @@
 
 package jp.f_matano44.jmars_recorder;
 
+import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,6 +27,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
 
 final class ScriptsManager {
     private final List<String> lines = readFile();
@@ -34,6 +43,73 @@ final class ScriptsManager {
     public final int minOfLabel = 1;
     public final int maxOfLabel = lines.size();
     public static int currentIndex = 0;
+
+
+    public class ScriptPanel extends JScrollPane {
+        private final JTextArea scriptTextArea = new JTextArea();
+
+        public ScriptPanel() {
+            Util.setTextViewerSetting(scriptTextArea);
+            scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+            this.setViewportView(scriptTextArea);
+            this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.setBorder(new LineBorder(Color.BLACK, Main.lineBorderThickness));
+            // this.scriptTextArea.setRows(rows);
+            // this.scriptTextArea.setColumns(Main.textAreaWidth);
+        }
+
+        public void updateText(final String str) {
+            scriptTextArea.setText(str);
+        }
+
+        public void updateColor(final Color color) {
+            scriptTextArea.setBackground(color);
+        }
+    }
+
+
+    public class IndexSlider extends JSlider {
+        public IndexSlider() {
+            this.setMinimum(minOfIndex);
+            this.setMaximum(maxOfIndex);
+        }
+    }
+
+
+    public class IndexLabel extends JTextField {
+        public IndexLabel() {
+            super("0 / 0");
+            this.setHorizontalAlignment(SwingConstants.CENTER);
+            this.setFocusable(true);
+            this.setBorder(new LineBorder(Color.BLACK, Main.lineBorderThickness));
+        }
+
+        public void updateIndexNumber() {
+            final int currentIndex = ScriptsManager.currentIndex;
+            try {
+                final String[] inputSt = this.getText().replace(" ", "").split("/");
+                final int ansIndex = Integer.parseInt(inputSt[0]) - 1;
+                if (ansIndex < minOfIndex || maxOfIndex < ansIndex) {
+                    throw new Exception("Too small or too big.");
+                }
+                ScriptsManager.currentIndex = ansIndex;
+            } catch (final Exception e) {
+                ScriptsManager.currentIndex = currentIndex;
+            }
+        }
+
+        public void update(final int currentIdx, final int maxIdx) {
+            final boolean isRecording = RecorderBody.isRecording();
+            this.setText(isRecording
+                ? "** RECORDING **"
+                : ((ScriptsManager.currentIndex + 1) + " / " + maxIdx));
+            this.setEditable(!isRecording);
+            this.setFocusable(!isRecording);
+            this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
+            this.setBackground(isRecording ? Color.RED : null);
+        }
+    }
+
 
     public final void nextLine() {
         final int nextIndex = currentIndex + 1;
