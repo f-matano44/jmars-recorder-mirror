@@ -219,7 +219,7 @@ public final class Main extends JFrame {
         this.setVisible(true);
 
         // initialize panel
-        this.indexSlider.setValue(0);
+        indexSlider.setValue(0);
         this.update();
     }
 
@@ -238,15 +238,15 @@ public final class Main extends JFrame {
 
         no001Button.setEnabled(
             !RecorderBody.isRecording()
-            && this.refPlayer.isPlayerExist
-            && this.refPlayer.isNo001Exist()
+            && refPlayer.isPlayerExist
+            && refPlayer.isNo001Exist()
         );
 
         refButton.setEnabled(
             !RecorderBody.isRecording()
-            && this.refPlayer.isPlayerExist
-            && this.refPlayer.list.length > ScriptsManager.currentIndex
-            && this.refPlayer.list[ScriptsManager.currentIndex].exists()
+            && refPlayer.isPlayerExist
+            && refPlayer.list.length > ScriptsManager.currentIndex
+            && refPlayer.list[ScriptsManager.currentIndex].exists()
         );
 
         recordButton.setSelected(RecorderBody.isRecording());
@@ -256,7 +256,7 @@ public final class Main extends JFrame {
             : recordingString
         );
 
-        playButton.setEnabled(this.wfv.isDataExist() && !RecorderBody.isRecording());
+        playButton.setEnabled(wfv.isDataExist() && !RecorderBody.isRecording());
 
         nextButton.setEnabled(
             !RecorderBody.isRecording()
