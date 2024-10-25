@@ -2,6 +2,9 @@
 
 **j**ava **MA**tano's user\-f**R**iendly corpu**S** **Recorder**
 
+[\[JMARS\]](https://jmars.asu.edu/) や [\[日本メイラード学会（JMARS）\]](http://www.maillard.umin.jp/) などの組織・プロジェクトとは関係ありません.
+
+
 * 音声コーパス収録用レコーダー
 * ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
 
@@ -72,10 +75,10 @@ OS 上で設定されたマイク，スピーカーを使用します．
 * https://voiceseven.com/7rdev/login.php
 
 
-### 001 番音声の再生
+### 1 番音声の再生
 複数回に分けて音声コーパスを収録する場合，音声の品質や喋り方などが時関経過と共に変化してしまうことがあります.
 そのような状況に対処するため，収録した音声の一番若い番号の音声を再生する機能があります.
-参考程度にご利用ください.
+参考のためにご利用ください.
 
 
 ### 収録
@@ -103,7 +106,6 @@ OS 上で設定されたマイク，スピーカーを使用します．
 ## ライセンス
 [![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
-[\[JMARS\]](https://jmars.asu.edu/) や [\[日本メイラード学会（JMARS）\]](http://www.maillard.umin.jp/) などの組織・プロジェクトとは関係ありません.
 
 ### 含まれる外部プロジェクト(アルファベット順)
 * [\[Checkstyle for Java / Google Java Style (Apache License Version 2.0)](https://github.com/checkstyle/checkstyle/blob/1de91bc2e79d13860f841e8cddd85fdc54d4c1a4/src/main/resources/google_checks.xml)
@@ -113,10 +115,12 @@ OS 上で設定されたマイク，スピーカーを使用します．
 * [\[vlcj (GNU GPL Version 3)\]](https://github.com/caprica/vlcj)
 * [\[VL-PGothic (Modified BSD License)\]](https://github.com/daisukesuzuki/VLGothic/blob/main/LICENSE.ja)
 
+
 ### アプリのスクリーンショットについて
 README 内のスクリーンショットは
 [\[Apple商標および著作権使用に関するガイドライン\]](https://www.apple.com/jp/legal/intellectual-property/guidelinesfor3rdparties.html)
 の **Apple製品の描写** に基づき使用しています。
+
 
 ### 旧バージョン（v20231209）についてのお詫び
 version 20231209 で使用していたフォントのライセンス（SIL OFL）が本アプリのライセンス（GPLv3+）と両立しないことが判明したため，BFG Repo-Cleaner を使用し過去のバージョンを含めて削除しました．
