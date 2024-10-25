@@ -130,12 +130,12 @@ version 20231209 で使用していたフォントのライセンス（SIL OFL�
 
 ## 引用するには / If you want to do cite this...
 
-### 日本語
+### 日本語（査読なし原稿）
 > 俣野文義, 森勢将雅,
 ``jMARS Recorder: コーパス朗読に特化した音声収録アプリの制作と検討,’’
 日本音響学会 第 151 回 (2024 年春季) 研究発表会, pp.1061--1062 (2024.03).
 
-### English
+### English (Non-peer-reviewed)
 > F. Matano, M. Morise,
 ``jMARS Recorder: Development and consideration of a speech-database-focused recording application,''
 Proceedings of the 2024 Spring meeting of the Acoustical Society of Japan, pp.1061--1062 (2024.03) (in Japanese).
