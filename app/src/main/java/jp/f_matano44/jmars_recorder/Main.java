@@ -328,7 +328,10 @@ public final class Main extends JFrame {
 
         playButton.setEnabled(this.wfv.isDataExist() && !RecorderBody.isRecording());
 
-        nextButton.setEnabled(!RecorderBody.isRecording());
+        nextButton.setEnabled(
+            !RecorderBody.isRecording()
+            && Main.currentIndex < sm.maxOfIndex
+        );
     }
 
 
