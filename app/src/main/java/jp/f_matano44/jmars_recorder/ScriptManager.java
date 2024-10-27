@@ -149,7 +149,6 @@ final class ScriptManager {
                 }
                 currentIndex = ansIndex;
             } catch (final Exception e) {
-                e.printStackTrace();
                 currentIndex = tempIndex;
             }
         }
@@ -168,9 +167,12 @@ final class ScriptManager {
 
 
     // MARK: Methods
+    public final void prevLine() {
+        currentIndex = Math.max(--currentIndex, minOfIndex);
+    }
+
     public final void nextLine() {
-        final int nextIndex = currentIndex + 1;
-        currentIndex = Math.min(nextIndex, maxOfIndex);
+        currentIndex = Math.min(++currentIndex, maxOfIndex);
     }
 
     public final String getScriptText() {

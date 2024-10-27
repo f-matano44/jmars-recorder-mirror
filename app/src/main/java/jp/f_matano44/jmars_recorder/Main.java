@@ -63,6 +63,8 @@ public final class Main extends JFrame {
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing
     private final ScriptPanel scriptPanel = sm.new ScriptPanel();
+    private final JButton miniNextButton = new JButton(">");
+    private final JButton miniPrevButton = new JButton("<");
     private final IndexSlider indexSlider = sm.new IndexSlider();
     private final IndexLabel indexLabel = sm.new IndexLabel();
     private final JButton nextButton = new JButton("Next >>");
@@ -142,7 +144,17 @@ public final class Main extends JFrame {
         // add button, slider etc. actions
         this.setComponentAction();
 
-        // Recorder panel setting
+        // Slider panel
+        final JPanel sliderPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints sliderGbc = new GridBagConstraints();
+        sliderGbc.gridx = 0;
+        sliderPanel.add(miniPrevButton, sliderGbc);
+        sliderGbc.gridx++;
+        sliderPanel.add(indexSlider, sliderGbc);
+        sliderGbc.gridx++;
+        sliderPanel.add(miniNextButton, sliderGbc);
+
+        // Recorder panel
         final JPanel recorderPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints recorderGbc = new GridBagConstraints();
         recorderGbc.insets = Main.defaultInsets;
@@ -164,7 +176,7 @@ public final class Main extends JFrame {
         gbc.gridy = 0;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
-        mainPanel.add(indexSlider, gbc);
+        mainPanel.add(sliderPanel, gbc);
         gbc.gridy++;
         mainPanel.add(indexLabel, gbc);
         gbc.gridy++;
@@ -183,9 +195,13 @@ public final class Main extends JFrame {
         // Index Label
         indexLabel.setColumns(Main.textAreaWidth / 3);
         // Slider
+        final Dimension miniButtonSize = miniNextButton.getPreferredSize();
         final Dimension sliderSize = indexSlider.getPreferredSize();
-        sliderSize.width = Main.panelWidth;
+        miniButtonSize.height = sliderSize.height;
+        sliderSize.width = Main.panelWidth - (miniButtonSize.width * 2);
+        miniPrevButton.setPreferredSize(miniButtonSize);
         indexSlider.setPreferredSize(sliderSize);
+        miniNextButton.setPreferredSize(miniButtonSize);
         // Buttons
         final int buttonHeight = recordButton.getPreferredSize().height * 2;
         // Set dimension: Start recording
@@ -220,6 +236,7 @@ public final class Main extends JFrame {
 
         // initialize panel
         indexSlider.setValue(0);
+        recordButton.requestFocusInWindow();
         this.update();
     }
 
@@ -259,6 +276,15 @@ public final class Main extends JFrame {
         playButton.setEnabled(wfv.isDataExist() && !RecorderBody.isRecording());
 
         nextButton.setEnabled(
+            !RecorderBody.isRecording()
+            && sm.getCurrentIndex() < sm.maxOfIndex
+        );
+
+        miniPrevButton.setEnabled(
+            !RecorderBody.isRecording()
+            && sm.minOfIndex < sm.getCurrentIndex()
+        );
+        miniNextButton.setEnabled(
             !RecorderBody.isRecording()
             && sm.getCurrentIndex() < sm.maxOfIndex
         );
@@ -316,6 +342,17 @@ public final class Main extends JFrame {
         });
 
         nextButton.addActionListener((ActionEvent e) -> {
+            sm.nextLine();
+            wfv.reset();
+            this.update();
+        });
+
+        miniPrevButton.addActionListener((ActionEvent e) -> {
+            sm.prevLine();
+            wfv.reset();
+            this.update();
+        });
+        miniNextButton.addActionListener((ActionEvent e) -> {
             sm.nextLine();
             wfv.reset();
             this.update();
