@@ -37,14 +37,61 @@ import javax.swing.border.LineBorder;
 
 
 final class ScriptsManager {
-    private final List<String> lines = readFile();
-    public final int minOfIndex = 0;
-    public final int maxOfIndex = lines.size() - 1;
-    public final int minOfLabel = 1;
-    public final int maxOfLabel = lines.size();
+    private final String[] lines;
+    public final int minOfIndex;
+    public final int maxOfIndex;
+    public final int minOfLabel;
+    public final int maxOfLabel;
     public static int currentIndex = 0;
 
 
+    // MARK: Constructor
+    public ScriptsManager() {
+        final List<String> linesList = new ArrayList<String>();
+
+        try (
+            final Scanner sc = new Scanner(
+                new FileInputStream(AppConfig.script),
+                StandardCharsets.UTF_8.name())
+            ) {
+            while (sc.hasNextLine()) {
+                final String str = sc.nextLine();
+                if (!str.isEmpty()) {
+                    linesList.add(str
+                        .replace(":", System.lineSeparator())
+                        .replace(",", System.lineSeparator())
+                    );
+                }
+            }
+        } catch (IOException e) {
+            // StackTrace to String
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            final String stacktrace = sw.toString();
+
+            linesList.clear();
+            linesList.add(
+                "Error: Can't read script file.\n"
+                + "\n"
+                + stacktrace
+            );
+        }
+
+        if (linesList.isEmpty()) {
+            linesList.clear();
+            linesList.add("Error: Script file is empty.");
+        }
+
+        lines = linesList.toArray(new String[linesList.size()]);
+        minOfIndex = 0;
+        maxOfIndex = lines.length - 1;
+        minOfLabel = 1;
+        maxOfLabel = lines.length;
+    }
+
+
+    // MARK: Child classes
     public class ScriptPanel extends JScrollPane {
         private final JTextArea scriptTextArea = new JTextArea();
 
@@ -119,52 +166,13 @@ final class ScriptsManager {
     }
 
 
+    // MARK: Methods
     public final void nextLine() {
         final int nextIndex = currentIndex + 1;
         currentIndex = Math.min(nextIndex, maxOfIndex);
     }
 
     public final String getScriptText() {
-        return lines.get(ScriptsManager.currentIndex);
-    }
-
-    private static final List<String> readFile() {
-        final List<String> lines = new ArrayList<>();
-
-        try (
-            final Scanner sc = new Scanner(
-                new FileInputStream(AppConfig.script),
-                StandardCharsets.UTF_8.name())
-            ) {
-            while (sc.hasNextLine()) {
-                final String str = sc.nextLine();
-                if (!str.isEmpty()) {
-                    lines.add(str
-                        .replace(":", System.lineSeparator())
-                        .replace(",", System.lineSeparator())
-                    );
-                }
-            }
-        } catch (IOException e) {
-            // StackTrace to String
-            final StringWriter sw = new StringWriter();
-            final PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            final String stacktrace = sw.toString();
-
-            lines.clear();
-            lines.add(
-                "Error: Can't read script file.\n"
-                + "\n"
-                + stacktrace
-            );
-        }
-
-        if (lines.isEmpty()) {
-            lines.clear();
-            lines.add("Error: Script file is empty.");
-        }
-
-        return lines;
+        return lines[ScriptsManager.currentIndex];
     }
 }
