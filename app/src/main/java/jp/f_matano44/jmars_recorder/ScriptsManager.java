@@ -74,8 +74,12 @@ final class ScriptsManager {
             this.setMaximum(maxOfIndex);
         }
 
-        public void updateValue() {
+        public void updateIndex() {
             ScriptsManager.currentIndex = this.getValue();
+        }
+
+        public void updateValue() {
+            this.setValue(ScriptsManager.currentIndex);
         }
     }
 

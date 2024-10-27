@@ -40,9 +40,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import jp.f_matano44.jmars_recorder.ScriptsManager.ScriptPanel;
 import jp.f_matano44.jmars_recorder.ScriptsManager.IndexLabel;
 import jp.f_matano44.jmars_recorder.ScriptsManager.IndexSlider;
+import jp.f_matano44.jmars_recorder.ScriptsManager.ScriptPanel;
 
 
 /** Main-Class. */
@@ -267,7 +267,7 @@ public final class Main extends JFrame {
 
     private void setComponentAction() {
         indexSlider.addChangeListener((ChangeEvent e) -> {
-            indexSlider.updateValue();
+            indexSlider.updateIndex();
             wfv.reset();
             this.update();
         });
