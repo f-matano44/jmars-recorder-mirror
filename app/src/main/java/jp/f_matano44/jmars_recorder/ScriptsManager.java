@@ -42,7 +42,7 @@ final class ScriptsManager {
     public final int maxOfIndex;
     public final int minOfLabel;
     public final int maxOfLabel;
-    public static int currentIndex = 0;
+    private int currentIndex = 0;
 
 
     // MARK: Constructor
@@ -122,11 +122,11 @@ final class ScriptsManager {
         }
 
         public void updateIndex() {
-            ScriptsManager.currentIndex = this.getValue();
+            currentIndex = this.getValue();
         }
 
         public void updateValue() {
-            this.setValue(ScriptsManager.currentIndex);
+            this.setValue(currentIndex);
         }
     }
 
@@ -140,16 +140,17 @@ final class ScriptsManager {
         }
 
         public void updateIndexNumber() {
-            final int currentIndex = ScriptsManager.currentIndex;
+            final int tempIndex = currentIndex;
             try {
                 final String[] inputSt = this.getText().replace(" ", "").split("/");
                 final int ansIndex = Integer.parseInt(inputSt[0]) - 1;
                 if (ansIndex < minOfIndex || maxOfIndex < ansIndex) {
                     throw new Exception("Too small or too big.");
                 }
-                ScriptsManager.currentIndex = ansIndex;
+                currentIndex = ansIndex;
             } catch (final Exception e) {
-                ScriptsManager.currentIndex = currentIndex;
+                e.printStackTrace();
+                currentIndex = tempIndex;
             }
         }
 
@@ -157,7 +158,7 @@ final class ScriptsManager {
             final boolean isRecording = RecorderBody.isRecording();
             this.setText(isRecording
                 ? "** RECORDING **"
-                : ((ScriptsManager.currentIndex + 1) + " / " + maxOfLabel));
+                : ((currentIndex + 1) + " / " + maxOfLabel));
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
@@ -173,6 +174,10 @@ final class ScriptsManager {
     }
 
     public final String getScriptText() {
-        return lines[ScriptsManager.currentIndex];
+        return lines[this.currentIndex];
+    }
+
+    public final int getCurrentIndex() {
+        return this.currentIndex;
     }
 }

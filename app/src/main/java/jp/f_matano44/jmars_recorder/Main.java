@@ -57,10 +57,10 @@ public final class Main extends JFrame {
 
 
     // MARK: Components
-    private final ReferencePlayer refPlayer = new ReferencePlayer();
-    private final RecorderBody recorder = new RecorderBody();
-    private final WaveFormViewer wfv = new WaveFormViewer();
     private final ScriptsManager sm = new ScriptsManager();
+    private final RecorderBody recorder = new RecorderBody(sm);
+    private final ReferencePlayer refPlayer = new ReferencePlayer();
+    private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing
     private final ScriptPanel scriptPanel = sm.new ScriptPanel();
     private final IndexSlider indexSlider = sm.new IndexSlider();
@@ -227,7 +227,7 @@ public final class Main extends JFrame {
     // MARK: Methods
     private void update() {
         scriptPanel.updateText(sm.getScriptText());
-        final File saveTo = AppConfig.getSaveFile(ScriptsManager.currentIndex);
+        final File saveTo = AppConfig.getSaveFile(sm.getCurrentIndex());
         final Color lightGreen = new Color(220, 255, 220);
         scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
 
@@ -245,8 +245,8 @@ public final class Main extends JFrame {
         refButton.setEnabled(
             !RecorderBody.isRecording()
             && refPlayer.isPlayerExist
-            && refPlayer.list.length > ScriptsManager.currentIndex
-            && refPlayer.list[ScriptsManager.currentIndex].exists()
+            && refPlayer.list.length > sm.getCurrentIndex()
+            && refPlayer.list[sm.getCurrentIndex()].exists()
         );
 
         recordButton.setSelected(RecorderBody.isRecording());
@@ -260,7 +260,7 @@ public final class Main extends JFrame {
 
         nextButton.setEnabled(
             !RecorderBody.isRecording()
-            && ScriptsManager.currentIndex < sm.maxOfIndex
+            && sm.getCurrentIndex() < sm.maxOfIndex
         );
     }
 
@@ -284,7 +284,7 @@ public final class Main extends JFrame {
         });
 
         refButton.addActionListener((final ActionEvent e) ->
-            refPlayer.playReference(ScriptsManager.currentIndex)
+            refPlayer.playReference(sm.getCurrentIndex())
         );
 
         no001Button.addActionListener((final ActionEvent e) ->
