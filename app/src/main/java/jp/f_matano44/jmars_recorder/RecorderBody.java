@@ -34,7 +34,7 @@ import jp.f_matano44.jfloatwavio.Converter;
 import jp.f_matano44.jfloatwavio.WavIO;
 
 final class RecorderBody implements Cloneable {
-    private final ScriptsManager sm;
+    private final ScriptManager sm;
     /* Constant */
     private static final byte[] defaultSignal = new byte[0];
     private static final double trimmingThreshold_db = -15.0;
@@ -46,7 +46,7 @@ final class RecorderBody implements Cloneable {
     /* data */
     private byte[] byteSignal = defaultSignal;
 
-    public RecorderBody(final ScriptsManager sm) {
+    public RecorderBody(final ScriptManager sm) {
         this.sm = sm;
         TargetDataLine line = null;
         try {

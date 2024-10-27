@@ -36,7 +36,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 
-final class ScriptsManager {
+final class ScriptManager {
     private final String[] lines;
     public final int minOfIndex;
     public final int maxOfIndex;
@@ -46,7 +46,7 @@ final class ScriptsManager {
 
 
     // MARK: Constructor
-    public ScriptsManager() {
+    public ScriptManager() {
         final List<String> linesList = new ArrayList<String>();
 
         try (

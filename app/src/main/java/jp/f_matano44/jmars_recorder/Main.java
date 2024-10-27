@@ -40,9 +40,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import jp.f_matano44.jmars_recorder.ScriptsManager.IndexLabel;
-import jp.f_matano44.jmars_recorder.ScriptsManager.IndexSlider;
-import jp.f_matano44.jmars_recorder.ScriptsManager.ScriptPanel;
+import jp.f_matano44.jmars_recorder.ScriptManager.IndexLabel;
+import jp.f_matano44.jmars_recorder.ScriptManager.IndexSlider;
+import jp.f_matano44.jmars_recorder.ScriptManager.ScriptPanel;
 
 
 /** Main-Class. */
@@ -57,7 +57,7 @@ public final class Main extends JFrame {
 
 
     // MARK: Components
-    private final ScriptsManager sm = new ScriptsManager();
+    private final ScriptManager sm = new ScriptManager();
     private final RecorderBody recorder = new RecorderBody(sm);
     private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final WaveFormViewer wfv = new WaveFormViewer();
