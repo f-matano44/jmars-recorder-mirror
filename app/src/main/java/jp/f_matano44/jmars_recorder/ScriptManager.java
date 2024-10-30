@@ -162,7 +162,7 @@ final class ScriptManager {
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
-            this.setBackground(isRecording ? Color.RED : null);
+            this.setBackground(isRecording ? new Color(230, 0, 0) : null);
         }
     }
 
