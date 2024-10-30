@@ -151,9 +151,7 @@ final class TopBarMenu extends JMenuBar {
 
             // Window setting
             this.pack();
-            this.setPreferredSize(getPreferredSize());
             this.setResizable(false);
-            this.setMinimumSize(getSize());
             this.setLocationRelativeTo(null);
             this.setVisible(true);
         }
