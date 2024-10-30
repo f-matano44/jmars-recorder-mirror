@@ -65,12 +65,12 @@ public final class Main extends JFrame {
     }
 
 
-    // MARK: Components
+    // MARK: Instances
     private final ScriptManager sm = new ScriptManager();
     private final RecorderBody recorder = new RecorderBody(sm);
     private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final WaveFormViewer wfv = new WaveFormViewer();
-    // Swing
+    // Swing components
     private final ScriptPanel scriptPanel = sm.new ScriptPanel();
     private final JButton miniNextButton = new JButton(">");
     private final JButton miniPrevButton = new JButton("<");
@@ -89,9 +89,7 @@ public final class Main extends JFrame {
     public static final int lineBorderThickness = 1;
     final Dimension defaultWindowDimension;
     public static final int oneRowHeight;
-    public static final int textAreaWidth = 60;
     public static final int panelWidth = 750;
-    // public static final Insets zerosInsets = new Insets(0, 0, 0, 0);
     public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
 
 
@@ -108,7 +106,7 @@ public final class Main extends JFrame {
     // MARK: Static initializer
     static {
         final JTextArea sampleTextArea = new JTextArea("Sample string");
-        Util.setFontRecursive(sampleTextArea, AppConfig.fontSize + 1);
+        Util.setFontRecursive(sampleTextArea, AppConfig.scriptFontSize);
         sampleTextArea.setRows(1);
         oneRowHeight = sampleTextArea.getFontMetrics(sampleTextArea.getFont()).getHeight();
 
@@ -193,7 +191,7 @@ public final class Main extends JFrame {
         gbc.gridy++;
         mainPanel.add(wfv, gbc);
         Util.setFontRecursive(mainPanel, AppConfig.fontSize);
-        Util.setFontRecursive(scriptPanel, AppConfig.fontSize + 1);
+        Util.setFontRecursive(scriptPanel, AppConfig.scriptFontSize);
         this.add(mainPanel);
 
         // Component size setting
@@ -202,7 +200,9 @@ public final class Main extends JFrame {
         scriptPanel.setPreferredSize(
             new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
         // Index Label
-        indexLabel.setColumns(Main.textAreaWidth / 3);
+        final Dimension indexLabelDimension = indexLabel.getPreferredSize();
+        indexLabelDimension.width = Main.panelWidth / 3;
+        indexLabel.setPreferredSize(indexLabelDimension);
         // Slider
         final Dimension miniButtonSize = miniNextButton.getPreferredSize();
         final Dimension sliderSize = indexSlider.getPreferredSize();

@@ -85,7 +85,9 @@ final class WaveFormViewer extends JPanel {
 
         // Index viewer
         this.indexLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        this.indexLabel.setColumns(Main.textAreaWidth / 4);
+        final Dimension indexLabelDimension = indexLabel.getPreferredSize();
+        indexLabelDimension.width = Main.panelWidth / 4;
+        indexLabel.setPreferredSize(indexLabelDimension);
         this.indexLabel.setBackground(null);
         this.indexLabel.setEditable(true);
         this.indexLabel.setFocusable(true);

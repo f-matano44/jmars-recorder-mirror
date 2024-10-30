@@ -47,6 +47,7 @@ final class AppConfig extends JFrame {
     public static final boolean isTrimming;
     public static final PrintStream logTargetStream = System.out;
     public static final float fontSize = 15f;
+    public static final float scriptFontSize = fontSize + 1;
     private static final String confFileName = "." + Main.appName + ".yaml";
 
     static {
@@ -199,7 +200,8 @@ final class AppConfig extends JFrame {
         final JTextArea textArea = new UneditableTextArea(sb.toString());
         Util.setFontRecursive(textArea, AppConfig.fontSize);
         textArea.setWrapStyleWord(false);
-        textArea.setColumns(Main.textAreaWidth);
+        final int textAreaWidth = 60;
+        textArea.setColumns(textAreaWidth);
         final int blank = 20;
         textArea.setBorder(new EmptyBorder(blank, blank, blank, blank));
         final JScrollPane textPane = new JScrollPane(textArea);
