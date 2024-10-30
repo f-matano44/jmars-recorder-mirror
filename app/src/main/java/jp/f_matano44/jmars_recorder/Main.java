@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexLabel;
@@ -50,8 +51,16 @@ public final class Main extends JFrame {
     /** main-function. */
     public static final void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Util.setLookAndFeel();
-            new Main();
+            try {
+                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                new Main();
+            } catch (final Exception e) {
+                JOptionPane.showMessageDialog(
+                    null, e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+                System.exit(1);
+            }
         });
     }
 

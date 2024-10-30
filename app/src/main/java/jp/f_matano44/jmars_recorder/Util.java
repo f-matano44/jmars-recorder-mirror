@@ -28,20 +28,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 // import java.net.URL;
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
 
 
 final class Util {
     private Util() {
         /* Nothing to do. */
-    }
-
-    public static final void setLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static final void changeFont(Component component, final int fontSize) {
