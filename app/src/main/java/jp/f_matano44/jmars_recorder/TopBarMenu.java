@@ -35,6 +35,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+
 
 final class TopBarMenu extends JMenuBar {
     private final Main mainFrame;
@@ -179,8 +181,7 @@ final class TopBarMenu extends JMenuBar {
                 Util.appendLn(sb, "");
             }
 
-            final JTextArea textArea = new JTextArea(sb.toString());
-            Util.setTextViewerSetting(textArea);
+            final JTextArea textArea = new UneditableTextArea(sb.toString());
             textArea.setColumns(80);
             textArea.setRows(20);
             final JScrollPane scrollPane = new JScrollPane(textArea);

@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
 
 
 final class ScriptManager {
@@ -93,10 +94,9 @@ final class ScriptManager {
 
     // MARK: Child classes
     public class ScriptPanel extends JScrollPane {
-        private final JTextArea scriptTextArea = new JTextArea();
+        private final JTextArea scriptTextArea = new UneditableTextArea();
 
         public ScriptPanel() {
-            Util.setTextViewerSetting(scriptTextArea);
             scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
             this.setViewportView(scriptTextArea);
             this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);

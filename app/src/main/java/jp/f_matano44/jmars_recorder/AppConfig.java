@@ -36,6 +36,8 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+
 
 final class AppConfig extends JFrame {
     public static final AudioFormat format;
@@ -194,11 +196,9 @@ final class AppConfig extends JFrame {
         Util.appendLn(sb, "Trimming");
         Util.appendLn(sb, ">> " + AppConfig.isTrimming);
 
-        final JTextArea textArea = new JTextArea(sb.toString());
+        final JTextArea textArea = new UneditableTextArea(sb.toString());
         Util.setFontRecursive(textArea, AppConfig.fontSize);
-        Util.setTextViewerSetting(textArea);
         textArea.setWrapStyleWord(false);
-        textArea.setEditable(false);
         textArea.setColumns(Main.textAreaWidth);
         final int blank = 20;
         textArea.setBorder(new EmptyBorder(blank, blank, blank, blank));

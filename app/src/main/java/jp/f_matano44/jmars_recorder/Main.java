@@ -108,7 +108,7 @@ public final class Main extends JFrame {
     // MARK: Static initializer
     static {
         final JTextArea sampleTextArea = new JTextArea("Sample string");
-        Util.setTextViewerSetting(sampleTextArea);
+        Util.setFontRecursive(sampleTextArea, AppConfig.fontSize + 1);
         sampleTextArea.setRows(1);
         oneRowHeight = sampleTextArea.getFontMetrics(sampleTextArea.getFont()).getHeight();
 

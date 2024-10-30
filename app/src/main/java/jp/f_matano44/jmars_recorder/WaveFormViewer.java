@@ -43,6 +43,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+
 
 final class WaveFormViewer extends JPanel {
     private static final int sPanelWidth = Main.panelWidth - 14;
@@ -64,7 +66,7 @@ final class WaveFormViewer extends JPanel {
     private final JSlider endSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
     private final SignalPanel sPanel = new SignalPanel();
-    private final JTextArea recInfoViewer = new JTextArea();
+    private final JTextArea recInfoViewer = new UneditableTextArea();
 
     public WaveFormViewer() {
         // Previous button
@@ -160,7 +162,6 @@ final class WaveFormViewer extends JPanel {
         recorderChooserPanel.add(this.nextButton, recorderChooserGbc);
 
         // SNR viewer
-        Util.setTextViewerSetting(this.recInfoViewer);
         // set size
         this.recInfoViewer.setRows(1);
         this.recInfoViewer.setPreferredSize(
