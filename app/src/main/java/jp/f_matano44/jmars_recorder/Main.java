@@ -84,7 +84,7 @@ public final class Main extends JFrame {
     private static final String startButtonString = "Start recording";
     private static final String recordingString   = "Stop and Save";
     public static final int lineBorderThickness = 1;
-    final Dimension defaultWindowDimension;
+    private final Dimension defaultWindowDimension;
     public static final int oneRowHeight;
     public static final int panelWidth = 750;
     public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
@@ -207,7 +207,7 @@ public final class Main extends JFrame {
     }
 
 
-    // MARK: Methods
+    // MARK: Update
     private void update() {
         scriptPanel.updateText(sm.getScriptText());
         final File targetFile = sm.getSaveFileObject();
@@ -257,6 +257,7 @@ public final class Main extends JFrame {
     }
 
 
+    // MARK: setComponentAction
     private void setComponentAction() {
         indexSlider.addChangeListener((ChangeEvent e) -> {
             indexSlider.updateIndex();
@@ -323,5 +324,10 @@ public final class Main extends JFrame {
             wfv.reset();
             this.update();
         });
+    }
+
+    // MARK: Reset Size
+    public void resetSize() {
+        this.setSize(defaultWindowDimension);
     }
 }

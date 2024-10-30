@@ -19,6 +19,7 @@
 package jp.f_matano44.jmars_recorder;
 
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.InputStream;
@@ -94,7 +95,7 @@ final class TopBarMenu extends JMenuBar {
 
             final JMenuItem resetWindowSize = new JMenuItem("Reset window size");
             resetWindowSize.addActionListener((ActionEvent e)
-                -> mainFrame.setSize(mainFrame.defaultWindowDimension));
+                -> mainFrame.resetSize());
             this.add(resetWindowSize);
         }
     }
@@ -137,18 +138,14 @@ final class TopBarMenu extends JMenuBar {
             }
 
             final JTextArea textArea = new UneditableTextArea(sb.toString());
-            textArea.setColumns(80);
-            textArea.setRows(20);
             final JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setVerticalScrollBarPolicy(
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            scrollPane.setBackground(null);
-            scrollPane.setAutoscrolls(true);
-            scrollPane.getViewport().setBackground(null);
             SwingUtilities.invokeLater(() ->
                 scrollPane.getVerticalScrollBar().setValue(0));
             final int blank = 20;
             scrollPane.setBorder(new EmptyBorder(blank, blank, blank, blank));
+            scrollPane.setPreferredSize(new Dimension(Main.panelWidth, Main.panelWidth));
 
             Util.setFontRecursive(scrollPane, AppConfig.fontSize);
             this.add(scrollPane);
@@ -156,7 +153,6 @@ final class TopBarMenu extends JMenuBar {
             // Window setting
             this.pack();
             this.setResizable(false);
-            this.setMinimumSize(getSize());
             this.setLocationRelativeTo(null);
             this.setVisible(true);
         }

@@ -18,6 +18,7 @@
 
 package jp.f_matano44.jmars_recorder;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -200,8 +201,9 @@ final class AppConfig extends JFrame {
         final JTextArea textArea = new UneditableTextArea(sb.toString());
         Util.setFontRecursive(textArea, AppConfig.fontSize);
         textArea.setWrapStyleWord(false);
-        final int textAreaWidth = 60;
-        textArea.setColumns(textAreaWidth);
+        final Dimension textAreaDimension = textArea.getPreferredSize();
+        textAreaDimension.width = (int) (Main.panelWidth * 0.9);
+        textArea.setPreferredSize(textAreaDimension);
         final int blank = 20;
         textArea.setBorder(new EmptyBorder(blank, blank, blank, blank));
         final JScrollPane textPane = new JScrollPane(textArea);
