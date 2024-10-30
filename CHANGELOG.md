@@ -1,5 +1,10 @@
 # Version History
 
+## version 20241031
+
+* 1 つ前に戻るボタンを追加
+* UI の調整
+
 ## version 20241025
 
 * UI の調整
