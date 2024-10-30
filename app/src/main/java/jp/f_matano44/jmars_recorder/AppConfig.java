@@ -34,9 +34,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
 
 
 final class AppConfig extends JFrame {
@@ -213,11 +213,6 @@ final class AppConfig extends JFrame {
         this.setVisible(true);
     }
 
-    public static final File getSaveFile(final int index) {
-        final int num = index + 1;
-        final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
-        return new File(saveTo, fileString);
-    }
 
     public static void unexpectedError(final Exception e) {
         final String[] messages = {

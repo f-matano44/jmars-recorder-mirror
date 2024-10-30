@@ -211,7 +211,7 @@ final class RecorderBody implements Cloneable {
     public final void saveSignalAsWav(
         final double startPercent, final double endPercent
     ) {
-        final File targetFile = AppConfig.getSaveFile(sm.getCurrentIndex());
+        final File targetFile = sm.getSaveFileObject();
         final int nbits = AppConfig.format.getSampleSizeInBits();
         final float fs = AppConfig.format.getSampleRate();
         final double[] allSignal = this.getDoubleSignal();

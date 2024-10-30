@@ -253,9 +253,9 @@ public final class Main extends JFrame {
     // MARK: Methods
     private void update() {
         scriptPanel.updateText(sm.getScriptText());
-        final File saveTo = AppConfig.getSaveFile(sm.getCurrentIndex());
+        final File targetFile = sm.getSaveFileObject();
         final Color lightGreen = new Color(220, 255, 220);
-        scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
+        scriptPanel.updateColor(targetFile.exists() ? lightGreen : null);
 
         indexSlider.updateValue();
         indexSlider.setEnabled(!RecorderBody.isRecording());

@@ -19,6 +19,7 @@
 package jp.f_matano44.jmars_recorder;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -181,5 +182,11 @@ final class ScriptManager {
 
     public final int getCurrentIndex() {
         return this.currentIndex;
+    }
+
+    public final File getSaveFileObject() {
+        final int num = currentIndex + 1;
+        final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
+        return new File(AppConfig.saveTo, fileString);
     }
 }
