@@ -137,7 +137,7 @@ final class TopBarMenu extends JMenuBar {
             SimpleAttributeSet center = new SimpleAttributeSet();
             StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
             doc.setParagraphAttributes(0, doc.getLength(), center, false);
-            Util.changeFont(textPane, AppConfig.fontSize);
+            Util.setFontRecursive(textPane, AppConfig.fontSize);
             textPane.setEditable(false);
             textPane.setFocusable(false);
             textPane.setBackground(null);
@@ -194,7 +194,7 @@ final class TopBarMenu extends JMenuBar {
             final int blank = 20;
             scrollPane.setBorder(new EmptyBorder(blank, blank, blank, blank));
 
-            Util.changeFont(scrollPane, AppConfig.fontSize);
+            Util.setFontRecursive(scrollPane, AppConfig.fontSize);
             this.add(scrollPane);
 
             // Window setting

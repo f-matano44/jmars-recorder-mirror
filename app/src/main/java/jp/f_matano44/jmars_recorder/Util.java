@@ -26,37 +26,41 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-// import java.net.URL;
 import javax.swing.JTextArea;
 
 
 final class Util {
+    private static final Font font;
+
     private Util() {
         /* Nothing to do. */
     }
 
-    public static final void changeFont(Component component, final int fontSize) {
-        Font font = null;
+    static {
+        Font tempFont = null;
         try (
-            final InputStream input = Main.class.getClassLoader()
+            final InputStream input = Util.class.getClassLoader()
                 .getResourceAsStream("VL-PGothic-Regular.ttf")
         ) {
-            font = Font.createFont(Font.TRUETYPE_FONT, input)
-                .deriveFont(Font.BOLD, (float) fontSize);
+            tempFont = Font.createFont(Font.TRUETYPE_FONT, input)
+                .deriveFont(Font.BOLD, (float) AppConfig.fontSize);
         } catch (final FontFormatException | IOException e) {
-            font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
+            tempFont = new Font(Font.MONOSPACED, Font.PLAIN, (int) AppConfig.fontSize);
         }
+        font = tempFont;
+    }
 
-        component.setFont(font);
+    public static final void setFontRecursive(final Component component, final float fontSize) {
+        component.setFont(font.deriveFont(fontSize));
         if (component instanceof Container) {
-            for (Component child : ((Container) component).getComponents()) {
-                changeFont(child, fontSize);
+            for (final Component child : ((Container) component).getComponents()) {
+                setFontRecursive(child, fontSize);
             }
         }
     }
 
     public static final void setTextViewerSetting(JTextArea textArea) {
-        Util.changeFont(textArea, AppConfig.fontSize);
+        Util.setFontRecursive(textArea, AppConfig.fontSize);
         textArea.setWrapStyleWord(true);
         textArea.setLineWrap(true);
         textArea.setEditable(false);

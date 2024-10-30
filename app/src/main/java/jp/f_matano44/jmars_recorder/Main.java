@@ -192,8 +192,8 @@ public final class Main extends JFrame {
         mainPanel.add(recorderPanel, gbc);
         gbc.gridy++;
         mainPanel.add(wfv, gbc);
-        Util.changeFont(mainPanel, AppConfig.fontSize);
-        Util.changeFont(scriptPanel, AppConfig.fontSize + 1);
+        Util.setFontRecursive(mainPanel, AppConfig.fontSize);
+        Util.setFontRecursive(scriptPanel, AppConfig.fontSize + 1);
         this.add(mainPanel);
 
         // Component size setting
