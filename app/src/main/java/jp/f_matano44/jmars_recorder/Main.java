@@ -27,10 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Properties;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -93,59 +90,19 @@ public final class Main extends JFrame {
     public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
 
 
-    // MARK: application info
-    public static final String appName;
-    public static final String appVersion;
-    public static final String buildBy;
-    public static final String buildDate;
-    public static final String gitHEAD;
-    public static final String copyright;
-    public static final String license;
-
-
     // MARK: Static initializer
     static {
         final JTextArea sampleTextArea = new JTextArea("Sample string");
         Util.setFontRecursive(sampleTextArea, AppConfig.scriptFontSize);
         sampleTextArea.setRows(1);
         oneRowHeight = sampleTextArea.getFontMetrics(sampleTextArea.getFont()).getHeight();
-
-        String tempAppName = "unknown";
-        String tempAppVersion = "unknown";
-        String tempBuildBy = "unknown";
-        String tempBuildDate = "unknown";
-        String tempGitHEAD = "unknown";
-        String tempCopyright = "unknown";
-        String tempLicense = "unknown";
-        try (InputStream input = Main.class.getClassLoader()
-            .getResourceAsStream("build-info.properties")
-        ) {
-            final Properties prop = new Properties();
-            prop.load(input);
-            tempAppName = prop.getProperty("app.name");
-            tempAppVersion = prop.getProperty("app.version");
-            tempBuildBy = prop.getProperty("build.by");
-            tempBuildDate = prop.getProperty("build.date");
-            tempGitHEAD = prop.getProperty("git.head");
-            tempCopyright = prop.getProperty("copyright");
-            tempLicense = prop.getProperty("license");
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        appName = tempAppName;
-        appVersion = tempAppVersion;
-        buildBy = tempBuildBy;
-        buildDate = tempBuildDate;
-        gitHEAD = tempGitHEAD;
-        copyright = tempCopyright;
-        license = tempLicense;
     }
 
 
     // MARK: Constructor
     private Main() {
         // Window config
-        super(Main.appName + " - " + Main.appVersion);
+        super(AppInfo.name + " - " + AppInfo.version);
         this.setJMenuBar(new TopBarMenu(this));
 
         // add button, slider etc. actions

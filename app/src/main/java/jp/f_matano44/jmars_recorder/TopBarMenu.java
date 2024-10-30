@@ -29,12 +29,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
 
 
@@ -86,7 +82,7 @@ final class TopBarMenu extends JMenuBar {
             openNewWindowItem.addActionListener((ActionEvent e) -> new AppConfig());
             this.add(openNewWindowItem);
 
-            final JMenuItem quitItem = new JMenuItem("Quit " + Main.appName);
+            final JMenuItem quitItem = new JMenuItem("Quit " + AppInfo.name);
             quitItem.addActionListener((ActionEvent e) -> System.exit(0));
             this.add(quitItem);
         }
@@ -107,7 +103,7 @@ final class TopBarMenu extends JMenuBar {
         public HelpTab() {
             super("Help");
 
-            final JMenuItem appInfoItem = new JMenuItem("About " + Main.appName);
+            final JMenuItem appInfoItem = new JMenuItem("About " + AppInfo.name);
             appInfoItem.addActionListener((ActionEvent e) -> new AppInfo());
             this.add(appInfoItem);
 
@@ -117,45 +113,6 @@ final class TopBarMenu extends JMenuBar {
         }
     }
 
-    private class AppInfo extends JFrame {
-        public AppInfo() {
-            super("");
-
-            final StringBuilder sb = new StringBuilder();
-            Util.appendLn(sb, Main.appName);
-            Util.appendLn(sb, "");
-            Util.appendLn(sb,
-                "Version: " + Main.appVersion + " (" + Main.gitHEAD + ")");
-            Util.appendLn(sb,
-                "Build by: " + Util.insertNewLines(Main.buildBy));
-            Util.appendLn(sb, "Build date: " + Main.buildDate);
-            Util.appendLn(sb, "");
-            Util.appendLn(sb, "License: " + Main.license);
-            sb.append(Main.copyright);
-
-            final JTextPane textPane = new JTextPane();
-            textPane.setText(sb.toString());
-            StyledDocument doc = textPane.getStyledDocument();
-            SimpleAttributeSet center = new SimpleAttributeSet();
-            StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-            doc.setParagraphAttributes(0, doc.getLength(), center, false);
-            Util.setFontRecursive(textPane, AppConfig.fontSize);
-            textPane.setEditable(false);
-            textPane.setFocusable(false);
-            textPane.setBackground(null);
-            textPane.setBorder(null);
-            textPane.setAutoscrolls(false);
-            final int blank = 20;
-            textPane.setBorder(new EmptyBorder(blank, blank, blank, blank));
-            this.add(textPane);
-
-            // Window setting
-            this.pack();
-            this.setResizable(false);
-            this.setLocationRelativeTo(null);
-            this.setVisible(true);
-        }
-    }
 
     private class ThirdPartyNotice extends JFrame {
         public ThirdPartyNotice() {

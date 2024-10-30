@@ -48,7 +48,7 @@ final class AppConfig extends JFrame {
     public static final PrintStream logTargetStream = System.out;
     public static final float fontSize = 15f;
     public static final float scriptFontSize = fontSize + 1;
-    private static final String confFileName = "." + Main.appName + ".yaml";
+    private static final String confFileName = "." + AppInfo.name + ".yaml";
 
     static {
         final String fsKey = "sample_rate";
@@ -60,8 +60,8 @@ final class AppConfig extends JFrame {
 
         final String osName = System.getProperty("os.name").toLowerCase();
         final File basePath = osName.contains("win") || osName.contains("mac")
-            ? new File(System.getProperty("user.home"), "Desktop/" + Main.appName)
-            : new File(System.getProperty("user.home"), Main.appName);
+            ? new File(System.getProperty("user.home"), "Desktop/" + AppInfo.name)
+            : new File(System.getProperty("user.home"), AppInfo.name);
 
         final int defaultFs = 48000;
         final int defaultNbits = 16;
@@ -216,7 +216,7 @@ final class AppConfig extends JFrame {
     }
 
 
-    public static void unexpectedError(final Exception e) {
+    private static void unexpectedError(final Exception e) {
         final String[] messages = {
             "An unexpected error has occurred in loading configure.",
             "Please send the following information to the author:",
@@ -235,6 +235,7 @@ final class AppConfig extends JFrame {
             null, message,
             "Error", JOptionPane.ERROR_MESSAGE
         );
+
         System.exit(1);
     }
 }
