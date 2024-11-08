@@ -1,17 +1,17 @@
 /*
  * jMARS Recorder
  * Copyright (C) 2023  Fumiyoshi MATANO
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -34,6 +34,7 @@ import jp.f_matano44.jfloatwavio.Converter;
 import jp.f_matano44.jfloatwavio.WavIO;
 
 final class RecorderBody implements Cloneable {
+    private final ScriptManager sm;
     /* Constant */
     private static final byte[] defaultSignal = new byte[0];
     private static final double trimmingThreshold_db = -15.0;
@@ -45,14 +46,15 @@ final class RecorderBody implements Cloneable {
     /* data */
     private byte[] byteSignal = defaultSignal;
 
-    public RecorderBody() {
+    public RecorderBody(final ScriptManager sm) {
+        this.sm = sm;
         TargetDataLine line = null;
         try {
             line = AudioSystem.getTargetDataLine(AppConfig.format);
         } catch (final Exception e) {
             e.printStackTrace(AppConfig.logTargetStream);
             JOptionPane.showMessageDialog(
-                null, 
+                null,
                 "DataLine couldn't open. Please check microphone or "
                 + "configuration of this application.\n\n"
                 + e.getMessage(),
@@ -65,7 +67,7 @@ final class RecorderBody implements Cloneable {
 
     @Override
     public RecorderBody clone() throws CloneNotSupportedException {
-        final RecorderBody cloneRecorder = new RecorderBody();
+        final RecorderBody cloneRecorder = new RecorderBody(this.sm);
         cloneRecorder.byteSignal = this.byteSignal.clone();
         return cloneRecorder;
     }
@@ -106,7 +108,7 @@ final class RecorderBody implements Cloneable {
         final int startPoint = (int) (AppConfig.format.getFrameRate() * 0.1);
         for (int i = startPoint; i < power.length; i++) {
             if (trimmingThreshold_db < power[i]) {
-                final double ret = 
+                final double ret =
                     (double) (i - trimmingMargin_s * AppConfig.format.getSampleRate())
                     / power.length;
                 return Math.max(ret, 0.0);
@@ -120,7 +122,7 @@ final class RecorderBody implements Cloneable {
         final int endPoint = power.length - (int) (AppConfig.format.getFrameRate() * 0.1);
         for (int i = endPoint; i >= 0; i--) {
             if (trimmingThreshold_db < power[i]) {
-                final double ret = 
+                final double ret =
                     (double) (i + (trimmingMargin_s + 0.1) * AppConfig.format.getSampleRate())
                     / power.length;
                 return Math.min(ret, 1.0);
@@ -201,7 +203,7 @@ final class RecorderBody implements Cloneable {
         final int nBits = AppConfig.format.getSampleSizeInBits();
         final float signalLength_s = (float) recordedSignal.length / ((nBits / 8) * fs);
         this.byteSignal = 0.2 /* s */ <= signalLength_s
-            ? recordedSignal.clone() 
+            ? recordedSignal.clone()
             : defaultSignal;
         RecorderBody.recording = false;
     }
@@ -209,7 +211,7 @@ final class RecorderBody implements Cloneable {
     public final void saveSignalAsWav(
         final double startPercent, final double endPercent
     ) {
-        final File targetFile = AppConfig.getSaveFile(Main.currentIndex);
+        final File targetFile = sm.getSaveFileObject();
         final int nbits = AppConfig.format.getSampleSizeInBits();
         final float fs = AppConfig.format.getSampleRate();
         final double[] allSignal = this.getDoubleSignal();

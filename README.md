@@ -17,21 +17,25 @@
 ## 起動方法
 
 ### 動作環境
-* Java 8 が動作する GUI 環境（Windows, macOS, Linux etc.）
+* Java 8 が動作する GUI 環境 \(Windows, macOS etc.\)
     * ダウンロードはこちらから → [\[java.com\]](https://www.java.com/ja/)
 * リファレンス音声の再生機能を使用するには VLC のインストールが必要です
     * ダウンロードはこちらから → [\[videolan.org\]](https://www.videolan.org/vlc/index.ja.html)
 
 
-#### 既知の不具合
+#### 既知の不具合 と その対策
+* 倍率変更されたディスプレイにおいて表示が崩れる現象が確認されました \(全環境\)
+    * `Window` \> `Reset window size` で初期状態に復帰します
 * セキュリティ機能によりマイク等が認識されない現象が確認されました \(macOS\)
     * その場合はターミナルから `java -jar` で実行してください
     * 例：`$ java -jar jMARS_Recorder-20240101.jar`
-* 倍率変更されたディスプレイにおいて表示が崩れる現象が確認されました \(全環境\)
-    * `Window` \> `Reset window size` で初期状態に復帰します
 * 特定のハードウェア構成においてリファレンス音声が正常に現象が確認されました \(Linux\)
-    * VLC 側の問題なので現状根本的な修正方法がありません
+    * VLC もしくはドライバ由来の問題なので現状根本的な修正方法がありません
     * ハードウェア由来の問題なので音声出力先を変更することにより対処可能です
+* 特定のハードウェア構成において音声が小さく収録される現象が確認されました \(Linux\)
+    * ドライバ由来の問題なので現状根本的な修正方法がありません
+    * これはもう収録後に正規化することで対処するしかないとおもいます
+    * そのためクリッピング判定が正常に動作しません
 
 
 ### jMARS のダウンロード
@@ -104,7 +108,7 @@ OS 上で設定されたマイク，スピーカーを使用します．
 
 
 ## ライセンス
-[![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://gitlab.com/f-matano44/jmars-recorder/-/blob/main/LICENSE.txt)
 
 
 ### 含まれる外部プロジェクト(アルファベット順)

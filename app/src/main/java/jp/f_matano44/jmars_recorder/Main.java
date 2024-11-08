@@ -27,24 +27,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Properties;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
+import jp.f_matano44.jmars_recorder.ScriptManager.IndexLabel;
+import jp.f_matano44.jmars_recorder.ScriptManager.IndexSlider;
+import jp.f_matano44.jmars_recorder.ScriptManager.ScriptPanel;
 
 
 /** Main-Class. */
@@ -52,21 +48,31 @@ public final class Main extends JFrame {
     /** main-function. */
     public static final void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Util.setLookAndFeel();
-            new Main();
+            try {
+                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                new Main();
+            } catch (final Exception e) {
+                JOptionPane.showMessageDialog(
+                    null, e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE
+                );
+                System.exit(1);
+            }
         });
     }
 
 
-    // MARK: Components
+    // MARK: Instances
+    private final ScriptManager sm = new ScriptManager();
+    private final RecorderBody recorder = new RecorderBody(sm);
     private final ReferencePlayer refPlayer = new ReferencePlayer();
-    private final RecorderBody recorder = new RecorderBody();
     private final WaveFormViewer wfv = new WaveFormViewer();
-    private final ScriptsManager sm = new ScriptsManager();
-    // Swing
-    private final ScriptPanel scriptPanel = new ScriptPanel();
-    private final IndexSlider indexSlider = new IndexSlider(this.sm.getScriptSize() - 1);
-    private final IndexLabel indexLabel = new IndexLabel(this.sm.getScriptSize());
+    // Swing components
+    private final ScriptPanel scriptPanel = sm.new ScriptPanel();
+    private final JButton miniNextButton = new JButton(">");
+    private final JButton miniPrevButton = new JButton("<");
+    private final IndexSlider indexSlider = sm.new IndexSlider();
+    private final IndexLabel indexLabel = sm.new IndexLabel();
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
     private final JButton no001Button = new JButton("Play No.001");
@@ -74,96 +80,58 @@ public final class Main extends JFrame {
     private final JButton playButton = new JButton("Play Rec.");
 
 
-    // MARK: Member variable
-    static int currentIndex = 0;
-
-
     // MARK: Constants
     private static final String startButtonString = "Start recording";
     private static final String recordingString   = "Stop and Save";
     public static final int lineBorderThickness = 1;
-    final Dimension defaultWindowDimension;
+    private final Dimension defaultWindowDimension;
     public static final int oneRowHeight;
-    public static final int textAreaWidth = 60;
     public static final int panelWidth = 750;
-    public static final Insets defaultInsets = new Insets(0, 0, 0, 0);
-    private static final int insetsNum = 4;
-    public static final Insets insets
-        = new Insets(insetsNum, insetsNum, insetsNum, insetsNum);
-
-
-    // MARK: application info
-    public static final String appName;
-    public static final String appVersion;
-    public static final String buildBy;
-    public static final String buildDate;
-    public static final String gitHEAD;
-    public static final String copyright;
-    public static final String license;
+    public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
 
 
     // MARK: Static initializer
     static {
         final JTextArea sampleTextArea = new JTextArea("Sample string");
-        Util.setTextViewerSetting(sampleTextArea);
+        Util.setFontRecursive(sampleTextArea, AppConfig.scriptFontSize);
         sampleTextArea.setRows(1);
         oneRowHeight = sampleTextArea.getFontMetrics(sampleTextArea.getFont()).getHeight();
-
-        String tempAppName = "unknown";
-        String tempAppVersion = "unknown";
-        String tempBuildBy = "unknown";
-        String tempBuildDate = "unknown";
-        String tempGitHEAD = "unknown";
-        String tempCopyright = "unknown";
-        String tempLicense = "unknown";
-        try (InputStream input = Main.class.getClassLoader()
-            .getResourceAsStream("build-info.properties")
-        ) {
-            final Properties prop = new Properties();
-            prop.load(input);
-            tempAppName = prop.getProperty("app.name");
-            tempAppVersion = prop.getProperty("app.version");
-            tempBuildBy = prop.getProperty("build.by");
-            tempBuildDate = prop.getProperty("build.date");
-            tempGitHEAD = prop.getProperty("git.head");
-            tempCopyright = prop.getProperty("copyright");
-            tempLicense = prop.getProperty("license");
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        appName = tempAppName;
-        appVersion = tempAppVersion;
-        buildBy = tempBuildBy;
-        buildDate = tempBuildDate;
-        gitHEAD = tempGitHEAD;
-        copyright = tempCopyright;
-        license = tempLicense;
     }
 
 
     // MARK: Constructor
     private Main() {
         // Window config
-        super(Main.appName + " - " + Main.appVersion);
+        super(AppInfo.name + " - " + AppInfo.version);
         this.setJMenuBar(new TopBarMenu(this));
 
         // add button, slider etc. actions
         this.setComponentAction();
 
-        // Recorder panel setting
+        // Slider panel
+        final JPanel sliderPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints sliderGbc = new GridBagConstraints();
+        sliderGbc.gridx = 0;
+        sliderPanel.add(miniPrevButton, sliderGbc);
+        sliderGbc.gridx++;
+        sliderPanel.add(indexSlider, sliderGbc);
+        sliderGbc.gridx++;
+        sliderPanel.add(miniNextButton, sliderGbc);
+
+        // Recorder panel
         final JPanel recorderPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints recorderGbc = new GridBagConstraints();
-        recorderGbc.insets = Main.insets;
+        recorderGbc.insets = Main.defaultInsets;
         recorderGbc.gridx = 0;
-        recorderPanel.add(this.no001Button, recorderGbc);
+        recorderPanel.add(no001Button, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.refButton, recorderGbc);
+        recorderPanel.add(refButton, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.recordButton, recorderGbc);
+        recorderPanel.add(recordButton, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.playButton, recorderGbc);
+        recorderPanel.add(playButton, recorderGbc);
         recorderGbc.gridx++;
-        recorderPanel.add(this.nextButton, recorderGbc);
+        recorderPanel.add(nextButton, recorderGbc);
 
         // main panel setting
         final JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -172,205 +140,161 @@ public final class Main extends JFrame {
         gbc.gridy = 0;
         mainPanel.add(scriptPanel, gbc);
         gbc.gridy++;
-        mainPanel.add(this.indexSlider, gbc);
+        mainPanel.add(sliderPanel, gbc);
         gbc.gridy++;
-        mainPanel.add(this.indexLabel, gbc);
+        mainPanel.add(indexLabel, gbc);
         gbc.gridy++;
         mainPanel.add(recorderPanel, gbc);
         gbc.gridy++;
         mainPanel.add(wfv, gbc);
-        Util.changeFont(mainPanel, AppConfig.fontSize);
-        Util.changeFont(scriptPanel, AppConfig.fontSize + 1);
+        Util.setFontRecursive(mainPanel, AppConfig.fontSize);
+        Util.setFontRecursive(scriptPanel, AppConfig.scriptFontSize);
         this.add(mainPanel);
 
         // Component size setting
+        // Script panel
+        final int rows = 10; // ここの数字は決め打ち
+        scriptPanel.setPreferredSize(
+            new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
+        // Index Label
+        final Dimension indexLabelDimension = indexLabel.getPreferredSize();
+        indexLabelDimension.width = Main.panelWidth / 3;
+        indexLabel.setPreferredSize(indexLabelDimension);
+        // Slider
+        final Dimension miniButtonSize = miniNextButton.getPreferredSize();
+        final Dimension sliderSize = indexSlider.getPreferredSize();
+        miniButtonSize.height = sliderSize.height;
+        sliderSize.width = Main.panelWidth - (miniButtonSize.width * 2);
+        miniPrevButton.setPreferredSize(miniButtonSize);
+        indexSlider.setPreferredSize(sliderSize);
+        miniNextButton.setPreferredSize(miniButtonSize);
         // Buttons
-        final int buttonHeight = this.recordButton.getPreferredSize().height * 2;
-        // Set dimention: Start recording
+        final int buttonHeight = recordButton.getPreferredSize().height * 2;
+        // Set dimension: Start recording
         final double buttonWidthRatio = 1.1;
-        final Dimension recordDimension = this.recordButton.getPreferredSize();
+        final Dimension recordDimension = recordButton.getPreferredSize();
         recordDimension.height = buttonHeight;
         recordDimension.width *= buttonWidthRatio;
-        this.recordButton.setPreferredSize(recordDimension);
+        recordButton.setPreferredSize(recordDimension);
         // Get other button width
         final int[] widthList = new int[4];
-        widthList[0] = this.refButton.getPreferredSize().width;
-        widthList[1] = this.no001Button.getPreferredSize().width;
-        widthList[2] = this.playButton.getPreferredSize().width;
-        widthList[3] = this.nextButton.getPreferredSize().width;
+        widthList[0] = refButton.getPreferredSize().width;
+        widthList[1] = no001Button.getPreferredSize().width;
+        widthList[2] = playButton.getPreferredSize().width;
+        widthList[3] = nextButton.getPreferredSize().width;
         final int buttonWidth = Arrays.stream(widthList).max().getAsInt();
-        // Set dimention: Others
+        // Set dimension: Others
         final Dimension buttonDimension = new Dimension(buttonWidth, buttonHeight);
-        this.refButton.setPreferredSize(buttonDimension);
-        this.no001Button.setPreferredSize(buttonDimension);
-        this.playButton.setPreferredSize(buttonDimension);
-        this.nextButton.setPreferredSize(buttonDimension);
+        refButton.setPreferredSize(buttonDimension);
+        no001Button.setPreferredSize(buttonDimension);
+        playButton.setPreferredSize(buttonDimension);
+        nextButton.setPreferredSize(buttonDimension);
 
         // Window setting
         this.pack();
-        this.defaultWindowDimension = getSize();
+        defaultWindowDimension = this.getPreferredSize();
         defaultWindowDimension.height += 5;
         defaultWindowDimension.width += 5;
-        this.setMinimumSize(this.defaultWindowDimension);
+        this.setMinimumSize(defaultWindowDimension);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 
         // initialize panel
-        this.indexSlider.setValue(0);
+        indexSlider.setValue(0);
+        recordButton.requestFocusInWindow();
         this.update();
     }
 
 
-    // MARK: Def of component
-    private static class ScriptPanel extends JScrollPane {
-        private final JTextArea scriptTextArea = new JTextArea();
-
-        public ScriptPanel() {
-            Util.setTextViewerSetting(this.scriptTextArea);
-            this.scriptTextArea.setBorder(new EmptyBorder(5, 5, 5, 5));
-            this.setViewportView(this.scriptTextArea);
-            this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
-            final int rows = 10; // ここの数字は決め打ち
-            this.setPreferredSize(new Dimension(Main.panelWidth, Main.oneRowHeight * rows));
-            // this.scriptTextArea.setRows(rows);
-            // this.scriptTextArea.setColumns(Main.textAreaWidth);
-        }
-
-        public void updateText(final String str) {
-            this.scriptTextArea.setText(str);
-        }
-
-        public void updateColor(final Color color) {
-            this.scriptTextArea.setBackground(color);
-        }
-    }
-
-
-    private static class IndexSlider extends JSlider {
-        public IndexSlider(final int sliderMax) {
-            this.setMinimum(0);
-            this.setMaximum(sliderMax);
-            final Dimension sliderSize = this.getPreferredSize();
-            sliderSize.width = Main.panelWidth;
-            this.setPreferredSize(sliderSize);
-        }
-    }
-
-
-    private static class IndexLabel extends JTextField {
-        private final int labelMax;
-
-        public IndexLabel(final int labelMax) {
-            super("0 / 0");
-            this.labelMax = labelMax;
-            this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setColumns(Main.textAreaWidth / 3);
-            this.setFocusable(true);
-            this.setBorder(new LineBorder(Color.BLACK, lineBorderThickness));
-        }
-
-        public int getIndexNumber() {
-            final int currentIdxTemp = Main.currentIndex;
-            try {
-                final String[] inputSt = this.getText().replace(" ", "").split("/");
-                final int ans = Integer.parseInt(inputSt[0]) - 1;
-                if (ans < 0 || labelMax <= ans) {
-                    throw new Exception("Too small or too big.");
-                }
-                return ans;
-            } catch (final Exception e) {
-                return currentIdxTemp;
-            }
-        }
-
-        public void update(final int currentIdx, final int maxIdx) {
-            final boolean isRecording = RecorderBody.isRecording();
-            this.setText(isRecording ? "** RECORDING **" : ((currentIndex + 1) + " / " + maxIdx));
-            this.setEditable(!isRecording);
-            this.setFocusable(!isRecording);
-            this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
-            this.setBackground(isRecording ? Color.RED : null);
-        }
-    }
-
-
-    // MARK: Methods
+    // MARK: Update
     private void update() {
-        this.scriptPanel.updateText(this.sm.getScriptText(currentIndex));
-        final File saveTo = AppConfig.getSaveFile(currentIndex);
+        scriptPanel.updateText();
+        final File targetFile = sm.getSaveFileObject();
         final Color lightGreen = new Color(220, 255, 220);
-        this.scriptPanel.updateColor(saveTo.exists() ? lightGreen : null);
+        scriptPanel.updateColor(targetFile.exists() ? lightGreen : null);
 
-        this.indexSlider.setValue(currentIndex);
-        this.indexSlider.setEnabled(!RecorderBody.isRecording());
+        indexSlider.updateValue();
+        indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        this.indexLabel.update(currentIndex, this.sm.getScriptSize());
+        indexLabel.updateValue();
 
-        this.no001Button.setEnabled(
+        no001Button.setEnabled(
             !RecorderBody.isRecording()
-            && this.refPlayer.isPlayerExist
-            && this.refPlayer.isNo001Exist()
+            && refPlayer.isPlayerExist
+            && refPlayer.isNo001Exist()
         );
 
-        this.refButton.setEnabled(
+        refButton.setEnabled(
             !RecorderBody.isRecording()
-            && this.refPlayer.isPlayerExist
-            && this.refPlayer.list.length > currentIndex
-            && this.refPlayer.list[currentIndex].exists()
+            && refPlayer.isPlayerExist
+            && refPlayer.list.length > sm.getCurrentIndex()
+            && refPlayer.list[sm.getCurrentIndex()].exists()
         );
 
-        this.recordButton.setSelected(RecorderBody.isRecording());
-        this.recordButton.setText(
+        recordButton.setSelected(RecorderBody.isRecording());
+        recordButton.setText(
             !RecorderBody.isRecording()
             ? startButtonString
             : recordingString
         );
 
-        this.playButton.setEnabled(this.wfv.isDataExist() && !RecorderBody.isRecording());
+        playButton.setEnabled(wfv.isDataExist() && !RecorderBody.isRecording());
 
-        this.nextButton.setEnabled(!RecorderBody.isRecording());
+        nextButton.setEnabled(
+            !RecorderBody.isRecording()
+            && sm.getCurrentIndex() < sm.maxOfIndex
+        );
+
+        miniPrevButton.setEnabled(
+            !RecorderBody.isRecording()
+            && sm.minOfIndex < sm.getCurrentIndex()
+        );
+        miniNextButton.setEnabled(
+            !RecorderBody.isRecording()
+            && sm.getCurrentIndex() < sm.maxOfIndex
+        );
     }
 
 
+    // MARK: setComponentAction
     private void setComponentAction() {
-        this.indexSlider.addChangeListener((ChangeEvent e) -> {
-            Main.currentIndex = this.indexSlider.getValue();
+        indexSlider.addChangeListener((ChangeEvent e) -> {
+            indexSlider.updateIndex();
             wfv.reset();
             this.update();
         });
 
-        this.indexLabel.addActionListener((ActionEvent e) -> {
-            Main.currentIndex = this.indexLabel.getIndexNumber();
+        indexLabel.addActionListener((ActionEvent e) -> {
+            indexLabel.updateIndexNumber();
             this.update();
         });
-        this.indexLabel.addFocusListener(new FocusAdapter() {
+        indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
-                Main.currentIndex = indexLabel.getIndexNumber();
+                indexLabel.updateIndexNumber();
                 update();
             }
         });
 
-        this.refButton.addActionListener((final ActionEvent e) ->
-            refPlayer.playReference(currentIndex)
+        refButton.addActionListener((final ActionEvent e) ->
+            refPlayer.playReference(sm.getCurrentIndex())
         );
 
-        this.no001Button.addActionListener((final ActionEvent e) ->
+        no001Button.addActionListener((final ActionEvent e) ->
             refPlayer.playNumber001()
         );
 
-        this.recordButton.addActionListener((final ActionEvent e) -> {
+        recordButton.addActionListener((final ActionEvent e) -> {
             try {
                 if (!RecorderBody.isRecording()) {
-                    this.recorder.startRecording();
+                    recorder.startRecording();
                 } else {
-                    this.recorder.stopRecording();
+                    recorder.stopRecording();
                     wfv.add(recorder);
                 }
                 this.update();
             } catch (final Exception ex) {
-                this.recorder.enforceStopRecording();
+                recorder.enforceStopRecording();
                 this.update();
                 ex.printStackTrace(AppConfig.logTargetStream);
                 JOptionPane.showMessageDialog(
@@ -380,14 +304,30 @@ public final class Main extends JFrame {
             }
         });
 
-        this.playButton.addActionListener((ActionEvent e) -> {
+        playButton.addActionListener((ActionEvent e) -> {
             wfv.playSignal();
         });
 
-        this.nextButton.addActionListener((ActionEvent e) -> {
-            currentIndex = this.sm.nextLine(currentIndex);
+        nextButton.addActionListener((ActionEvent e) -> {
+            sm.nextLine();
             wfv.reset();
             this.update();
         });
+
+        miniPrevButton.addActionListener((ActionEvent e) -> {
+            sm.prevLine();
+            wfv.reset();
+            this.update();
+        });
+        miniNextButton.addActionListener((ActionEvent e) -> {
+            sm.nextLine();
+            wfv.reset();
+            this.update();
+        });
+    }
+
+    // MARK: Reset Size
+    public void resetSize() {
+        this.setSize(defaultWindowDimension);
     }
 }

@@ -43,8 +43,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+
 
 final class WaveFormViewer extends JPanel {
+    // MARK: Variables
     private static final int sPanelWidth = Main.panelWidth - 14;
     private static final int sPanelHeight = 200;
     private static final int sliderMin = 0;
@@ -64,8 +67,10 @@ final class WaveFormViewer extends JPanel {
     private final JSlider endSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
     private final SignalPanel sPanel = new SignalPanel();
-    private final JTextArea recInfoViewer = new JTextArea();
+    private final JTextArea recInfoViewer = new UneditableTextArea();
 
+
+    // MARK: Constructor
     public WaveFormViewer() {
         // Previous button
         this.prevButton.addActionListener((ActionEvent e) -> {
@@ -83,7 +88,9 @@ final class WaveFormViewer extends JPanel {
 
         // Index viewer
         this.indexLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        this.indexLabel.setColumns(Main.textAreaWidth / 4);
+        final Dimension indexLabelDimension = indexLabel.getPreferredSize();
+        indexLabelDimension.width = Main.panelWidth / 4;
+        indexLabel.setPreferredSize(indexLabelDimension);
         this.indexLabel.setBackground(null);
         this.indexLabel.setEditable(true);
         this.indexLabel.setFocusable(true);
@@ -151,7 +158,7 @@ final class WaveFormViewer extends JPanel {
         // Script chooser panel setting
         final JPanel recorderChooserPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints recorderChooserGbc = new GridBagConstraints();
-        recorderChooserGbc.insets = Main.insets;
+        recorderChooserGbc.insets = Main.defaultInsets;
         recorderChooserGbc.gridx = 0;
         recorderChooserPanel.add(this.prevButton, recorderChooserGbc);
         recorderChooserGbc.gridx++;
@@ -160,7 +167,6 @@ final class WaveFormViewer extends JPanel {
         recorderChooserPanel.add(this.nextButton, recorderChooserGbc);
 
         // SNR viewer
-        Util.setTextViewerSetting(this.recInfoViewer);
         // set size
         this.recInfoViewer.setRows(1);
         this.recInfoViewer.setPreferredSize(
@@ -193,6 +199,8 @@ final class WaveFormViewer extends JPanel {
         this.reset();
     }
 
+
+    // MARK: Public method
     public void playSignal() {
         this.recs.get(recsIndex).playSignal(
             (double) startSlider.getValue() / sliderMax,
@@ -216,6 +224,20 @@ final class WaveFormViewer extends JPanel {
         this.update();
     }
 
+    public void reset() {
+        this.recs.clear();
+        this.startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
+        this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
+        this.sPanel.resetSignal();
+        this.recInfoViewer.setText(getRecInfo(
+            "----",
+            "----"
+        ));
+        this.indexLabel.setText("0 / 0");
+    }
+
+
+    // MARK: Private method
     private void update() {
         if (this.recs.size() != 0) {
             final RecorderBody recorder = this.recs.get(recsIndex);
@@ -255,18 +277,6 @@ final class WaveFormViewer extends JPanel {
         } else {
             reset();
         }
-    }
-
-    public void reset() {
-        this.recs.clear();
-        this.startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
-        this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
-        this.sPanel.resetSignal();
-        this.recInfoViewer.setText(getRecInfo(
-            "----",
-            "----"
-        ));
-        this.indexLabel.setText("0 / 0");
     }
 
     private static final String getRecInfo(String snr, String clip) {

@@ -18,6 +18,7 @@
 
 package jp.f_matano44.jmars_recorder;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,8 +35,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+
 
 final class AppConfig extends JFrame {
     public static final AudioFormat format;
@@ -44,8 +47,9 @@ final class AppConfig extends JFrame {
     public static final File saveTo;
     public static final boolean isTrimming;
     public static final PrintStream logTargetStream = System.out;
-    public static final int fontSize = 15;
-    private static final String confFileName = "." + Main.appName + ".yaml";
+    public static final float fontSize = 15f;
+    public static final float scriptFontSize = fontSize + 1;
+    private static final String confFileName = "." + AppInfo.name + ".yaml";
 
     static {
         final String fsKey = "sample_rate";
@@ -57,8 +61,8 @@ final class AppConfig extends JFrame {
 
         final String osName = System.getProperty("os.name").toLowerCase();
         final File basePath = osName.contains("win") || osName.contains("mac")
-            ? new File(System.getProperty("user.home"), "Desktop/" + Main.appName)
-            : new File(System.getProperty("user.home"), Main.appName);
+            ? new File(System.getProperty("user.home"), "Desktop/" + AppInfo.name)
+            : new File(System.getProperty("user.home"), AppInfo.name);
 
         final int defaultFs = 48000;
         final int defaultNbits = 16;
@@ -194,12 +198,12 @@ final class AppConfig extends JFrame {
         Util.appendLn(sb, "Trimming");
         Util.appendLn(sb, ">> " + AppConfig.isTrimming);
 
-        final JTextArea textArea = new JTextArea(sb.toString());
-        Util.changeFont(textArea, AppConfig.fontSize);
-        Util.setTextViewerSetting(textArea);
+        final JTextArea textArea = new UneditableTextArea(sb.toString());
+        Util.setFontRecursive(textArea, AppConfig.fontSize);
         textArea.setWrapStyleWord(false);
-        textArea.setEditable(false);
-        textArea.setColumns(Main.textAreaWidth);
+        final Dimension textAreaDimension = textArea.getPreferredSize();
+        textAreaDimension.width = (int) (Main.panelWidth * 0.9);
+        textArea.setPreferredSize(textAreaDimension);
         final int blank = 20;
         textArea.setBorder(new EmptyBorder(blank, blank, blank, blank));
         final JScrollPane textPane = new JScrollPane(textArea);
@@ -213,13 +217,8 @@ final class AppConfig extends JFrame {
         this.setVisible(true);
     }
 
-    public static final File getSaveFile(final int index) {
-        final int num = index + 1;
-        final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
-        return new File(saveTo, fileString);
-    }
 
-    public static void unexpectedError(final Exception e) {
+    private static void unexpectedError(final Exception e) {
         final String[] messages = {
             "An unexpected error has occurred in loading configure.",
             "Please send the following information to the author:",
@@ -238,6 +237,7 @@ final class AppConfig extends JFrame {
             null, message,
             "Error", JOptionPane.ERROR_MESSAGE
         );
+
         System.exit(1);
     }
 }
