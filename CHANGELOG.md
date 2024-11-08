@@ -1,6 +1,6 @@
 # Version History
 
-## version 20241031
+## version 20241108
 
 * 1 つ前に戻るボタンを追加
 * UI の調整
