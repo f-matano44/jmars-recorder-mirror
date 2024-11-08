@@ -209,7 +209,7 @@ public final class Main extends JFrame {
 
     // MARK: Update
     private void update() {
-        scriptPanel.updateText(sm.getScriptText());
+        scriptPanel.updateText();
         final File targetFile = sm.getSaveFileObject();
         final Color lightGreen = new Color(220, 255, 220);
         scriptPanel.updateColor(targetFile.exists() ? lightGreen : null);

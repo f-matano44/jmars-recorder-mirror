@@ -106,8 +106,8 @@ final class ScriptManager {
             // this.scriptTextArea.setColumns(Main.textAreaWidth);
         }
 
-        public void updateText(final String str) {
-            scriptTextArea.setText(str);
+        public void updateText() {
+            scriptTextArea.setText(lines[currentIndex]);
         }
 
         public void updateColor(final Color color) {
@@ -174,10 +174,6 @@ final class ScriptManager {
 
     public final void nextLine() {
         currentIndex = Math.min(++currentIndex, maxOfIndex);
-    }
-
-    public final String getScriptText() {
-        return lines[this.currentIndex];
     }
 
     public final int getCurrentIndex() {
