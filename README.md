@@ -108,7 +108,7 @@ OS 上で設定されたマイク，スピーカーを使用します．
 
 
 ## ライセンス
-[![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![GPLv3+](doc/imgs/gplv3-or-later.svg)](https://gitlab.com/f-matano44/jmars-recorder/-/blob/main/LICENSE.txt)
 
 
 ### 含まれる外部プロジェクト(アルファベット順)
