@@ -3,27 +3,25 @@ stages:
   - deploy
 
 build_job:
-  image: gradle:jdk17-jammy
-  only: 
+  image: gradle:jdk8
+  only:
     - main
   stage: build
   script:
     - java -version
-    - gradle jar
+    - gradle build jar
     # ---
     - mkdir jMARS_Recorder
     - mv app/build/libs/jMARS_Recorder-*.jar jMARS_Recorder/
     - mv README.md jMARS_Recorder/README.md
     - mv LICENSE.txt jMARS_Recorder/LICENSE.txt
-    - apt-get update
-    - apt-get install -y zip
-    - zip -r jMARS_Recorder-latest.zip jMARS_Recorder/
+    - tar -zcvf jMARS_Recorder-latest.tgz jMARS_Recorder/
   artifacts:
     paths:
       - jMARS_Recorder-latest.zip
 
 pages:
-  only: 
+  only:
     - main
   stage: deploy
   script:

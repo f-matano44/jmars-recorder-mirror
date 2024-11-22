@@ -17,7 +17,6 @@ import java.util.Properties
 val appFullName = "jMARS_Recorder"
 val appVersion = "20241108"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
-val javaRuntimeVersion = 8
 val license = "GPLv3 (or later)"
 val copyright = "Copyright 2023 Fumiyoshi MATANO"
 
@@ -43,23 +42,13 @@ dependencies {
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion = JavaLanguageVersion.of(8)
     }
-}
-
-tasks.withType<JavaCompile> {
-    options.release.set(javaRuntimeVersion)
 }
 
 application {
     mainClass.set(mainClassName)
-}
-
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
 }
 
 tasks.jar {
