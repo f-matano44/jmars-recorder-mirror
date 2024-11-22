@@ -18,7 +18,7 @@ build_job:
     - tar -zcvf jMARS_Recorder-latest.tgz jMARS_Recorder/
   artifacts:
     paths:
-      - jMARS_Recorder-latest.zip
+      - jMARS_Recorder-latest.tgz
 
 pages:
   only:
@@ -26,7 +26,7 @@ pages:
   stage: deploy
   script:
     - mkdir public
-    - mv jMARS_Recorder-latest.zip public/
+    - mv jMARS_Recorder-latest.tgz public/
   dependencies:
     - build_job
   artifacts:

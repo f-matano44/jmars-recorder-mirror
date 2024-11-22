@@ -6,7 +6,7 @@
 
 
 * 音声コーパス収録用レコーダー
-* ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
+* ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.tgz)
     * ローカルでビルドする方法は README の最下部に記載しています。
 * [\[If you want to read this in English, please use a machine translation...\]](https://translate.google.com/translate?sl=ja&tl=en&u=https://gitlab.com/f-matano44/jmars-recorder)
 
