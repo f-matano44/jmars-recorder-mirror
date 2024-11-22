@@ -38,7 +38,9 @@
     * ドライバ由来の問題なので現状根本的な修正方法がありません
     * これはもう収録後に正規化することで対処するしかないとおもいます
     * そのためクリッピング判定が正常に動作しません
-
+* Ubuntu 公式リポジトリ上の `openjdk-8-jre` を使用した場合に，収録した音声が再生できない現象が確認されました \(Ubuntu\)
+    * Java Runtime に由来する問題ですので，他の JRE を使用することで回避可能です
+    * [\[Azul JDKs\]](https://www.azul.com/downloads/?version=java-8-lts&os=ubuntu&architecture=x86-64-bit&package=jre#zulu) を使用することで当該問題が発生しないことを確認しました
 
 ### jMARS のダウンロード
 アプリをダウンロード及び展開し，jar ファイルを好きな場所に配置してください．

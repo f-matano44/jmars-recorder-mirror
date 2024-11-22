@@ -1,5 +1,10 @@
 # Version History
 
+## version 20241122_1
+
+* README の修正（不具合情報の追加）
+* （アプリケーションに変更はありません）
+
 ## version 20241122
 
 * CI, README の修正
