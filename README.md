@@ -7,6 +7,8 @@
 
 * 音声コーパス収録用レコーダー
 * ダウンロードはこちら → [\[gitlab.io\]](https://jmars-recorder-f-matano44-c1b89be0a6cc184def2f5c56a8ae3f5241af6.gitlab.io/jMARS_Recorder-latest.zip)
+    * ローカルでビルドする方法は README の最下部に記載しています。
+* [\[If you want to read this in English, please use a machine translation...\]](https://translate.google.com/translate?sl=ja&tl=en&u=https://gitlab.com/f-matano44/jmars-recorder)
 
 ![macOS 上で動作している開発版アプリのスクリーンショット](doc/imgs/screenshot.png)
 
@@ -69,7 +71,7 @@ OS 上で設定されたマイク，スピーカーを使用します．
 ### リファレンス音声の再生
 コーパス収録の際にカタカナ語のような「どのように発音すればよいかわからない」単語が出現する場合があります．
 その場合は，すでに収録された音声コーパスをダウンロードし，
-プロジェクトフォルダ内の `reference/` に `reference/corpus_0001.wav` のような形式で展開してください．
+プロジェクトフォルダ内の `reference/` に `corpus_0001.wav`, `corpus_0002.wav`,... のような形式で展開してください．
 すると `Play ref.` ボタンが有効化され，リファレンス音声を再生できるようになります．
 
 収録済みの ROHAN コーパスとしては，以下のようなものが挙げられます．
@@ -79,7 +81,7 @@ OS 上で設定されたマイク，スピーカーを使用します．
 * https://voiceseven.com/7rdev/login.php
 
 
-### 1 番音声の再生
+### 1 番の音声を再生
 複数回に分けて音声コーパスを収録する場合，音声の品質や喋り方などが時関経過と共に変化してしまうことがあります.
 そのような状況に対処するため，収録した音声の一番若い番号の音声を再生する機能があります.
 参考のためにご利用ください.
@@ -134,7 +136,7 @@ version 20231209 で使用していたフォントのライセンス（SIL OFL�
 
 ## 引用するには / If you want to do cite this...
 
-### 日本語（査読なし原稿）
+### 日本語（査読なし論文）
 > 俣野文義, 森勢将雅,
 ``jMARS Recorder: コーパス朗読に特化した音声収録アプリの制作と検討,’’
 日本音響学会 第 151 回 (2024 年春季) 研究発表会, pp.1061--1062 (2024.03).
@@ -151,8 +153,7 @@ Git の log を見るとバージョンの命名規則が不規則になって�
 
 
 ### 開発環境
-* Gradle \(Kotlin DSL\)
-* Java 8 互換モード \(Java 17\)
+* Java 8 + Gradle \(Kotlin DSL\)
 * [\[VSCodium\]](https://github.com/VSCodium/vscodium) + [\[Checkstyle for Java\]](https://github.com/jdneo/vscode-checkstyle)
 
 
