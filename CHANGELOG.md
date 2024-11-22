@@ -1,5 +1,9 @@
 # Version History
 
+## version 20241122
+
+* CI, README の修正
+
 ## version 20241108
 
 * 1 つ前に戻るボタンを追加

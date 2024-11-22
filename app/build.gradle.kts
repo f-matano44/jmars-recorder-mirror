@@ -15,7 +15,7 @@ import java.util.Date
 import java.util.Properties
 
 val appFullName = "jMARS_Recorder"
-val appVersion = "20241108"
+val appVersion = "20241122"
 val mainClassName = "jp.f_matano44.jmars_recorder.Main"
 val license = "GPLv3 (or later)"
 val copyright = "Copyright 2023 Fumiyoshi MATANO"
