@@ -144,9 +144,12 @@ version 20231209 で使用していたフォントのライセンス（SIL OFL�
 日本音響学会 第 151 回 (2024 年春季) 研究発表会, pp.1061--1062 (2024.03).
 
 ### English (Non-peer-reviewed)
+
+**\(A correction on November 12, 2024\)** I apologize for the mistake in the English translation of the Japanese conference name and have corrected it.
+
 > F. Matano, M. Morise,
 ``jMARS Recorder: Development and consideration of a speech-database-focused recording application,''
-Proceedings of the 2024 Spring meeting of the Acoustical Society of Japan, pp.1061--1062 (2024.03) (in Japanese).
+2024 Spring Meeting Acoustical Society of Japan, pp.1061--1062 (2024.03) (in Japanese).
 
 
 ## 開発者向け情報
