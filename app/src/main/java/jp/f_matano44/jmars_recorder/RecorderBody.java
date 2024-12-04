@@ -34,7 +34,6 @@ import jp.f_matano44.jfloatwavio.Converter;
 import jp.f_matano44.jfloatwavio.WavIO;
 
 final class RecorderBody implements Cloneable {
-    private final ScriptManager sm;
     /* Constant */
     private static final byte[] defaultSignal = new byte[0];
     private static final double trimmingThreshold_db = -15.0;
@@ -46,8 +45,7 @@ final class RecorderBody implements Cloneable {
     /* data */
     private byte[] byteSignal = defaultSignal;
 
-    public RecorderBody(final ScriptManager sm) {
-        this.sm = sm;
+    public RecorderBody() {
         TargetDataLine line = null;
         try {
             line = AudioSystem.getTargetDataLine(AppConfig.format);
@@ -67,7 +65,7 @@ final class RecorderBody implements Cloneable {
 
     @Override
     public RecorderBody clone() throws CloneNotSupportedException {
-        final RecorderBody cloneRecorder = new RecorderBody(this.sm);
+        final RecorderBody cloneRecorder = new RecorderBody();
         cloneRecorder.byteSignal = this.byteSignal.clone();
         return cloneRecorder;
     }
@@ -211,7 +209,7 @@ final class RecorderBody implements Cloneable {
     public final void saveSignalAsWav(
         final double startPercent, final double endPercent
     ) {
-        final File targetFile = sm.getSaveFileObject();
+        final File targetFile = ScriptManager.getSaveFileObject();
         final int nbits = AppConfig.format.getSampleSizeInBits();
         final float fs = AppConfig.format.getSampleRate();
         final double[] allSignal = this.getDoubleSignal();

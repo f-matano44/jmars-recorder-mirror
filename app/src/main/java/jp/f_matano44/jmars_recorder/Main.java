@@ -64,7 +64,7 @@ public final class Main extends JFrame {
 
     // MARK: Instances
     private final ScriptManager sm = new ScriptManager();
-    private final RecorderBody recorder = new RecorderBody(sm);
+    private final RecorderBody recorder = new RecorderBody();
     private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
@@ -210,7 +210,7 @@ public final class Main extends JFrame {
     // MARK: Update
     private void update() {
         scriptPanel.updateText();
-        final File targetFile = sm.getSaveFileObject();
+        final File targetFile = ScriptManager.getSaveFileObject();
         final Color lightGreen = new Color(220, 255, 220);
         scriptPanel.updateColor(targetFile.exists() ? lightGreen : null);
 
@@ -228,8 +228,8 @@ public final class Main extends JFrame {
         refButton.setEnabled(
             !RecorderBody.isRecording()
             && refPlayer.isPlayerExist
-            && refPlayer.list.length > sm.getCurrentIndex()
-            && refPlayer.list[sm.getCurrentIndex()].exists()
+            && refPlayer.list.length > ScriptManager.getCurrentIndex()
+            && refPlayer.list[ScriptManager.getCurrentIndex()].exists()
         );
 
         recordButton.setSelected(RecorderBody.isRecording());
@@ -243,16 +243,16 @@ public final class Main extends JFrame {
 
         nextButton.setEnabled(
             !RecorderBody.isRecording()
-            && sm.getCurrentIndex() < sm.maxOfIndex
+            && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
         );
 
         miniPrevButton.setEnabled(
             !RecorderBody.isRecording()
-            && sm.minOfIndex < sm.getCurrentIndex()
+            && ScriptManager.minOfIndex < ScriptManager.getCurrentIndex()
         );
         miniNextButton.setEnabled(
             !RecorderBody.isRecording()
-            && sm.getCurrentIndex() < sm.maxOfIndex
+            && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
         );
     }
 
@@ -277,7 +277,7 @@ public final class Main extends JFrame {
         });
 
         refButton.addActionListener((final ActionEvent e) ->
-            refPlayer.playReference(sm.getCurrentIndex())
+            refPlayer.playReference(ScriptManager.getCurrentIndex())
         );
 
         no001Button.addActionListener((final ActionEvent e) ->

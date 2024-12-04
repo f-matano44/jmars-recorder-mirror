@@ -39,16 +39,16 @@ import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
 
 
 final class ScriptManager {
-    private final String[] lines;
-    public final int minOfIndex;
-    public final int maxOfIndex;
-    public final int minOfLabel;
-    public final int maxOfLabel;
-    private int currentIndex = 0;
+    private static final String[] lines;
+    public static final int minOfIndex;
+    public static final int maxOfIndex;
+    public static final int minOfLabel;
+    public static final int maxOfLabel;
+    private static int currentIndex = 0;
 
 
-    // MARK: Constructor
-    public ScriptManager() {
+    // MARK: Static initializer
+    static {
         final List<String> linesList = new ArrayList<String>();
 
         try (
@@ -90,6 +90,12 @@ final class ScriptManager {
         maxOfIndex = lines.length - 1;
         minOfLabel = 1;
         maxOfLabel = lines.length;
+    }
+
+
+    // MARK: Constructor
+    public ScriptManager() {
+
     }
 
 
@@ -176,11 +182,11 @@ final class ScriptManager {
         currentIndex = Math.min(++currentIndex, maxOfIndex);
     }
 
-    public final int getCurrentIndex() {
-        return this.currentIndex;
+    public static final int getCurrentIndex() {
+        return currentIndex;
     }
 
-    public final File getSaveFileObject() {
+    public static final File getSaveFileObject() {
         final int num = currentIndex + 1;
         final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
         return new File(AppConfig.saveTo, fileString);
