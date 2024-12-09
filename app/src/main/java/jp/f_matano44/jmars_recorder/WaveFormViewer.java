@@ -112,7 +112,10 @@ final class WaveFormViewer extends JPanel {
                 if (endSlider.getValue() <= startSlider.getValue()) {
                     endSlider.setValue(startSlider.getValue() + 1);
                 }
-                repaint();
+                final double[] signal = recs.size() != 0
+                    ? recs.get(recsIndex).getDoubleSignal() : defaultSignal;
+                sPanel.updateSignal(
+                    startSlider.getValue(), endSlider.getValue(), signal);
             }
         });
         startSlider.addMouseListener(new MouseAdapter() {
@@ -133,7 +136,10 @@ final class WaveFormViewer extends JPanel {
                 if (endSlider.getValue() <= startSlider.getValue()) {
                     startSlider.setValue(endSlider.getValue() - 1);
                 }
-                repaint();
+                final double[] signal = recs.size() != 0
+                    ? recs.get(recsIndex).getDoubleSignal() : defaultSignal;
+                sPanel.updateSignal(
+                    startSlider.getValue(), endSlider.getValue(), signal);
             }
         });
         endSlider.addMouseListener(new MouseAdapter() {
@@ -228,7 +234,8 @@ final class WaveFormViewer extends JPanel {
         this.recs.clear();
         this.startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
         this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
-        this.sPanel.resetSignal();
+        this.sPanel.updateSignal(
+            startSlider.getValue(), endSlider.getValue(), defaultSignal);
         this.recInfoViewer.setText(getRecInfo(
             "----",
             "----"
@@ -250,7 +257,8 @@ final class WaveFormViewer extends JPanel {
                 endSlider.setValue(end);
             }
             final double[] dSignal = recorder.getDoubleSignal();
-            sPanel.updateSignal(dSignal);
+            sPanel.updateSignal(
+                startSlider.getValue(), endSlider.getValue(), dSignal);
             recorder.saveSignalAsWav(
                 (double) startSlider.getValue() / sliderMax,
                 (double) endSlider.getValue() / sliderMax
@@ -283,21 +291,22 @@ final class WaveFormViewer extends JPanel {
         return "S/N: " + snr + "[dB] / Clipping: " + clip;
     }
 
-    private class SignalPanel extends JPanel {
-        private double[] signal;
+    private static class SignalPanel extends JPanel {
+        private int startSliderValue = defaultStart;
+        private int endSliderValue = defaultEnd;
+        private double[] signal = defaultSignal;
 
         public SignalPanel() {
-            this.signal = defaultSignal;
-            setPreferredSize(new Dimension(sPanelWidth, sPanelHeight));
+            this.setPreferredSize(new Dimension(sPanelWidth, sPanelHeight));
         }
 
-        public void resetSignal() {
-            updateSignal(defaultSignal);
-        }
-
-        public void updateSignal(double[] newSignal) {
-            this.signal = newSignal;
-            repaint();
+        public void updateSignal(
+            final int start, final int end, final double[] signal
+        ) {
+            this.startSliderValue = start;
+            this.endSliderValue = end;
+            this.signal = signal;
+            this.repaint();
         }
 
         @Override
@@ -312,8 +321,8 @@ final class WaveFormViewer extends JPanel {
             g2d.fillRect(0, 0, sPanelWidth, sPanelHeight);
 
             // set speech-section
-            final int ssStart = startSlider.getValue();
-            final int ssWidth = endSlider.getValue() - startSlider.getValue();
+            final int ssStart = startSliderValue;
+            final int ssWidth = endSliderValue - startSliderValue;
             g2d.setColor(Color.LIGHT_GRAY);
             g2d.fillRect(ssStart, 0, ssWidth, sPanelHeight);
 
