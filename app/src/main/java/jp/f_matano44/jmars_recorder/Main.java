@@ -63,16 +63,15 @@ public final class Main extends JFrame {
 
 
     // MARK: Instances
-    private final ScriptManager sm = new ScriptManager();
     private final RecorderBody recorder = new RecorderBody();
     private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
-    private final ScriptPanel scriptPanel = sm.new ScriptPanel();
+    private final ScriptPanel scriptPanel = new ScriptPanel();
     private final JButton miniNextButton = new JButton(">");
     private final JButton miniPrevButton = new JButton("<");
-    private final IndexSlider indexSlider = sm.new IndexSlider();
-    private final IndexLabel indexLabel = sm.new IndexLabel();
+    private final IndexSlider indexSlider = new IndexSlider();
+    private final IndexLabel indexLabel = new IndexLabel();
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
     private final JButton no001Button = new JButton("Play No.001");
@@ -309,18 +308,18 @@ public final class Main extends JFrame {
         });
 
         nextButton.addActionListener((ActionEvent e) -> {
-            sm.nextLine();
+            ScriptManager.nextLine();
             wfv.reset();
             this.update();
         });
 
         miniPrevButton.addActionListener((ActionEvent e) -> {
-            sm.prevLine();
+            ScriptManager.prevLine();
             wfv.reset();
             this.update();
         });
         miniNextButton.addActionListener((ActionEvent e) -> {
-            sm.nextLine();
+            ScriptManager.nextLine();
             wfv.reset();
             this.update();
         });

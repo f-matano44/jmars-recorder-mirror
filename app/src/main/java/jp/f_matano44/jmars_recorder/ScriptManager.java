@@ -94,13 +94,34 @@ final class ScriptManager {
 
 
     // MARK: Constructor
-    public ScriptManager() {
+    private ScriptManager() { }
 
+
+    // MARK: Methods
+    public static final void prevLine() {
+        currentIndex = Math.max(--currentIndex, minOfIndex);
     }
 
 
-    // MARK: Child classes
-    public class ScriptPanel extends JScrollPane {
+    public static final void nextLine() {
+        currentIndex = Math.min(++currentIndex, maxOfIndex);
+    }
+
+
+    public static final int getCurrentIndex() {
+        return currentIndex;
+    }
+
+
+    public static final File getSaveFileObject() {
+        final int num = currentIndex + 1;
+        final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
+        return new File(AppConfig.saveTo, fileString);
+    }
+
+
+    // MARK: Inner classes
+    public static class ScriptPanel extends JScrollPane {
         private final JTextArea scriptTextArea = new UneditableTextArea();
 
         public ScriptPanel() {
@@ -122,7 +143,7 @@ final class ScriptManager {
     }
 
 
-    public class IndexSlider extends JSlider {
+    public static class IndexSlider extends JSlider {
         public IndexSlider() {
             this.setMinimum(minOfIndex);
             this.setMaximum(maxOfIndex);
@@ -138,7 +159,7 @@ final class ScriptManager {
     }
 
 
-    public class IndexLabel extends JTextField {
+    public static class IndexLabel extends JTextField {
         public IndexLabel() {
             super("0 / 0");
             this.setHorizontalAlignment(SwingConstants.CENTER);
@@ -170,25 +191,5 @@ final class ScriptManager {
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
             this.setBackground(isRecording ? new Color(230, 0, 0) : null);
         }
-    }
-
-
-    // MARK: Methods
-    public final void prevLine() {
-        currentIndex = Math.max(--currentIndex, minOfIndex);
-    }
-
-    public final void nextLine() {
-        currentIndex = Math.min(++currentIndex, maxOfIndex);
-    }
-
-    public static final int getCurrentIndex() {
-        return currentIndex;
-    }
-
-    public static final File getSaveFileObject() {
-        final int num = currentIndex + 1;
-        final String fileString = "corpus_" + String.format("%04d", num) + ".wav";
-        return new File(AppConfig.saveTo, fileString);
     }
 }
