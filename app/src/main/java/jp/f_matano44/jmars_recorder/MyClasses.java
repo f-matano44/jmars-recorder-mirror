@@ -1,6 +1,7 @@
 package jp.f_matano44.jmars_recorder;
 
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 class MyClasses {
     public static class UneditableTextArea extends JTextArea {
@@ -27,5 +28,10 @@ class MyClasses {
             // その他
             this.setAutoscrolls(false);
         }
+    }
+
+
+    public abstract static class SuperIndexViewer extends JTextField {
+
     }
 }
