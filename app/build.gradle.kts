@@ -37,7 +37,7 @@ dependencies {
     // implementation("groupID:artifactID:version")
     implementation("com.gitlab.f-matano44:jfloatwavio:4.0.0")
     implementation("uk.co.caprica:vlcj:4.7.3")
-    implementation("org.yaml:snakeyaml:2.3")
+    // implementation("org.yaml:snakeyaml:2.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
