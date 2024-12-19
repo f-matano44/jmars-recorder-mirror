@@ -32,7 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
 final class TopBarMenu extends JMenuBar {

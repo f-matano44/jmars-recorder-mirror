@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
 final class ScriptManager {

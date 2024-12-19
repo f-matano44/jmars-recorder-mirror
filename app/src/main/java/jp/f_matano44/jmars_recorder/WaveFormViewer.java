@@ -43,7 +43,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import jp.f_matano44.jmars_recorder.Util.UneditableTextArea;
+import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
 final class WaveFormViewer extends JPanel {
