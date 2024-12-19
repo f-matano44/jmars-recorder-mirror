@@ -66,7 +66,7 @@ final class WaveFormViewer extends JPanel {
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
     private final JSlider endSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
-    private final SignalPanel sPanel = new SignalPanel();
+    private final SignalPanel sPanel = new SignalPanel(sPanelWidth, sPanelHeight);
     private final JTextArea recInfoViewer = new UneditableTextArea();
 
 
@@ -147,8 +147,8 @@ final class WaveFormViewer extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 if (isDataExist()) {
                     recs.get(recsIndex).saveSignalAsWav(
-                        (double) startSlider.getValue() / sliderMax,
-                        (double) endSlider.getValue() / sliderMax
+                        (double) startSlider.getValue() / startSlider.getMaximum(),
+                        (double) endSlider.getValue() / endSlider.getMaximum()
                     );
                 }
             }
@@ -209,8 +209,8 @@ final class WaveFormViewer extends JPanel {
     // MARK: Public method
     public void playSignal() {
         this.recs.get(recsIndex).playSignal(
-            (double) startSlider.getValue() / sliderMax,
-            (double) endSlider.getValue() / sliderMax
+            (double) startSlider.getValue() / startSlider.getMaximum(),
+            (double) endSlider.getValue() / endSlider.getMaximum()
         );
     }
 
@@ -287,68 +287,11 @@ final class WaveFormViewer extends JPanel {
         }
     }
 
+
     private static final String getRecInfo(String snr, String clip) {
         return "S/N: " + snr + "[dB] / Clipping: " + clip;
     }
 
-    private static class SignalPanel extends JPanel {
-        private int startSliderValue = defaultStart;
-        private int endSliderValue = defaultEnd;
-        private double[] signal = defaultSignal;
-
-        public SignalPanel() {
-            this.setPreferredSize(new Dimension(sPanelWidth, sPanelHeight));
-        }
-
-        public void updateSignal(
-            final int start, final int end, final double[] signal
-        ) {
-            this.startSliderValue = start;
-            this.endSliderValue = end;
-            this.signal = signal;
-            this.repaint();
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            final BufferedImage bi = new BufferedImage(
-                sPanelWidth, sPanelHeight, BufferedImage.TYPE_INT_RGB);
-            final Graphics2D g2d = bi.createGraphics();
-
-            // set background
-            g2d.setColor(Color.GRAY);
-            g2d.fillRect(0, 0, sPanelWidth, sPanelHeight);
-
-            // set speech-section
-            final int ssStart = startSliderValue;
-            final int ssWidth = endSliderValue - startSliderValue;
-            g2d.setColor(Color.LIGHT_GRAY);
-            g2d.fillRect(ssStart, 0, ssWidth, sPanelHeight);
-
-            // y = 0
-            g2d.setColor(Color.RED);
-            g2d.setStroke(new BasicStroke(1));
-            g2d.drawLine(0, sPanelHeight / 2, sPanelWidth, sPanelHeight / 2);
-
-            if (1 < this.signal.length) {
-                final Path2D path = new Path2D.Double();
-                final double y0 = sPanelHeight / 2.0 - (sPanelHeight * signal[0]) / 2.0;
-                path.moveTo(0, y0);
-                for (int i = 1; i < signal.length; i++) {
-                    int x = (int) Math.round((double) i / (signal.length - 1) * sPanelWidth);
-                    double y = sPanelHeight / 2.0 - (sPanelHeight * signal[i]) / 2.0;
-                    path.lineTo(x, y);
-                }
-                g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(1));
-                g2d.draw(path);
-            }
-
-            g2d.dispose();
-            g.drawImage(bi, 0, 0, this);
-        }
-    }
 
     private void getIndexFromIndexViewer() {
         final int currentTemp = this.recsIndex;
@@ -361,6 +304,70 @@ final class WaveFormViewer extends JPanel {
             }
         } catch (Exception ex) {
             this.recsIndex = currentTemp;
+        }
+    }
+
+
+    // MARK: Inner Classes
+    private static class SignalPanel extends JPanel {
+        private int ssStart = defaultStart;
+        private int ssEnd = defaultEnd;
+        private double[] signal = defaultSignal;
+
+        public SignalPanel(final int width, final int height) {
+            this.setPreferredSize(new Dimension(width, height));
+        }
+
+        public void updateSignal(
+            final int start, final int end, final double[] signal
+        ) {
+            this.ssStart = start;
+            this.ssEnd = end;
+            this.signal = signal;
+            this.repaint();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            final int width = this.getSize().width;
+            final int height = this.getSize().height;
+
+            final BufferedImage bi = new BufferedImage(
+                width, height, BufferedImage.TYPE_INT_RGB);
+            final Graphics2D g2d = bi.createGraphics();
+
+            // set background
+            g2d.setColor(Color.GRAY);
+            g2d.fillRect(0, 0, width, height);
+
+            // set speech-section
+            final int ssWidth = ssEnd - ssStart;
+            g2d.setColor(Color.LIGHT_GRAY);
+            g2d.fillRect(ssStart, 0, ssWidth, height);
+
+            // y = 0
+            g2d.setColor(Color.RED);
+            g2d.setStroke(new BasicStroke(1));
+            g2d.drawLine(0, height / 2, width, height / 2);
+
+            if (1 < this.signal.length) {
+                final Path2D path = new Path2D.Double();
+                final double y0 = height / 2.0 - (height * signal[0]) / 2.0;
+                path.moveTo(0, y0);
+                for (int i = 1; i < signal.length; i++) {
+                    final int x = (int) Math.round((double) i / (signal.length - 1) * width);
+                    final double y = height / 2.0 - (height * signal[i]) / 2.0;
+                    path.lineTo(x, y);
+                }
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(1));
+                g2d.draw(path);
+            }
+
+            g2d.dispose();
+            g.drawImage(bi, 0, 0, this);
         }
     }
 }
