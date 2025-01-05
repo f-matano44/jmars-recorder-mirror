@@ -260,7 +260,7 @@ public final class Main extends JFrame {
     private void setComponentAction() {
         indexSlider.addChangeListener((ChangeEvent e) -> {
             indexSlider.updateIndex();
-            wfv.reset();
+            WaveFormViewer.reset();
             this.update();
         });
 
@@ -309,18 +309,18 @@ public final class Main extends JFrame {
 
         nextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
-            wfv.reset();
+            WaveFormViewer.reset();
             this.update();
         });
 
         miniPrevButton.addActionListener((ActionEvent e) -> {
             ScriptManager.prevLine();
-            wfv.reset();
+            WaveFormViewer.reset();
             this.update();
         });
         miniNextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
-            wfv.reset();
+            WaveFormViewer.reset();
             this.update();
         });
     }

@@ -58,31 +58,31 @@ final class WaveFormViewer extends JPanel {
     private static int recsIndex = 0;
     private static final List<RecorderBody> recs = new ArrayList<>();
 
-    private final JButton prevButton = new JButton("< Prev");
+    private static final JButton prevButton = new JButton("< Prev");
     private static final IndexViewer indexLabel = new IndexViewer();
-    private final JButton nextButton = new JButton("Next >");
-    private final JSlider startSlider = new JSlider(
+    private static final JButton nextButton = new JButton("Next >");
+    private static final JSlider startSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
-    private final JSlider endSlider = new JSlider(
+    private static final JSlider endSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
-    private final SignalPanel sPanel = new SignalPanel(sPanelWidth, sPanelHeight);
-    private final JTextArea recInfoViewer = new UneditableTextArea();
+    private static final SignalPanel sPanel = new SignalPanel(sPanelWidth, sPanelHeight);
+    private static final JTextArea recInfoViewer = new UneditableTextArea();
 
 
     // MARK: Constructor
     public WaveFormViewer() {
         // Previous button
-        this.prevButton.addActionListener((ActionEvent e) -> {
+        prevButton.addActionListener((ActionEvent e) -> {
             final int prevIndex = recsIndex - 1;
             recsIndex = 0 <= prevIndex ? prevIndex : recs.size() - 1;
-            this.update();
+            WaveFormViewer.update();
         });
 
         // Next button
-        this.nextButton.addActionListener((ActionEvent e) -> {
+        nextButton.addActionListener((ActionEvent e) -> {
             final int nextIndex = recsIndex + 1;
             recsIndex = nextIndex <= recs.size() - 1 ? nextIndex : 0;
-            this.update();
+            WaveFormViewer.update();
         });
 
         // Index viewer
@@ -91,7 +91,7 @@ final class WaveFormViewer extends JPanel {
         indexLabel.setPreferredSize(indexLabelDimension);
         indexLabel.addActionListener((ActionEvent e) -> {
             indexLabel.updateIndex();
-            this.update();
+            WaveFormViewer.update();
         });
         indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
@@ -160,17 +160,16 @@ final class WaveFormViewer extends JPanel {
         final GridBagConstraints recorderChooserGbc = new GridBagConstraints();
         recorderChooserGbc.insets = Main.defaultInsets;
         recorderChooserGbc.gridx = 0;
-        recorderChooserPanel.add(this.prevButton, recorderChooserGbc);
+        recorderChooserPanel.add(prevButton, recorderChooserGbc);
         recorderChooserGbc.gridx++;
         recorderChooserPanel.add(indexLabel, recorderChooserGbc);
         recorderChooserGbc.gridx++;
-        recorderChooserPanel.add(this.nextButton, recorderChooserGbc);
+        recorderChooserPanel.add(nextButton, recorderChooserGbc);
 
         // SNR viewer
         // set size
-        this.recInfoViewer.setRows(1);
-        this.recInfoViewer.setPreferredSize(
-            new Dimension(sPanelWidth, Main.oneRowHeight));
+        recInfoViewer.setRows(1);
+        recInfoViewer.setPreferredSize(new Dimension(sPanelWidth, Main.oneRowHeight));
 
         // determine size
         final Dimension preferredSize = startSlider.getPreferredSize();
@@ -185,18 +184,18 @@ final class WaveFormViewer extends JPanel {
         gbc.gridy = 0;
         this.add(recorderChooserPanel, gbc);
         gbc.gridy++;
-        this.add(this.startSlider, gbc);
+        this.add(startSlider, gbc);
         gbc.gridy++;
-        this.add(this.endSlider, gbc);
+        this.add(endSlider, gbc);
         gbc.gridy++;
-        this.add(this.sPanel, gbc);
+        this.add(sPanel, gbc);
         gbc.gridy++;
-        this.add(this.recInfoViewer, gbc);
+        this.add(recInfoViewer, gbc);
 
         this.setBorder(new LineBorder(Color.BLACK, Main.lineBorderThickness));
 
         // initialization
-        this.reset();
+        WaveFormViewer.reset();
     }
 
 
@@ -221,19 +220,16 @@ final class WaveFormViewer extends JPanel {
                 e.printStackTrace(AppConfig.logTargetStream);
             }
         }
-        this.update();
+        WaveFormViewer.update();
     }
 
-    public void reset() {
+    public static void reset() {
         recs.clear();
-        this.startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
-        this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
-        this.sPanel.updateSignal(
+        startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
+        endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
+        sPanel.updateSignal(
             startSlider.getValue(), endSlider.getValue(), defaultSignal);
-        this.recInfoViewer.setText(getRecInfo(
-            "----",
-            "----"
-        ));
+        recInfoViewer.setText(getRecInfo("----", "----"));
         indexLabel.resetThis();
     }
 
@@ -243,7 +239,7 @@ final class WaveFormViewer extends JPanel {
         return recs.size() - 1;
     }
 
-    private void update() {
+    private static void update() {
         if (recs.size() != 0) {
             final RecorderBody recorder = recs.get(recsIndex);
             if (AppConfig.isTrimming) {
@@ -263,17 +259,17 @@ final class WaveFormViewer extends JPanel {
             );
 
             try {
-                this.recInfoViewer.setText(getRecInfo(
+                recInfoViewer.setText(getRecInfo(
                     String.format("%.1f", recorder.getSignalNoiseRatio()),
                     String.valueOf(recorder.isClipping())
                 ));
             } catch (ArithmeticException e) {
-                this.recInfoViewer.setText(getRecInfo(
+                recInfoViewer.setText(getRecInfo(
                     "-Inf",
                     String.valueOf(recorder.isClipping())
                 ));
             } catch (Exception e) {
-                this.recInfoViewer.setText(getRecInfo(
+                recInfoViewer.setText(getRecInfo(
                     "Unknown ERROR",
                     "Look StackTrace that printed std-out"
                 ));
