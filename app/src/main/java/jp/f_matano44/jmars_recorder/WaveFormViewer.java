@@ -38,11 +38,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import jp.f_matano44.jmars_recorder.MyClasses.SuperIndexViewer;
 import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
@@ -56,11 +55,11 @@ final class WaveFormViewer extends JPanel {
     private static final int defaultEnd = sliderMax * 3 / 4;
     private static final double[] defaultSignal = new double[0];
 
-    private int recsIndex = 0;
-    public final List<RecorderBody> recs = new ArrayList<>();
+    private static int recsIndex = 0;
+    private static final List<RecorderBody> recs = new ArrayList<>();
 
     private final JButton prevButton = new JButton("< Prev");
-    private final JTextField indexLabel = new JTextField("0 / 0");
+    private static final IndexViewer indexLabel = new IndexViewer();
     private final JButton nextButton = new JButton("Next >");
     private final JSlider startSlider = new JSlider(
         JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
@@ -75,33 +74,28 @@ final class WaveFormViewer extends JPanel {
         // Previous button
         this.prevButton.addActionListener((ActionEvent e) -> {
             final int prevIndex = recsIndex - 1;
-            recsIndex = 0 <= prevIndex ? prevIndex : this.recs.size() - 1;
+            recsIndex = 0 <= prevIndex ? prevIndex : recs.size() - 1;
             this.update();
         });
 
         // Next button
         this.nextButton.addActionListener((ActionEvent e) -> {
             final int nextIndex = recsIndex + 1;
-            recsIndex = nextIndex <= this.recs.size() - 1 ? nextIndex : 0;
+            recsIndex = nextIndex <= recs.size() - 1 ? nextIndex : 0;
             this.update();
         });
 
         // Index viewer
-        this.indexLabel.setHorizontalAlignment(SwingConstants.CENTER);
         final Dimension indexLabelDimension = indexLabel.getPreferredSize();
         indexLabelDimension.width = Main.panelWidth / 4;
         indexLabel.setPreferredSize(indexLabelDimension);
-        this.indexLabel.setBackground(null);
-        this.indexLabel.setEditable(true);
-        this.indexLabel.setFocusable(true);
-        this.indexLabel.setBorder(new LineBorder(Color.BLACK, 1));
-        this.indexLabel.addActionListener((ActionEvent e) -> {
-            this.getIndexFromIndexViewer();
+        indexLabel.addActionListener((ActionEvent e) -> {
+            indexLabel.updateIndex();
             this.update();
         });
-        this.indexLabel.addFocusListener(new FocusAdapter() {
+        indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
-                getIndexFromIndexViewer();
+                indexLabel.updateIndex();
                 update();
             }
         });
@@ -168,7 +162,7 @@ final class WaveFormViewer extends JPanel {
         recorderChooserGbc.gridx = 0;
         recorderChooserPanel.add(this.prevButton, recorderChooserGbc);
         recorderChooserGbc.gridx++;
-        recorderChooserPanel.add(this.indexLabel, recorderChooserGbc);
+        recorderChooserPanel.add(indexLabel, recorderChooserGbc);
         recorderChooserGbc.gridx++;
         recorderChooserPanel.add(this.nextButton, recorderChooserGbc);
 
@@ -208,22 +202,22 @@ final class WaveFormViewer extends JPanel {
 
     // MARK: Public method
     public void playSignal() {
-        this.recs.get(recsIndex).playSignal(
+        recs.get(recsIndex).playSignal(
             (double) startSlider.getValue() / startSlider.getMaximum(),
             (double) endSlider.getValue() / endSlider.getMaximum()
         );
     }
 
     public boolean isDataExist() {
-        return this.recs.size() != 0;
+        return recs.size() != 0;
     }
 
     public void add(RecorderBody recorder) {
         if (recorder.getByteSignal().length != 0) {
             try {
-                this.recs.add(recorder.clone());
-                this.recsIndex = this.recs.size() - 1;
-            } catch (Exception e) {
+                recs.add(recorder.clone());
+                recsIndex = getMaxOfIndex();
+            } catch (final Exception e) {
                 e.printStackTrace(AppConfig.logTargetStream);
             }
         }
@@ -231,7 +225,7 @@ final class WaveFormViewer extends JPanel {
     }
 
     public void reset() {
-        this.recs.clear();
+        recs.clear();
         this.startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
         this.endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
         this.sPanel.updateSignal(
@@ -240,14 +234,18 @@ final class WaveFormViewer extends JPanel {
             "----",
             "----"
         ));
-        this.indexLabel.setText("0 / 0");
+        indexLabel.resetThis();
     }
 
 
     // MARK: Private method
+    private static int getMaxOfIndex() {
+        return recs.size() - 1;
+    }
+
     private void update() {
-        if (this.recs.size() != 0) {
-            final RecorderBody recorder = this.recs.get(recsIndex);
+        if (recs.size() != 0) {
+            final RecorderBody recorder = recs.get(recsIndex);
             if (AppConfig.isTrimming) {
                 final int start = (int) Math.round(
                     sliderMax * recorder.getStartPointOfSpeechSection_percent());
@@ -281,7 +279,7 @@ final class WaveFormViewer extends JPanel {
                 ));
                 e.printStackTrace();
             }
-            this.indexLabel.setText((recsIndex + 1) + " / " + this.recs.size());
+            indexLabel.updateThisObj();
         } else {
             reset();
         }
@@ -293,22 +291,30 @@ final class WaveFormViewer extends JPanel {
     }
 
 
-    private void getIndexFromIndexViewer() {
-        final int currentTemp = this.recsIndex;
-        try {
-            final String[] inputSt = indexLabel.getText()
-                .replace(" ", "").split("/");
-            this.recsIndex = Integer.parseInt(inputSt[0]) - 1;
-            if (this.recsIndex < 0 || this.recs.size() <= this.recsIndex) {
-                throw new Exception("Too small or too big.");
+    // MARK: Inner Classes
+    private static class IndexViewer extends SuperIndexViewer {
+        public IndexViewer() {
+            super(0);
+        }
+
+        @Override public void updateThisObj() {
+            final boolean isRecording = RecorderBody.isRecording();
+            this.setText((recsIndex + 1) + " / " + (getMaxOfIndex() + 1));
+            this.setEditable(!isRecording);
+            this.setFocusable(!isRecording);
+            this.setBackground(isRecording ? Color.LIGHT_GRAY : null);
+        }
+
+        @Override public void updateIndex() {
+            final int currentTemp = recsIndex;
+            try {
+                recsIndex = this.getIndexFromText();
+            } catch (final NumberFormatException e) {
+                recsIndex = currentTemp;
             }
-        } catch (Exception ex) {
-            this.recsIndex = currentTemp;
         }
     }
 
-
-    // MARK: Inner Classes
     private static class SignalPanel extends JPanel {
         private int ssStart = defaultStart;
         private int ssEnd = defaultEnd;

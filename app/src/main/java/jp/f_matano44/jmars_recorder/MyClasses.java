@@ -1,7 +1,10 @@
 package jp.f_matano44.jmars_recorder;
 
+import java.awt.Color;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 class MyClasses {
     public static class UneditableTextArea extends JTextArea {
@@ -32,6 +35,41 @@ class MyClasses {
 
 
     public abstract static class SuperIndexViewer extends JTextField {
+        private int maxOfIndex = 0;
+        private final int minOfIndex = 0;
 
+        public SuperIndexViewer(final int defaultMax) {
+            super("0 / 0");
+            this.setHorizontalAlignment(SwingConstants.CENTER);
+            this.setBackground(null);
+            this.setEditable(true);
+            this.setFocusable(true);
+            this.setBorder(new LineBorder(Color.BLACK, Main.lineBorderThickness));
+
+            maxOfIndex = defaultMax;
+        }
+
+        public abstract void updateThisObj();
+
+        public abstract void updateIndex();
+
+        public void resetThis() {
+            maxOfIndex = 0;
+            this.setText("0 / 0");
+        }
+
+        public void updateMaxOfIndex(int newMax) {
+            maxOfIndex = newMax;
+        }
+
+        protected final int getIndexFromText() throws NumberFormatException {
+            final String[] sepString = this.getText().replace(" ", "").split("/");
+            final int ansIndex = Integer.parseInt(sepString[0]) - 1;
+            if (ansIndex < minOfIndex || maxOfIndex < ansIndex) {
+                throw new NumberFormatException("Too small or too big.");
+            } else {
+                return ansIndex;
+            }
+        }
     }
 }

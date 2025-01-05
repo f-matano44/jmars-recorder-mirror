@@ -38,7 +38,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import jp.f_matano44.jmars_recorder.ScriptManager.IndexLabel;
+import jp.f_matano44.jmars_recorder.ScriptManager.IndexViewer;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexSlider;
 import jp.f_matano44.jmars_recorder.ScriptManager.ScriptPanel;
 
@@ -71,7 +71,7 @@ public final class Main extends JFrame {
     private final JButton miniNextButton = new JButton(">");
     private final JButton miniPrevButton = new JButton("<");
     private final IndexSlider indexSlider = new IndexSlider();
-    private final IndexLabel indexLabel = new IndexLabel();
+    private final IndexViewer indexLabel = new IndexViewer();
     private final JButton nextButton = new JButton("Next >>");
     private final JButton refButton = new JButton("Play Ref.");
     private final JButton no001Button = new JButton("Play No.001");
@@ -216,7 +216,7 @@ public final class Main extends JFrame {
         indexSlider.updateValue();
         indexSlider.setEnabled(!RecorderBody.isRecording());
 
-        indexLabel.updateValue();
+        indexLabel.updateThisObj();
 
         no001Button.setEnabled(
             !RecorderBody.isRecording()
@@ -265,12 +265,12 @@ public final class Main extends JFrame {
         });
 
         indexLabel.addActionListener((ActionEvent e) -> {
-            indexLabel.updateIndexNumber();
+            indexLabel.updateIndex();
             this.update();
         });
         indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
-                indexLabel.updateIndexNumber();
+                indexLabel.updateIndex();
                 update();
             }
         });

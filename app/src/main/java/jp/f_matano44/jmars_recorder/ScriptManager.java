@@ -31,19 +31,19 @@ import java.util.Scanner;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import jp.f_matano44.jmars_recorder.MyClasses.SuperIndexViewer;
 import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
 final class ScriptManager {
     private static final String[] lines;
+    // index: 配列のインデックス
+    // 表示される数値 - 1 <- Java は 0-index のため
     public static final int minOfIndex;
     public static final int maxOfIndex;
-    public static final int minOfLabel;
-    public static final int maxOfLabel;
+    // label: パネルに表示する番号 (index + 1)
     private static int currentIndex = 0;
 
 
@@ -88,8 +88,6 @@ final class ScriptManager {
         lines = linesList.toArray(new String[linesList.size()]);
         minOfIndex = 0;
         maxOfIndex = lines.length - 1;
-        minOfLabel = 1;
-        maxOfLabel = lines.length;
     }
 
 
@@ -159,33 +157,25 @@ final class ScriptManager {
     }
 
 
-    public static class IndexLabel extends JTextField {
-        public IndexLabel() {
-            super("0 / 0");
-            this.setHorizontalAlignment(SwingConstants.CENTER);
-            this.setFocusable(true);
-            this.setBorder(new LineBorder(Color.BLACK, Main.lineBorderThickness));
+    public static class IndexViewer extends SuperIndexViewer {
+        public IndexViewer() {
+            super(maxOfIndex);
         }
 
-        public void updateIndexNumber() {
+        @Override public void updateIndex() {
             final int tempIndex = currentIndex;
             try {
-                final String[] inputSt = this.getText().replace(" ", "").split("/");
-                final int ansIndex = Integer.parseInt(inputSt[0]) - 1;
-                if (ansIndex < minOfIndex || maxOfIndex < ansIndex) {
-                    throw new Exception("Too small or too big.");
-                }
-                currentIndex = ansIndex;
-            } catch (final Exception e) {
+                currentIndex = this.getIndexFromText();
+            } catch (final NumberFormatException e) {
                 currentIndex = tempIndex;
             }
         }
 
-        public void updateValue() {
+        @Override public void updateThisObj() {
             final boolean isRecording = RecorderBody.isRecording();
             this.setText(isRecording
                 ? "** RECORDING **"
-                : ((currentIndex + 1) + " / " + maxOfLabel));
+                : ((currentIndex + 1) + " / " + (maxOfIndex + 1)));
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);
             this.setForeground(isRecording ? Color.WHITE : Color.BLACK);
