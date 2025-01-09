@@ -38,8 +38,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import jp.f_matano44.jmars_recorder.ScriptManager.IndexViewer;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexSlider;
+import jp.f_matano44.jmars_recorder.ScriptManager.IndexViewer;
 import jp.f_matano44.jmars_recorder.ScriptManager.ScriptPanel;
 
 
@@ -238,7 +238,8 @@ public final class Main extends JFrame {
             : recordingString
         );
 
-        playButton.setEnabled(wfv.isDataExist() && !RecorderBody.isRecording());
+        playButton.setEnabled(
+            WaveFormViewer.hasRecData() && !RecorderBody.isRecording());
 
         nextButton.setEnabled(
             !RecorderBody.isRecording()
@@ -260,7 +261,7 @@ public final class Main extends JFrame {
     private void setComponentAction() {
         indexSlider.addChangeListener((ChangeEvent e) -> {
             indexSlider.updateIndex();
-            WaveFormViewer.reset();
+            WaveFormViewer.resetThis();
             this.update();
         });
 
@@ -309,18 +310,18 @@ public final class Main extends JFrame {
 
         nextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
-            WaveFormViewer.reset();
+            WaveFormViewer.resetThis();
             this.update();
         });
 
         miniPrevButton.addActionListener((ActionEvent e) -> {
             ScriptManager.prevLine();
-            WaveFormViewer.reset();
+            WaveFormViewer.resetThis();
             this.update();
         });
         miniNextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
-            WaveFormViewer.reset();
+            WaveFormViewer.resetThis();
             this.update();
         });
     }

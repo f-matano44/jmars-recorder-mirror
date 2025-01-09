@@ -58,103 +58,18 @@ final class WaveFormViewer extends JPanel {
     private static int recsIndex = 0;
     private static final List<RecorderBody> recs = new ArrayList<>();
 
-    private static final JButton prevButton = new JButton("< Prev");
-    private static final IndexViewer indexLabel = new IndexViewer();
-    private static final JButton nextButton = new JButton("Next >");
-    private static final JSlider startSlider = new JSlider(
-        JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
-    private static final JSlider endSlider = new JSlider(
-        JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
+    // MARK: Components
+    private static final PrevButton prevButton = new PrevButton();
+    private static final IndexViewer indexViewer = new IndexViewer();
+    private static final NextButton nextButton = new NextButton();
+    private static final StartSlider startSlider = new StartSlider();
+    private static final EndSlider endSlider = new EndSlider();
     private static final SignalPanel sPanel = new SignalPanel(sPanelWidth, sPanelHeight);
     private static final JTextArea recInfoViewer = new UneditableTextArea();
 
 
     // MARK: Constructor
     public WaveFormViewer() {
-        // Previous button
-        prevButton.addActionListener((ActionEvent e) -> {
-            final int prevIndex = recsIndex - 1;
-            recsIndex = 0 <= prevIndex ? prevIndex : recs.size() - 1;
-            WaveFormViewer.update();
-        });
-
-        // Next button
-        nextButton.addActionListener((ActionEvent e) -> {
-            final int nextIndex = recsIndex + 1;
-            recsIndex = nextIndex <= recs.size() - 1 ? nextIndex : 0;
-            WaveFormViewer.update();
-        });
-
-        // Index viewer
-        final Dimension indexLabelDimension = indexLabel.getPreferredSize();
-        indexLabelDimension.width = Main.panelWidth / 4;
-        indexLabel.setPreferredSize(indexLabelDimension);
-        indexLabel.addActionListener((ActionEvent e) -> {
-            indexLabel.updateIndex();
-            WaveFormViewer.update();
-        });
-        indexLabel.addFocusListener(new FocusAdapter() {
-            @Override public void focusLost(FocusEvent e) {
-                indexLabel.updateIndex();
-                update();
-            }
-        });
-
-        startSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (endSlider.getValue() <= startSlider.getValue()) {
-                    endSlider.setValue(startSlider.getValue() + 1);
-                }
-                final double[] signal = recs.size() != 0
-                    ? recs.get(recsIndex).getDoubleSignal() : defaultSignal;
-                sPanel.updateSignal(
-                    startSlider.getValue(), endSlider.getValue(), signal);
-            }
-        });
-        startSlider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (isDataExist()) {
-                    recs.get(recsIndex).saveSignalAsWav(
-                        (double) startSlider.getValue() / sliderMax,
-                        (double) endSlider.getValue() / sliderMax
-                    );
-                }
-            }
-        });
-
-        endSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (endSlider.getValue() <= startSlider.getValue()) {
-                    startSlider.setValue(endSlider.getValue() - 1);
-                }
-                final double[] signal = recs.size() != 0
-                    ? recs.get(recsIndex).getDoubleSignal() : defaultSignal;
-                sPanel.updateSignal(
-                    startSlider.getValue(), endSlider.getValue(), signal);
-            }
-        });
-        endSlider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (isDataExist()) {
-                    recs.get(recsIndex).saveSignalAsWav(
-                        (double) startSlider.getValue() / startSlider.getMaximum(),
-                        (double) endSlider.getValue() / endSlider.getMaximum()
-                    );
-                }
-            }
-        });
-
-        if (!AppConfig.isTrimming) {
-            startSlider.setValue(sliderMin);
-            startSlider.setEnabled(false);
-            endSlider.setValue(sliderMax);
-            endSlider.setEnabled(false);
-        }
-
         // Script chooser panel setting
         final JPanel recorderChooserPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints recorderChooserGbc = new GridBagConstraints();
@@ -162,20 +77,9 @@ final class WaveFormViewer extends JPanel {
         recorderChooserGbc.gridx = 0;
         recorderChooserPanel.add(prevButton, recorderChooserGbc);
         recorderChooserGbc.gridx++;
-        recorderChooserPanel.add(indexLabel, recorderChooserGbc);
+        recorderChooserPanel.add(indexViewer, recorderChooserGbc);
         recorderChooserGbc.gridx++;
         recorderChooserPanel.add(nextButton, recorderChooserGbc);
-
-        // SNR viewer
-        // set size
-        recInfoViewer.setRows(1);
-        recInfoViewer.setPreferredSize(new Dimension(sPanelWidth, Main.oneRowHeight));
-
-        // determine size
-        final Dimension preferredSize = startSlider.getPreferredSize();
-        preferredSize.width = Main.panelWidth;
-        startSlider.setPreferredSize(preferredSize);
-        endSlider.setPreferredSize(preferredSize);
 
         // set panel layout
         this.setLayout(new GridBagLayout());
@@ -192,10 +96,22 @@ final class WaveFormViewer extends JPanel {
         gbc.gridy++;
         this.add(recInfoViewer, gbc);
 
+        final Dimension indexLabelDimension = indexViewer.getPreferredSize();
+        indexLabelDimension.width = Main.panelWidth / 4;
+        indexViewer.setPreferredSize(indexLabelDimension);
+
+        final Dimension preferredSize = startSlider.getPreferredSize();
+        preferredSize.width = Main.panelWidth;
+        startSlider.setPreferredSize(preferredSize);
+        endSlider.setPreferredSize(preferredSize);
+
+        recInfoViewer.setRows(1);
+        recInfoViewer.setPreferredSize(new Dimension(sPanelWidth, Main.oneRowHeight));
+
         this.setBorder(new LineBorder(Color.BLACK, Main.lineBorderThickness));
 
         // initialization
-        WaveFormViewer.reset();
+        WaveFormViewer.resetThis();
     }
 
 
@@ -207,7 +123,7 @@ final class WaveFormViewer extends JPanel {
         );
     }
 
-    public boolean isDataExist() {
+    public static boolean hasRecData() {
         return recs.size() != 0;
     }
 
@@ -220,17 +136,23 @@ final class WaveFormViewer extends JPanel {
                 e.printStackTrace(AppConfig.logTargetStream);
             }
         }
-        WaveFormViewer.update();
+        WaveFormViewer.updateThis();
     }
 
-    public static void reset() {
+    public static void resetThis() {
+        if (!AppConfig.isTrimming) {
+            startSlider.setValue(sliderMin);
+            startSlider.setEnabled(false);
+            endSlider.setValue(sliderMax);
+            endSlider.setEnabled(false);
+        }
+
         recs.clear();
         startSlider.setValue(AppConfig.isTrimming ? defaultStart : sliderMin);
         endSlider.setValue(AppConfig.isTrimming ? defaultEnd : sliderMax);
-        sPanel.updateSignal(
-            startSlider.getValue(), endSlider.getValue(), defaultSignal);
+        sPanel.updateSignal(defaultSignal);
         recInfoViewer.setText(getRecInfo("----", "----"));
-        indexLabel.resetThis();
+        indexViewer.resetThis();
     }
 
 
@@ -239,7 +161,18 @@ final class WaveFormViewer extends JPanel {
         return recs.size() - 1;
     }
 
-    private static void update() {
+    private static void saveSignalAsWav() {
+        recs.get(recsIndex).saveSignalAsWav(
+            (double) startSlider.getValue() / sliderMax,
+            (double) endSlider.getValue() / sliderMax
+        );
+    }
+
+    private static String getRecInfo(String snr, String clip) {
+        return "S/N: " + snr + "[dB] / Clipping: " + clip;
+    }
+
+    private static void updateThis() {
         if (recs.size() != 0) {
             final RecorderBody recorder = recs.get(recsIndex);
             if (AppConfig.isTrimming) {
@@ -251,8 +184,7 @@ final class WaveFormViewer extends JPanel {
                 endSlider.setValue(end);
             }
             final double[] dSignal = recorder.getDoubleSignal();
-            sPanel.updateSignal(
-                startSlider.getValue(), endSlider.getValue(), dSignal);
+            sPanel.updateSignal(dSignal);
             recorder.saveSignalAsWav(
                 (double) startSlider.getValue() / sliderMax,
                 (double) endSlider.getValue() / sliderMax
@@ -275,22 +207,41 @@ final class WaveFormViewer extends JPanel {
                 ));
                 e.printStackTrace();
             }
-            indexLabel.updateThisObj();
+            indexViewer.updateThisObj();
         } else {
-            reset();
+            resetThis();
         }
     }
 
 
-    private static final String getRecInfo(String snr, String clip) {
-        return "S/N: " + snr + "[dB] / Clipping: " + clip;
+    // MARK: Inner Classes
+    private static final class PrevButton extends JButton {
+        public PrevButton() {
+            super("< Prev");
+
+            this.addActionListener((ActionEvent e) -> {
+                final int prevIndex = recsIndex - 1;
+                recsIndex = 0 <= prevIndex ? prevIndex : recs.size() - 1;
+                WaveFormViewer.updateThis();
+            });
+        }
     }
 
 
-    // MARK: Inner Classes
-    private static class IndexViewer extends SuperIndexViewer {
+    private static final class IndexViewer extends SuperIndexViewer {
         public IndexViewer() {
             super(0);
+
+            this.addActionListener((ActionEvent e) -> {
+                this.updateIndex();
+                WaveFormViewer.updateThis();
+            });
+            this.addFocusListener(new FocusAdapter() {
+                @Override public void focusLost(FocusEvent e) {
+                    updateIndex();
+                    WaveFormViewer.updateThis();
+                }
+            });
         }
 
         @Override public void updateThisObj() {
@@ -311,7 +262,74 @@ final class WaveFormViewer extends JPanel {
         }
     }
 
-    private static class SignalPanel extends JPanel {
+
+    private static final class NextButton extends JButton {
+        public NextButton() {
+            super("Next >");
+
+            this.addActionListener((ActionEvent e) -> {
+                final int nextIndex = recsIndex + 1;
+                recsIndex = nextIndex <= recs.size() - 1 ? nextIndex : 0;
+                WaveFormViewer.updateThis();
+            });
+        }
+    }
+
+
+    private static final class StartSlider extends JSlider {
+        public StartSlider() {
+            super(JSlider.HORIZONTAL, sliderMin, sliderMax, defaultStart);
+
+            this.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    if (endSlider.getValue() <= startSlider.getValue()) {
+                        endSlider.setValue(startSlider.getValue() + 1);
+                    }
+                    final double[] signal = recs.size() != 0
+                        ? recs.get(recsIndex).getDoubleSignal() : defaultSignal;
+                    sPanel.updateSignal(signal);
+                }
+            });
+            this.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (WaveFormViewer.hasRecData()) {
+                        WaveFormViewer.saveSignalAsWav();
+                    }
+                }
+            });
+        }
+    }
+
+
+    private static final class EndSlider extends JSlider {
+        public EndSlider() {
+            super(JSlider.HORIZONTAL, sliderMin, sliderMax, defaultEnd);
+
+            this.addChangeListener(new ChangeListener() {
+                @Override public void stateChanged(ChangeEvent e) {
+                    if (endSlider.getValue() <= startSlider.getValue()) {
+                        startSlider.setValue(endSlider.getValue() - 1);
+                    }
+                    final double[] signal = recs.size() != 0
+                        ? recs.get(recsIndex).getDoubleSignal() : defaultSignal;
+                    sPanel.updateSignal(signal);
+                }
+            });
+            this.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (WaveFormViewer.hasRecData()) {
+                        WaveFormViewer.saveSignalAsWav();
+                    }
+                }
+            });
+        }
+    }
+
+
+    private static final class SignalPanel extends JPanel {
         private int ssStart = defaultStart;
         private int ssEnd = defaultEnd;
         private double[] signal = defaultSignal;
@@ -320,17 +338,14 @@ final class WaveFormViewer extends JPanel {
             this.setPreferredSize(new Dimension(width, height));
         }
 
-        public void updateSignal(
-            final int start, final int end, final double[] signal
-        ) {
-            this.ssStart = start;
-            this.ssEnd = end;
+        public void updateSignal(final double[] signal) {
+            this.ssStart = WaveFormViewer.startSlider.getValue();
+            this.ssEnd = WaveFormViewer.endSlider.getValue();
             this.signal = signal;
             this.repaint();
         }
 
-        @Override
-        protected void paintComponent(Graphics g) {
+        @Override protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
             final int width = this.getSize().width;
