@@ -63,6 +63,7 @@ public final class Main extends JFrame {
 
 
     // MARK: Instances
+    // private final JFrame mainFrame = this;
     private final RecorderBody recorder = new RecorderBody();
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
@@ -201,12 +202,12 @@ public final class Main extends JFrame {
         // initialize panel
         indexSlider.setValue(0);
         recordButton.requestFocusInWindow();
-        this.update();
+        this.updateAll();
     }
 
 
     // MARK: Update
-    private void update() {
+    public void updateAll() {
         scriptPanel.updateText();
         final File targetFile = ScriptManager.getSaveFileObject();
         final Color lightGreen = new Color(220, 255, 220);
@@ -250,17 +251,17 @@ public final class Main extends JFrame {
         indexSlider.addChangeListener((ChangeEvent e) -> {
             indexSlider.updateIndex();
             WaveFormViewer.resetThis();
-            this.update();
+            this.updateAll();
         });
 
         indexLabel.addActionListener((ActionEvent e) -> {
             indexLabel.updateIndex();
-            this.update();
+            this.updateAll();
         });
         indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 indexLabel.updateIndex();
-                update();
+                updateAll();
             }
         });
 
@@ -272,10 +273,10 @@ public final class Main extends JFrame {
                     recorder.stopRecording();
                     wfv.add(recorder);
                 }
-                this.update();
+                this.updateAll();
             } catch (final Exception ex) {
                 recorder.enforceStopRecording();
-                this.update();
+                this.updateAll();
                 ex.printStackTrace(AppConfig.logTargetStream);
                 JOptionPane.showMessageDialog(
                     null, ex.getMessage(),
@@ -291,18 +292,18 @@ public final class Main extends JFrame {
         nextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
             WaveFormViewer.resetThis();
-            this.update();
+            this.updateAll();
         });
 
         miniPrevButton.addActionListener((ActionEvent e) -> {
             ScriptManager.prevLine();
             WaveFormViewer.resetThis();
-            this.update();
+            this.updateAll();
         });
         miniNextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
             WaveFormViewer.resetThis();
-            this.update();
+            this.updateAll();
         });
     }
 
