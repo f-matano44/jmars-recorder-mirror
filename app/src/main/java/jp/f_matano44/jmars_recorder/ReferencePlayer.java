@@ -18,20 +18,63 @@
 
 package jp.f_matano44.jmars_recorder;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
+import javax.swing.JButton;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
-class ReferencePlayer {
-    public final File[] list;
-    public final boolean isPlayerExist = new NativeDiscovery().discover();
-    private final MediaPlayer mediaPlayer = isPlayerExist
+final class ReferencePlayer {
+    // MARK: Swing Components
+    public static final JButton refButton = new JButton("Play Ref.");
+    public static final JButton no001Button = new JButton("Play No.001");
+
+    // MARK: Member variables
+    private static final File[] list;
+    private static final boolean isPlayerExist = new NativeDiscovery().discover();
+    private static final MediaPlayer mediaPlayer = isPlayerExist
         ? new MediaPlayerFactory().mediaPlayers().newMediaPlayer() : null;
 
-    public ReferencePlayer() {
+
+    // MARK: Constructor
+    private ReferencePlayer() {}
+
+
+    // MARK: Static initializer
+    static {
+        list = loadFiles();
+
+        refButton.addActionListener((final ActionEvent e) ->
+            playReference(ScriptManager.getCurrentIndex())
+        );
+
+        no001Button.addActionListener((final ActionEvent e) ->
+            playNumber001()
+        );
+    }
+
+
+    public static void updateThis() {
+        no001Button.setEnabled(
+            !RecorderBody.isRecording()
+            && ReferencePlayer.isPlayerExist
+            && ReferencePlayer.isNo001Exist()
+        );
+
+        refButton.setEnabled(
+            !RecorderBody.isRecording()
+            && ReferencePlayer.isPlayerExist
+            && ReferencePlayer.list.length > ScriptManager.getCurrentIndex()
+            && ReferencePlayer.list[ScriptManager.getCurrentIndex()].exists()
+        );
+    }
+
+    private static File[] loadFiles() {
+        File[] list = null;
+
         if (AppConfig.reference.exists() && AppConfig.reference.isDirectory()) {
             list = AppConfig.reference.listFiles((dir, file) -> {
                 return file.toLowerCase().endsWith(".wav")
@@ -43,9 +86,11 @@ class ReferencePlayer {
         } else {
             list = new File[0];
         }
+
+        return list;
     }
 
-    public void playNumber001() {
+    private static void playNumber001() {
         final File dir = new File(AppConfig.saveTo.getAbsolutePath());
         final String[] wavFiles = dir.list(new FilenameFilter() {
             public boolean accept(final File dir, final String name) {
@@ -57,13 +102,13 @@ class ReferencePlayer {
         final String playWavPath = new File(dir, wavFiles[0]).getAbsolutePath();
 
         try {
-            this.mediaPlayer.media().play(playWavPath);
+            mediaPlayer.media().play(playWavPath);
         } catch (Exception e) {
             // media-player cannot work.
         }
     }
 
-    public boolean isNo001Exist() {
+    private static boolean isNo001Exist() {
         final File dir = new File(AppConfig.saveTo.getAbsolutePath());
         final String[] wavFiles = dir.list(new FilenameFilter() {
             public boolean accept(final File dir, final String name) {
@@ -74,12 +119,12 @@ class ReferencePlayer {
         return 1 <= wavFiles.length;
     }
 
-    public void playReference(final int currentIndex) {
+    private static void playReference(final int currentIndex) {
         try {
-            this.mediaPlayer.media().play(this.list[currentIndex].getAbsolutePath());
-        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            mediaPlayer.media().play(list[currentIndex].getAbsolutePath());
+        } catch (final NullPointerException | IndexOutOfBoundsException e) {
             // media-player cannot work.
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace(AppConfig.logTargetStream);
         }
     }

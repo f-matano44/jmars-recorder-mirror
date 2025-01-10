@@ -64,7 +64,6 @@ public final class Main extends JFrame {
 
     // MARK: Instances
     private final RecorderBody recorder = new RecorderBody();
-    private final ReferencePlayer refPlayer = new ReferencePlayer();
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
     private final ScriptPanel scriptPanel = new ScriptPanel();
@@ -73,8 +72,8 @@ public final class Main extends JFrame {
     private final IndexSlider indexSlider = new IndexSlider();
     private final IndexViewer indexLabel = new IndexViewer();
     private final JButton nextButton = new JButton("Next >>");
-    private final JButton refButton = new JButton("Play Ref.");
-    private final JButton no001Button = new JButton("Play No.001");
+    private final JButton refButton = ReferencePlayer.refButton;
+    private final JButton no001Button = ReferencePlayer.no001Button;
     private final JToggleButton recordButton = new JToggleButton(startButtonString);
     private final JButton playButton = new JButton("Play Rec.");
 
@@ -218,18 +217,7 @@ public final class Main extends JFrame {
 
         indexLabel.updateThisObj();
 
-        no001Button.setEnabled(
-            !RecorderBody.isRecording()
-            && refPlayer.isPlayerExist
-            && refPlayer.isNo001Exist()
-        );
-
-        refButton.setEnabled(
-            !RecorderBody.isRecording()
-            && refPlayer.isPlayerExist
-            && refPlayer.list.length > ScriptManager.getCurrentIndex()
-            && refPlayer.list[ScriptManager.getCurrentIndex()].exists()
-        );
+        ReferencePlayer.updateThis();
 
         recordButton.setSelected(RecorderBody.isRecording());
         recordButton.setText(
@@ -275,14 +263,6 @@ public final class Main extends JFrame {
                 update();
             }
         });
-
-        refButton.addActionListener((final ActionEvent e) ->
-            refPlayer.playReference(ScriptManager.getCurrentIndex())
-        );
-
-        no001Button.addActionListener((final ActionEvent e) ->
-            refPlayer.playNumber001()
-        );
 
         recordButton.addActionListener((final ActionEvent e) -> {
             try {
