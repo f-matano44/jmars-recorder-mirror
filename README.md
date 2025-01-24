@@ -167,4 +167,10 @@ Git の log を見るとバージョンの命名規則が不規則になって�
 
 ```sh
 gradle build jar
+java -jar app/build/libs/jMARS_Recorder-dev.jar
 ```
+
+### ログについて（試験的な機能）
+アプリの動作ログは以下から確認できます.
+* Windows: `${HOME}/AppData/Local/jMARS_Recorder/logs/jMARS_Recorder.log`
+* else: `${HOME}/.local/share/jMARS_Recorder/logs/jMARS_Recorder.log`

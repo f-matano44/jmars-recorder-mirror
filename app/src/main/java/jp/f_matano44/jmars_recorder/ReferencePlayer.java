@@ -32,6 +32,7 @@ final class ReferencePlayer {
     public static final JButton refButton = new JButton("Play Ref.");
     public static final JButton no001Button = new JButton("Play No.001");
 
+
     // MARK: Member variables
     private static final File[] list;
     private static final boolean isPlayerExist = new NativeDiscovery().discover();
@@ -45,15 +46,31 @@ final class ReferencePlayer {
 
     // MARK: Static initializer
     static {
-        list = loadFiles();
+        File[] tmpList = null;
+        if (AppConfig.reference.isDirectory()) {
+            tmpList = AppConfig.reference.listFiles((dir, file) -> {
+                return file.toLowerCase().endsWith(".wav")
+                    || file.toLowerCase().endsWith(".mp3");
+            });
+            Arrays.sort(tmpList, (file1, file2) ->
+                file1.getName().compareTo(file2.getName())
+            );
+        } else {
+            tmpList = new File[0];
+        }
+        list = tmpList;
 
-        refButton.addActionListener((final ActionEvent e) ->
-            playReference(ScriptManager.getCurrentIndex())
-        );
 
-        no001Button.addActionListener((final ActionEvent e) ->
-            playNumber001()
-        );
+        // Set component action
+        refButton.addActionListener((final ActionEvent e) -> {
+            playReference(ScriptManager.getCurrentIndex());
+            Main.logger.info("Reference button is pushed.");
+        });
+
+        no001Button.addActionListener((final ActionEvent e) -> {
+            playNumber001();
+            Main.logger.info("No.001 button is pushed.");
+        });
     }
 
 
@@ -72,41 +89,27 @@ final class ReferencePlayer {
         );
     }
 
-    private static File[] loadFiles() {
-        File[] list = null;
-
-        if (AppConfig.reference.exists() && AppConfig.reference.isDirectory()) {
-            list = AppConfig.reference.listFiles((dir, file) -> {
-                return file.toLowerCase().endsWith(".wav")
-                    || file.toLowerCase().endsWith(".mp3");
-            });
-            Arrays.sort(list, (file1, file2) ->
-                file1.getName().compareTo(file2.getName())
-            );
-        } else {
-            list = new File[0];
-        }
-
-        return list;
-    }
 
     private static void playNumber001() {
+        // Get Number 001 wav File
         final File dir = new File(AppConfig.saveTo.getAbsolutePath());
         final String[] wavFiles = dir.list(new FilenameFilter() {
             public boolean accept(final File dir, final String name) {
                 return name.toLowerCase().endsWith(".wav");
             }
         });
-
         Arrays.sort(wavFiles);
-        final String playWavPath = new File(dir, wavFiles[0]).getAbsolutePath();
+        final File no001File = new File(dir, wavFiles[0]);
 
+        // Play Signal
         try {
-            mediaPlayer.media().play(playWavPath);
+            mediaPlayer.media().play(no001File.getAbsolutePath());
         } catch (Exception e) {
             // media-player cannot work.
+            e.printStackTrace(AppConfig.logTargetStream);
         }
     }
+
 
     private static boolean isNo001Exist() {
         final File dir = new File(AppConfig.saveTo.getAbsolutePath());
@@ -119,12 +122,16 @@ final class ReferencePlayer {
         return 1 <= wavFiles.length;
     }
 
+
     private static void playReference(final int currentIndex) {
+        // Get Number Reference File
+        final File refFile = list[currentIndex];
+
+        // Play Signal
         try {
-            mediaPlayer.media().play(list[currentIndex].getAbsolutePath());
-        } catch (final NullPointerException | IndexOutOfBoundsException e) {
-            // media-player cannot work.
+            mediaPlayer.media().play(refFile.getAbsolutePath());
         } catch (final Exception e) {
+            // media-player cannot work.
             e.printStackTrace(AppConfig.logTargetStream);
         }
     }

@@ -13,6 +13,7 @@ import javax.swing.text.StyledDocument;
 
 
 class AppInfo extends JFrame {
+    public static final String os = System.getProperty("os.name").toLowerCase();
     public static final String name;
     public static final String version;
     public static final String buildBy;

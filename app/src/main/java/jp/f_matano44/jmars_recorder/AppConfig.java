@@ -59,8 +59,7 @@ final class AppConfig extends JFrame {
         final String saveToKey = "save_to_folder";
         final String isTrimmingKey = "trimming";
 
-        final String osName = System.getProperty("os.name").toLowerCase();
-        final File basePath = osName.contains("win") || osName.contains("mac")
+        final File basePath = AppInfo.os.contains("win") || AppInfo.os.contains("mac")
             ? new File(System.getProperty("user.home"), "Desktop/" + AppInfo.name)
             : new File(System.getProperty("user.home"), AppInfo.name);
 

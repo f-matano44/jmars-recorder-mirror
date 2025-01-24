@@ -27,7 +27,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -46,7 +56,41 @@ import jp.f_matano44.jmars_recorder.ScriptManager.ScriptPanel;
 /** Main-Class. */
 public final class Main extends JFrame {
     /** main-function. */
-    public static final void main(String[] args) {
+    public static final void main(String[] args) throws IOException {
+        // Set logger file path
+        final String homeDir = System.getProperty("user.home");
+        final Path logDirPath = AppInfo.os.contains("win")
+            ? Paths.get(homeDir, "AppData", "Local", AppInfo.name, "logs")
+            : Paths.get(homeDir, ".local", "share", AppInfo.name, "logs");
+        try {
+            Files.createDirectories(logDirPath);
+        } catch (final FileAlreadyExistsException e) {
+            e.printStackTrace();
+            final String errorMessage =
+                "There is a file in the directory where the log is saved."
+                + System.lineSeparator()
+                + "`" + logDirPath.toString() + "`"
+                + System.lineSeparator()
+                + "Please delete it.";
+            JOptionPane.showMessageDialog(
+                null, errorMessage,
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+            System.exit(1);
+        } catch (final Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        final String logFileName = AppInfo.name + ".log";
+        // Logger setting
+        final Path logFilePath = logDirPath.resolve(logFileName);
+        final Handler handler = new FileHandler(logFilePath.toString());
+        Main.logger.setLevel(Level.INFO);
+        Main.logger.addHandler(handler);
+        handler.setFormatter(new SimpleFormatter());
+
+
+        // Swing
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
@@ -87,6 +131,10 @@ public final class Main extends JFrame {
     public static final int oneRowHeight;
     public static final int panelWidth = 750;
     public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
+
+
+    // MARK: Logger
+    static final Logger logger = Logger.getLogger(Main.class.getName());
 
 
     // MARK: Static initializer
@@ -203,6 +251,8 @@ public final class Main extends JFrame {
         indexSlider.setValue(0);
         recordButton.requestFocusInWindow();
         this.updateAll();
+
+        Main.logger.info("jMARS Recorder has started.");
     }
 
 
