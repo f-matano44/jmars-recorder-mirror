@@ -126,11 +126,11 @@ public final class Main extends JFrame {
     // MARK: Constants
     private static final String startButtonString = "Start recording";
     private static final String recordingString   = "Stop and Save";
-    public static final int lineBorderThickness = 1;
+    static final int lineBorderThickness = 1;
     private final Dimension defaultWindowDimension;
-    public static final int oneRowHeight;
-    public static final int panelWidth = 750;
-    public static final Insets defaultInsets = new Insets(4, 4, 4, 4);
+    static final int oneRowHeight;
+    static final int panelWidth = 750;
+    static final Insets defaultInsets = new Insets(4, 4, 4, 4);
 
 
     // MARK: Logger
@@ -257,7 +257,7 @@ public final class Main extends JFrame {
 
 
     // MARK: Update
-    public void updateAll() {
+    void updateAll() {
         scriptPanel.updateText();
         final File targetFile = ScriptManager.getSaveFileObject();
         final Color lightGreen = new Color(220, 255, 220);
@@ -358,7 +358,7 @@ public final class Main extends JFrame {
     }
 
     // MARK: Reset Size
-    public void resetSize() {
+    void resetSize() {
         this.setSize(defaultWindowDimension);
     }
 }
