@@ -18,7 +18,6 @@
 
 package jp.f_matano44.jmars_recorder;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,7 +25,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -42,6 +40,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -50,7 +49,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexSlider;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexViewer;
-import jp.f_matano44.jmars_recorder.ScriptManager.ScriptPanel;
 
 
 /** Main-Class. */
@@ -111,12 +109,12 @@ public final class Main extends JFrame {
     private final RecorderBody recorder = new RecorderBody();
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
-    private final ScriptPanel scriptPanel = new ScriptPanel();
-    private final JButton miniNextButton = new JButton(">");
-    private final JButton miniPrevButton = new JButton("<");
-    private final IndexSlider indexSlider = new IndexSlider();
-    private final IndexViewer indexLabel = new IndexViewer();
-    private final JButton nextButton = new JButton("Next >>");
+    private final JScrollPane scriptPanel = ScriptManager.scriptPanel;
+    private final JButton miniNextButton = ScriptManager.miniNextButton;
+    private final JButton miniPrevButton = ScriptManager.miniPrevButton;
+    private final IndexSlider indexSlider = ScriptManager.indexSlider;
+    private final IndexViewer indexLabel = ScriptManager.indexLabel;
+    private final JButton nextButton = ScriptManager.nextButton;
     private final JButton refButton = ReferencePlayer.refButton;
     private final JButton no001Button = ReferencePlayer.no001Button;
     private final JToggleButton recordButton = new JToggleButton(startButtonString);
@@ -257,17 +255,8 @@ public final class Main extends JFrame {
 
 
     // MARK: Update
-    void updateAll() {
-        scriptPanel.updateText();
-        final File targetFile = ScriptManager.getSaveFileObject();
-        final Color lightGreen = new Color(220, 255, 220);
-        scriptPanel.updateColor(targetFile.exists() ? lightGreen : null);
-
-        indexSlider.updateValue();
-        indexSlider.setEnabled(!RecorderBody.isRecording());
-
-        indexLabel.updateThisObj();
-
+    private void updateAll() {
+        ScriptManager.updateThis();
         ReferencePlayer.updateThis();
 
         recordButton.setSelected(RecorderBody.isRecording());
@@ -279,20 +268,6 @@ public final class Main extends JFrame {
 
         playButton.setEnabled(
             WaveFormViewer.hasRecData() && !RecorderBody.isRecording());
-
-        nextButton.setEnabled(
-            !RecorderBody.isRecording()
-            && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
-        );
-
-        miniPrevButton.setEnabled(
-            !RecorderBody.isRecording()
-            && ScriptManager.minOfIndex < ScriptManager.getCurrentIndex()
-        );
-        miniNextButton.setEnabled(
-            !RecorderBody.isRecording()
-            && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
-        );
     }
 
 

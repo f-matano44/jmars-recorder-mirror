@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
@@ -38,12 +39,21 @@ import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
 final class ScriptManager {
+    // MARK: Swing components
+    static final ScriptPanel scriptPanel = new ScriptPanel();
+    static final JButton miniNextButton = new JButton(">");
+    static final JButton miniPrevButton = new JButton("<");
+    static final IndexSlider indexSlider;
+    static final IndexViewer indexLabel;
+    static final JButton nextButton = new JButton("Next >>");
+
+
+    // MARK: Variable
     private static final String[] lines;
     // index: 配列のインデックス
     // 表示される数値 - 1 <- Java は 0-index のため
-    public static final int minOfIndex;
-    public static final int maxOfIndex;
-    // label: パネルに表示する番号 (index + 1)
+    private static final int minOfIndex;
+    private static final int maxOfIndex;
     private static int currentIndex = 0;
 
 
@@ -88,6 +98,8 @@ final class ScriptManager {
         lines = linesList.toArray(new String[linesList.size()]);
         minOfIndex = 0;
         maxOfIndex = lines.length - 1;
+        indexSlider = new IndexSlider();
+        indexLabel = new IndexViewer();
     }
 
 
@@ -96,6 +108,38 @@ final class ScriptManager {
 
 
     // MARK: Methods
+    static final void updateThis() {
+        // Script panel
+        scriptPanel.updateText();
+        final File targetFile = ScriptManager.getSaveFileObject();
+        final Color lightGreen = new Color(220, 255, 220);
+        scriptPanel.updateColor(targetFile.exists() ? lightGreen : null);
+
+        // Mini button
+        miniPrevButton.setEnabled(
+            !RecorderBody.isRecording()
+            && ScriptManager.minOfIndex < ScriptManager.getCurrentIndex()
+        );
+        miniNextButton.setEnabled(
+            !RecorderBody.isRecording()
+            && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
+        );
+
+        // Index Slider
+        indexSlider.updateValue();
+        indexSlider.setEnabled(!RecorderBody.isRecording());
+
+        // Index label
+        indexLabel.updateThisObj();
+
+        // Full-size button
+        nextButton.setEnabled(
+            !RecorderBody.isRecording()
+            && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
+        );
+    }
+
+
     public static final void prevLine() {
         currentIndex = Math.max(--currentIndex, minOfIndex);
     }
@@ -119,7 +163,7 @@ final class ScriptManager {
 
 
     // MARK: Inner classes
-    public static class ScriptPanel extends JScrollPane {
+    private static class ScriptPanel extends JScrollPane {
         private final JTextArea scriptTextArea = new UneditableTextArea();
 
         public ScriptPanel() {
