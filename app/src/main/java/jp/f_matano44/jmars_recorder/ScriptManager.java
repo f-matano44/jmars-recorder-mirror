@@ -117,24 +117,24 @@ final class ScriptManager {
 
         // Mini button
         miniPrevButton.setEnabled(
-            !RecorderBody.isRecording()
+            !RecorderManager.isRecording()
             && ScriptManager.minOfIndex < ScriptManager.getCurrentIndex()
         );
         miniNextButton.setEnabled(
-            !RecorderBody.isRecording()
+            !RecorderManager.isRecording()
             && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
         );
 
         // Index Slider
         indexSlider.updateValue();
-        indexSlider.setEnabled(!RecorderBody.isRecording());
+        indexSlider.setEnabled(!RecorderManager.isRecording());
 
         // Index label
         indexLabel.updateThisObj();
 
         // Full-size button
         nextButton.setEnabled(
-            !RecorderBody.isRecording()
+            !RecorderManager.isRecording()
             && ScriptManager.getCurrentIndex() < ScriptManager.maxOfIndex
         );
     }
@@ -216,7 +216,7 @@ final class ScriptManager {
         }
 
         @Override public void updateThisObj() {
-            final boolean isRecording = RecorderBody.isRecording();
+            final boolean isRecording = RecorderManager.isRecording();
             this.setText(isRecording
                 ? "** RECORDING **"
                 : ((currentIndex + 1) + " / " + (maxOfIndex + 1)));

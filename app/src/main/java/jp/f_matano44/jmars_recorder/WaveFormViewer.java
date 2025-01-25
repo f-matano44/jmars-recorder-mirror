@@ -56,7 +56,7 @@ final class WaveFormViewer extends JPanel {
     private static final double[] defaultSignal = new double[0];
 
     private static int recsIndex = 0;
-    private static final List<RecorderBody> recs = new ArrayList<>();
+    private static final List<RecorderManager> recs = new ArrayList<>();
 
     // MARK: Components
     private static final PrevButton prevButton = new PrevButton();
@@ -127,7 +127,7 @@ final class WaveFormViewer extends JPanel {
         return recs.size() != 0;
     }
 
-    public void add(RecorderBody recorder) {
+    public void add(RecorderManager recorder) {
         if (recorder.getByteSignal().length != 0) {
             try {
                 recs.add(recorder.clone());
@@ -174,7 +174,7 @@ final class WaveFormViewer extends JPanel {
 
     private static void updateThis() {
         if (recs.size() != 0) {
-            final RecorderBody recorder = recs.get(recsIndex);
+            final RecorderManager recorder = recs.get(recsIndex);
             if (AppConfig.isTrimming) {
                 final int start = (int) Math.round(
                     sliderMax * recorder.getStartPointOfSpeechSection_percent());
@@ -245,7 +245,7 @@ final class WaveFormViewer extends JPanel {
         }
 
         @Override public void updateThisObj() {
-            final boolean isRecording = RecorderBody.isRecording();
+            final boolean isRecording = RecorderManager.isRecording();
             this.setText((recsIndex + 1) + " / " + (getMaxOfIndex() + 1));
             this.setEditable(!isRecording);
             this.setFocusable(!isRecording);

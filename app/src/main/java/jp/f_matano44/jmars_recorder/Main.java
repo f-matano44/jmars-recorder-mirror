@@ -104,10 +104,18 @@ public final class Main extends JFrame {
     }
 
 
+    // MARK: Constants
+    static final int lineBorderThickness = 1;
+    static final int oneRowHeight;
+    static final int panelWidth = 750;
+    static final Insets defaultInsets = new Insets(4, 4, 4, 4);
+    private final Dimension defaultWindowDimension;
+
+
     // MARK: Instances
     // private final JFrame mainFrame = this;
-    static final RecorderBody recorder = new RecorderBody();
-    static final WaveFormViewer wfv = new WaveFormViewer();
+    private final RecorderManager recorder = new RecorderManager();
+    private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
     private final JScrollPane scriptPanel = ScriptManager.scriptPanel;
     private final JButton miniNextButton = ScriptManager.miniNextButton;
@@ -117,16 +125,8 @@ public final class Main extends JFrame {
     private final JButton nextButton = ScriptManager.nextButton;
     private final JButton refButton = ReferencePlayer.refButton;
     private final JButton no001Button = ReferencePlayer.no001Button;
-    private final JToggleButton recordButton = RecorderBody.recordButton;
-    private final JButton playButton = RecorderBody.playButton;
-
-
-    // MARK: Constants
-    static final int lineBorderThickness = 1;
-    private final Dimension defaultWindowDimension;
-    static final int oneRowHeight;
-    static final int panelWidth = 750;
-    static final Insets defaultInsets = new Insets(4, 4, 4, 4);
+    private final JToggleButton recordButton = RecorderManager.recordButton;
+    private final JButton playButton = RecorderManager.playButton;
 
 
     // MARK: Logger
@@ -256,7 +256,7 @@ public final class Main extends JFrame {
     private static void updateAllGUI() {
         ScriptManager.updateGUI();
         ReferencePlayer.updateGUI();
-        RecorderBody.updateGUI();
+        RecorderManager.updateGUI();
     }
 
 
@@ -281,7 +281,7 @@ public final class Main extends JFrame {
 
         recordButton.addActionListener((final ActionEvent e) -> {
             try {
-                if (!RecorderBody.isRecording()) {
+                if (!RecorderManager.isRecording()) {
                     recorder.startRecording();
                 } else {
                     recorder.stopRecording();

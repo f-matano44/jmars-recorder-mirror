@@ -77,13 +77,13 @@ final class ReferencePlayer {
     // MARK: Methods
     public static void updateGUI() {
         no001Button.setEnabled(
-            !RecorderBody.isRecording()
+            !RecorderManager.isRecording()
             && ReferencePlayer.isPlayerExist
             && ReferencePlayer.isNo001Exist()
         );
 
         refButton.setEnabled(
-            !RecorderBody.isRecording()
+            !RecorderManager.isRecording()
             && ReferencePlayer.isPlayerExist
             && ReferencePlayer.list.length > ScriptManager.getCurrentIndex()
             && ReferencePlayer.list[ScriptManager.getCurrentIndex()].exists()

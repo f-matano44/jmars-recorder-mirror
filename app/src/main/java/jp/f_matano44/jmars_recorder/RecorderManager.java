@@ -36,7 +36,7 @@ import javax.swing.JToggleButton;
 import jp.f_matano44.jfloatwavio.Converter;
 import jp.f_matano44.jfloatwavio.WavIO;
 
-final class RecorderBody implements Cloneable {
+final class RecorderManager implements Cloneable {
     // MARK: Swing components
     static final String startButtonString = "Start recording";
     static final String recordingString   = "Stop and Save";
@@ -87,7 +87,7 @@ final class RecorderBody implements Cloneable {
     // MARK: Static method(s)
     static final void updateGUI() {
         // record button
-        recordButton.setSelected(RecorderBody.isRecording());
+        recordButton.setSelected(RecorderManager.isRecording());
         recordButton.setText(!isRecording()
             ? startButtonString
             : recordingString
@@ -95,19 +95,19 @@ final class RecorderBody implements Cloneable {
 
         // play button
         playButton.setEnabled(
-            WaveFormViewer.hasRecData() && !RecorderBody.isRecording());
+            WaveFormViewer.hasRecData() && !RecorderManager.isRecording());
     }
 
 
     public static final boolean isRecording() {
-        return RecorderBody.recording;
+        return RecorderManager.recording;
     }
 
 
     // MARK: Method(s)
     @Override
-    public RecorderBody clone() throws CloneNotSupportedException {
-        final RecorderBody cloneRecorder = new RecorderBody();
+    public RecorderManager clone() throws CloneNotSupportedException {
+        final RecorderManager cloneRecorder = new RecorderManager();
         cloneRecorder.byteSignal = this.byteSignal.clone();
         return cloneRecorder;
     }
@@ -217,7 +217,7 @@ final class RecorderBody implements Cloneable {
 
 
     public final void startRecording() throws Exception {
-        RecorderBody.recording = true;
+        RecorderManager.recording = true;
         // Open input-line
         outStream.reset();
         line.open();
@@ -240,7 +240,7 @@ final class RecorderBody implements Cloneable {
     public final void stopRecording() {
         // stop recorder
         line.close();
-        RecorderBody.recording = false;
+        RecorderManager.recording = false;
 
         // post processing
         final byte[] recordedSignal = outStream.toByteArray();
@@ -273,7 +273,7 @@ final class RecorderBody implements Cloneable {
 
 
     public final void enforceStopRecording() {
-        RecorderBody.recording = false;
+        RecorderManager.recording = false;
         if (Objects.nonNull(line)) {
             line.close();
         }
