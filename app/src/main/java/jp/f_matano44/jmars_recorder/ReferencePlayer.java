@@ -40,10 +40,6 @@ final class ReferencePlayer {
         ? new MediaPlayerFactory().mediaPlayers().newMediaPlayer() : null;
 
 
-    // MARK: Constructor
-    private ReferencePlayer() {}
-
-
     // MARK: Static initializer
     static {
         File[] tmpList = null;
@@ -74,6 +70,11 @@ final class ReferencePlayer {
     }
 
 
+    // MARK: Constructor
+    private ReferencePlayer() {}
+
+
+    // MARK: Methods
     public static void updateThis() {
         no001Button.setEnabled(
             !RecorderBody.isRecording()
