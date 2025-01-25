@@ -56,11 +56,10 @@ final class RecorderBody implements Cloneable {
     // MARK: for recording process
     private static final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     private static final TargetDataLine line;
-    private static final Thread recordThread;
 
 
     // MARK: Variables
-    private static volatile boolean recording = false;
+    private static boolean recording = false;
     private byte[] byteSignal = defaultSignal;
 
 
@@ -82,19 +81,6 @@ final class RecorderBody implements Cloneable {
             System.exit(1);
         }
         line = tempLine;
-
-
-        // Recording thread
-        recordThread = new Thread(() -> {
-            final byte[] buffer = new byte[1200]; // 1200 = lcm[1, 2, 3, 4] * 100
-            while (RecorderBody.isRecording()) {
-                final int count = line.read(buffer, 0, buffer.length);
-                if (0 < count) {
-                    outStream.write(buffer, 0, count);
-                }
-            }
-        });
-        recordThread.setPriority(Thread.MAX_PRIORITY);
     }
 
 
@@ -231,18 +217,30 @@ final class RecorderBody implements Cloneable {
 
 
     public final void startRecording() throws Exception {
+        RecorderBody.recording = true;
+        // Open input-line
         outStream.reset();
         line.open();
         line.start();
-        RecorderBody.recording = true;
+        // determine thread and start recording
+        final Thread recordThread = new Thread(() -> {
+            final byte[] buffer = new byte[1200]; // 1200 = lcm[1, 2, 3, 4] * 100
+            while (line.isOpen()) {
+                final int count = line.read(buffer, 0, buffer.length);
+                if (0 < count) {
+                    outStream.write(buffer, 0, count);
+                }
+            }
+        });
+        recordThread.setPriority(Thread.MAX_PRIORITY);
         recordThread.start();
     }
 
 
     public final void stopRecording() {
         // stop recorder
-        RecorderBody.recording = false;
         line.close();
+        RecorderBody.recording = false;
 
         // post processing
         final byte[] recordedSignal = outStream.toByteArray();
