@@ -75,7 +75,7 @@ final class ReferencePlayer {
 
 
     // MARK: Methods
-    public static void updateThis() {
+    public static void updateGUI() {
         no001Button.setEnabled(
             !RecorderBody.isRecording()
             && ReferencePlayer.isPlayerExist

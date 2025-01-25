@@ -254,8 +254,8 @@ public final class Main extends JFrame {
 
     // MARK: Update
     private static void updateAllGUI() {
-        ScriptManager.updateThis();
-        ReferencePlayer.updateThis();
+        ScriptManager.updateGUI();
+        ReferencePlayer.updateGUI();
         RecorderBody.updateGUI();
     }
 

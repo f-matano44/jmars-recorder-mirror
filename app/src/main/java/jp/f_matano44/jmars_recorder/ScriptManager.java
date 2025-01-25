@@ -108,7 +108,7 @@ final class ScriptManager {
 
 
     // MARK: Methods
-    static final void updateThis() {
+    static final void updateGUI() {
         // Script panel
         scriptPanel.updateText();
         final File targetFile = ScriptManager.getSaveFileObject();
