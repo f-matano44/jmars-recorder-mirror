@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -34,21 +35,32 @@ import jp.f_matano44.jfloatwavio.Converter;
 import jp.f_matano44.jfloatwavio.WavIO;
 
 final class RecorderBody implements Cloneable {
-    /* Constant */
+    // MARK: Constants
+    private static final float fs = AppConfig.format.getSampleRate();
+    private static final int nbits = AppConfig.format.getSampleSizeInBits();
+    private static final boolean isBigEndian = AppConfig.format.isBigEndian();
     private static final byte[] defaultSignal = new byte[0];
     private static final double trimmingThreshold_db = -15.0;
     private static final double trimmingMargin_s = 0.2;
-    /* for recording process */
-    private final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-    private final TargetDataLine line;
-    private static boolean recording = false;
-    /* data */
+
+
+    // MARK: for recording process
+    private static final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    private static final TargetDataLine line;
+    private static final Thread recordThread;
+
+
+    // MARK: Variables
+    private static volatile boolean recording = false;
     private byte[] byteSignal = defaultSignal;
 
-    public RecorderBody() {
-        TargetDataLine line = null;
+
+    // MARK: Static initializer
+    static {
+        // TargetDataLine line
+        TargetDataLine tempLine = null;
         try {
-            line = AudioSystem.getTargetDataLine(AppConfig.format);
+            tempLine = AudioSystem.getTargetDataLine(AppConfig.format);
         } catch (final Exception e) {
             e.printStackTrace(AppConfig.logTargetStream);
             JOptionPane.showMessageDialog(
@@ -60,9 +72,30 @@ final class RecorderBody implements Cloneable {
             );
             System.exit(1);
         }
-        this.line = line;
+        line = tempLine;
+
+
+        // Recording thread
+        recordThread = new Thread(() -> {
+            final byte[] buffer = new byte[1200]; // 1200 = lcm[1, 2, 3, 4] * 100
+            while (RecorderBody.isRecording()) {
+                final int count = line.read(buffer, 0, buffer.length);
+                if (0 < count) {
+                    outStream.write(buffer, 0, count);
+                }
+            }
+        });
+        recordThread.setPriority(Thread.MAX_PRIORITY);
     }
 
+
+    // MARK: Static method(s)
+    public static final boolean isRecording() {
+        return RecorderBody.recording;
+    }
+
+
+    // MARK: Method(s)
     @Override
     public RecorderBody clone() throws CloneNotSupportedException {
         final RecorderBody cloneRecorder = new RecorderBody();
@@ -70,15 +103,16 @@ final class RecorderBody implements Cloneable {
         return cloneRecorder;
     }
 
+
     public final byte[] getByteSignal() {
         return this.byteSignal.clone();
     }
 
+
     public final double[] getDoubleSignal() {
-        final int nbits = AppConfig.format.getSampleSizeInBits();
-        final boolean isBigEndian = AppConfig.format.isBigEndian();
         return Converter.byte2double(this.byteSignal, nbits, isBigEndian);
     }
+
 
     private final byte[] getPartOfByteSignal(
         final double startPercent, final double endPercent
@@ -88,10 +122,9 @@ final class RecorderBody implements Cloneable {
         final int endIndex = (int) (dSignal.length * endPercent);
         final double[] newSignal = new double[endIndex - startIndex];
         System.arraycopy(dSignal, startIndex, newSignal, 0, newSignal.length);
-        final int nbits = AppConfig.format.getSampleSizeInBits();
-        final boolean isBigEndian = AppConfig.format.isBigEndian();
         return Converter.double2byte(newSignal, nbits, isBigEndian);
     }
+
 
     private final double[] getNormalizationSignalPowerArray_db() {
         final double max = Arrays.stream(this.getDoubleSignal()).max().orElse(1.0);
@@ -100,6 +133,7 @@ final class RecorderBody implements Cloneable {
             .map(y -> 10 * Math.log10(y * y + 1e-12))
             .toArray();
     }
+
 
     public final double getStartPointOfSpeechSection_percent() {
         final double[] power = this.getNormalizationSignalPowerArray_db();
@@ -115,6 +149,7 @@ final class RecorderBody implements Cloneable {
         return 0;
     }
 
+
     public final double getEndPointOfSpeechSection_percent() {
         final double[] power = this.getNormalizationSignalPowerArray_db();
         final int endPoint = power.length - (int) (AppConfig.format.getFrameRate() * 0.1);
@@ -129,9 +164,6 @@ final class RecorderBody implements Cloneable {
         return 1.0;
     }
 
-    public static final boolean isRecording() {
-        return RecorderBody.recording;
-    }
 
     public final boolean isClipping() {
         final double clippingThreshold = 0.99;
@@ -142,6 +174,7 @@ final class RecorderBody implements Cloneable {
         return clippingThreshold < max;
     }
 
+
     public final double getSignalNoiseRatio() {
         final double[] dSignal = this.getDoubleSignal();
 
@@ -149,9 +182,8 @@ final class RecorderBody implements Cloneable {
         try {
             final double width_s = 0.150;
             final double shift_s = 0.075;
-            final double fs_hz = AppConfig.format.getSampleRate();
-            final int windowSize = (int) (width_s * fs_hz);
-            final int shiftSize = (int) (shift_s * fs_hz);
+            final int windowSize = (int) (width_s * fs);
+            final int shiftSize = (int) (shift_s * fs);
 
             final List<Double> thisPower = new ArrayList<>();
             for (int i = 0; i < dSignal.length; i += shiftSize) {
@@ -174,44 +206,34 @@ final class RecorderBody implements Cloneable {
         }
     }
 
+
     public final void startRecording() throws Exception {
-        // Open input-line
         outStream.reset();
         line.open();
         line.start();
-        // determine thread and start recording
-        final Thread recordThread = new Thread(() -> {
-            final byte[] buffer = new byte[1200]; // 1200 = lcm[1, 2, 3, 4] * 100
-            while (this.line.isOpen()) {
-                final int count = this.line.read(buffer, 0, buffer.length);
-                if (0 < count) {
-                    outStream.write(buffer, 0, count);
-                }
-            }
-        });
-        recordThread.setPriority(Thread.MAX_PRIORITY);
-        recordThread.start();
         RecorderBody.recording = true;
+        recordThread.start();
     }
 
+
     public final void stopRecording() {
-        this.line.close();
-        final byte[] recordedSignal = this.outStream.toByteArray();
-        final float fs = AppConfig.format.getSampleRate();
-        final int nBits = AppConfig.format.getSampleSizeInBits();
-        final float signalLength_s = (float) recordedSignal.length / ((nBits / 8) * fs);
+        // stop recorder
+        RecorderBody.recording = false;
+        line.close();
+
+        // post processing
+        final byte[] recordedSignal = outStream.toByteArray();
+        final float signalLength_s = (float) recordedSignal.length / ((nbits / 8) * fs);
         this.byteSignal = 0.2 /* s */ <= signalLength_s
             ? recordedSignal.clone()
             : defaultSignal;
-        RecorderBody.recording = false;
     }
+
 
     public final void saveSignalAsWav(
         final double startPercent, final double endPercent
     ) {
         final File targetFile = ScriptManager.getSaveFileObject();
-        final int nbits = AppConfig.format.getSampleSizeInBits();
-        final float fs = AppConfig.format.getSampleRate();
         final double[] allSignal = this.getDoubleSignal();
         final double[] saveSignal = Arrays.copyOfRange(
             allSignal,
@@ -228,14 +250,15 @@ final class RecorderBody implements Cloneable {
         }
     }
 
+
     public final void enforceStopRecording() {
-        if (this.line != null) {
-            this.line.close();
+        RecorderBody.recording = false;
+        if (Objects.nonNull(line)) {
+            line.close();
         }
         this.byteSignal = defaultSignal;
-        RecorderBody.recording = false;
-        // sse.reset();
     }
+
 
     public final void playSignal(
         final double startPercent, final double endPercent
