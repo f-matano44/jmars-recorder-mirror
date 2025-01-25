@@ -107,7 +107,6 @@ public final class Main extends JFrame {
     // MARK: Instances
     // private final JFrame mainFrame = this;
     private final RecorderBody recorder = new RecorderBody();
-    private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
     private final JScrollPane scriptPanel = ScriptManager.scriptPanel;
     private final JButton miniNextButton = ScriptManager.miniNextButton;
@@ -117,13 +116,12 @@ public final class Main extends JFrame {
     private final JButton nextButton = ScriptManager.nextButton;
     private final JButton refButton = ReferencePlayer.refButton;
     private final JButton no001Button = ReferencePlayer.no001Button;
-    private final JToggleButton recordButton = new JToggleButton(startButtonString);
-    private final JButton playButton = new JButton("Play Rec.");
+    private final JToggleButton recordButton = RecorderBody.recordButton;
+    private final JButton playButton = RecorderBody.playButton;
+    private final WaveFormViewer wfv = new WaveFormViewer();
 
 
     // MARK: Constants
-    private static final String startButtonString = "Start recording";
-    private static final String recordingString   = "Stop and Save";
     static final int lineBorderThickness = 1;
     private final Dimension defaultWindowDimension;
     static final int oneRowHeight;
@@ -248,26 +246,17 @@ public final class Main extends JFrame {
         // initialize panel
         indexSlider.setValue(0);
         recordButton.requestFocusInWindow();
-        this.updateAll();
+        Main.updateAllGUI();
 
         Main.logger.info("jMARS Recorder has started.");
     }
 
 
     // MARK: Update
-    private void updateAll() {
+    private static void updateAllGUI() {
         ScriptManager.updateThis();
         ReferencePlayer.updateThis();
-
-        recordButton.setSelected(RecorderBody.isRecording());
-        recordButton.setText(
-            !RecorderBody.isRecording()
-            ? startButtonString
-            : recordingString
-        );
-
-        playButton.setEnabled(
-            WaveFormViewer.hasRecData() && !RecorderBody.isRecording());
+        RecorderBody.updateGUI();
     }
 
 
@@ -276,17 +265,17 @@ public final class Main extends JFrame {
         indexSlider.addChangeListener((ChangeEvent e) -> {
             indexSlider.updateIndex();
             WaveFormViewer.resetThis();
-            this.updateAll();
+            Main.updateAllGUI();
         });
 
         indexLabel.addActionListener((ActionEvent e) -> {
             indexLabel.updateIndex();
-            this.updateAll();
+            Main.updateAllGUI();
         });
         indexLabel.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 indexLabel.updateIndex();
-                updateAll();
+                Main.updateAllGUI();
             }
         });
 
@@ -298,10 +287,10 @@ public final class Main extends JFrame {
                     recorder.stopRecording();
                     wfv.add(recorder);
                 }
-                this.updateAll();
+                Main.updateAllGUI();
             } catch (final Exception ex) {
                 recorder.enforceStopRecording();
-                this.updateAll();
+                Main.updateAllGUI();
                 ex.printStackTrace(AppConfig.logTargetStream);
                 JOptionPane.showMessageDialog(
                     null, ex.getMessage(),
@@ -317,18 +306,18 @@ public final class Main extends JFrame {
         nextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
             WaveFormViewer.resetThis();
-            this.updateAll();
+            Main.updateAllGUI();
         });
 
         miniPrevButton.addActionListener((ActionEvent e) -> {
             ScriptManager.prevLine();
             WaveFormViewer.resetThis();
-            this.updateAll();
+            Main.updateAllGUI();
         });
         miniNextButton.addActionListener((ActionEvent e) -> {
             ScriptManager.nextLine();
             WaveFormViewer.resetThis();
-            this.updateAll();
+            Main.updateAllGUI();
         });
     }
 

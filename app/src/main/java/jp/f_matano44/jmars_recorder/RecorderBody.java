@@ -30,11 +30,20 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.TargetDataLine;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
 import jp.f_matano44.jfloatwavio.Converter;
 import jp.f_matano44.jfloatwavio.WavIO;
 
 final class RecorderBody implements Cloneable {
+    // MARK: Swing components
+    static final String startButtonString = "Start recording";
+    static final String recordingString   = "Stop and Save";
+    static final JToggleButton recordButton = new JToggleButton(startButtonString);
+    static final JButton playButton = new JButton("Play Rec.");
+
+
     // MARK: Constants
     private static final float fs = AppConfig.format.getSampleRate();
     private static final int nbits = AppConfig.format.getSampleSizeInBits();
@@ -90,6 +99,20 @@ final class RecorderBody implements Cloneable {
 
 
     // MARK: Static method(s)
+    static final void updateGUI() {
+        // record button
+        recordButton.setSelected(RecorderBody.isRecording());
+        recordButton.setText(!isRecording()
+            ? startButtonString
+            : recordingString
+        );
+
+        // play button
+        playButton.setEnabled(
+            WaveFormViewer.hasRecData() && !RecorderBody.isRecording());
+    }
+
+
     public static final boolean isRecording() {
         return RecorderBody.recording;
     }
