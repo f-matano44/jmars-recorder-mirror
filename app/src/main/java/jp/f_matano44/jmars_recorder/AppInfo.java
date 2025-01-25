@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import jp.f_matano44.jmars_recorder.MyClasses.MyStringBuilder;
 
 
 class AppInfo extends JFrame {
@@ -66,16 +67,14 @@ class AppInfo extends JFrame {
     public AppInfo() {
         super("");
 
-        final StringBuilder sb = new StringBuilder();
-        Util.appendLn(sb, AppInfo.name);
-        Util.appendLn(sb, "");
-        Util.appendLn(sb,
-            "Version: " + AppInfo.version + " (" + AppInfo.gitHASH + ")");
-        Util.appendLn(sb,
-            "Build by: " + Util.insertNewLines(AppInfo.buildBy));
-        Util.appendLn(sb, "Build date: " + AppInfo.buildDate);
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "License: " + AppInfo.license);
+        final MyStringBuilder sb = new MyStringBuilder();
+        sb.appendLn(AppInfo.name);
+        sb.appendLn("");
+        sb.appendLn("Version: " + AppInfo.version + " (" + AppInfo.gitHASH + ")");
+        sb.appendLn("Build by: " + Util.insertNewLines(AppInfo.buildBy));
+        sb.appendLn("Build date: " + AppInfo.buildDate);
+        sb.appendLn("");
+        sb.appendLn("License: " + AppInfo.license);
         sb.append(AppInfo.copyright);
 
         final JTextPane textPane = new JTextPane();

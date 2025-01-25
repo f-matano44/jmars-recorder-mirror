@@ -21,7 +21,6 @@ package jp.f_matano44.jmars_recorder;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,12 +28,15 @@ import java.io.OutputStream;
 
 
 final class Util {
+    // MARK: Variable
     private static final Font font;
 
-    private Util() {
-        /* Nothing to do. */
-    }
 
+    // MARK: Constructor
+    private Util() {}
+
+
+    // MARK: Static initializer
     static {
         Font tempFont = null;
         try (
@@ -43,12 +45,14 @@ final class Util {
         ) {
             tempFont = Font.createFont(Font.TRUETYPE_FONT, input)
                 .deriveFont(Font.BOLD, (float) AppConfig.fontSize);
-        } catch (final FontFormatException | IOException e) {
+        } catch (final Exception e) {
             tempFont = new Font(Font.MONOSPACED, Font.PLAIN, (int) AppConfig.fontSize);
         }
         font = tempFont;
     }
 
+
+    // MARK: Methods
     public static final void setFontRecursive(final Component component, final float fontSize) {
         component.setFont(font.deriveFont(fontSize));
         if (component instanceof Container) {
@@ -58,11 +62,6 @@ final class Util {
         }
     }
 
-    public static void appendLn(
-        final StringBuilder sb, final String toAppend
-    ) {
-        sb.append(toAppend).append(System.lineSeparator());
-    }
 
     public static String insertNewLines(
         final String text

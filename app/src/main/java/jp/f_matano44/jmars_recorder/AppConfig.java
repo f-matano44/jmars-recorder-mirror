@@ -35,6 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import jp.f_matano44.jmars_recorder.MyClasses.MyStringBuilder;
 import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -121,12 +122,13 @@ final class AppConfig extends JFrame {
                 "If you wish to resolve this issue, delete the config file",
                 "and restart the application. Then, this app will start correctly."
             };
-            final StringBuilder message = new StringBuilder();
+            final MyStringBuilder sb = new MyStringBuilder();
             for (final String m : messages) {
-                Util.appendLn(message, m);
+                sb.appendLn(m);
             }
             JOptionPane.showMessageDialog(
-                null, message, "Error", JOptionPane.ERROR_MESSAGE
+                null, sb.toString(),
+                "Error", JOptionPane.ERROR_MESSAGE
             );
 
             fo = new AudioFormat(defaultFs, defaultNbits, 1, true, false);
@@ -172,30 +174,30 @@ final class AppConfig extends JFrame {
         super("Configuration (read-only)");
 
         // Build string
-        final StringBuilder sb = new StringBuilder();
-        Util.appendLn(sb, "If you want to change configuration,");
-        Util.appendLn(sb, "edit `{HOME}/" + confFileName + "`.");
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Sampling rate (Fs)");
-        Util.appendLn(sb, ">> " + AppConfig.format.getSampleRate() + " [Hz]");
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Bit depth (nBits)");
-        Util.appendLn(sb, ">> " + AppConfig.format.getSampleSizeInBits() + " [bit]");
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Channels");
-        Util.appendLn(sb, ">> " + AppConfig.format.getChannels() + " (Cannot change)");
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Script file");
-        Util.appendLn(sb, ">> " + AppConfig.script);
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Reference sound folder");
-        Util.appendLn(sb, ">> " + AppConfig.reference);
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Save to...");
-        Util.appendLn(sb, ">> " + AppConfig.saveTo);
-        Util.appendLn(sb, "");
-        Util.appendLn(sb, "Trimming");
-        Util.appendLn(sb, ">> " + AppConfig.isTrimming);
+        final MyStringBuilder sb = new MyStringBuilder();
+        sb.appendLn("If you want to change configuration,");
+        sb.appendLn("edit `{HOME}/" + confFileName + "`.");
+        sb.appendLn("");
+        sb.appendLn("Sampling rate (Fs)");
+        sb.appendLn(">> " + AppConfig.format.getSampleRate() + " [Hz]");
+        sb.appendLn("");
+        sb.appendLn("Bit depth (nBits)");
+        sb.appendLn(">> " + AppConfig.format.getSampleSizeInBits() + " [bit]");
+        sb.appendLn("");
+        sb.appendLn("Channels");
+        sb.appendLn(">> " + AppConfig.format.getChannels() + " (Cannot change)");
+        sb.appendLn("");
+        sb.appendLn("Script file");
+        sb.appendLn(">> " + AppConfig.script);
+        sb.appendLn("");
+        sb.appendLn("Reference sound folder");
+        sb.appendLn(">> " + AppConfig.reference);
+        sb.appendLn("");
+        sb.appendLn("Save to...");
+        sb.appendLn(">> " + AppConfig.saveTo);
+        sb.appendLn("");
+        sb.appendLn("Trimming");
+        sb.appendLn(">> " + AppConfig.isTrimming);
 
         final JTextArea textArea = new UneditableTextArea(sb.toString());
         Util.setFontRecursive(textArea, AppConfig.fontSize);
@@ -218,22 +220,18 @@ final class AppConfig extends JFrame {
 
 
     private static void unexpectedError(final Exception e) {
-        final String[] messages = {
-            "An unexpected error has occurred in loading configure.",
-            "Please send the following information to the author:",
-            "OS information, Java version, the outputted StackTrace",
-            "and contents of the configuration file(${HOME}/" + confFileName + ").",
-            "",
-            "X/Twitter: @f_matano44"
-        };
-        final StringBuilder message = new StringBuilder();
-        for (final String m : messages) {
-            Util.appendLn(message, m);
-        }
+        final MyStringBuilder sb = new MyStringBuilder();
+
+        sb.appendLn("An unexpected error has occurred in loading configure.");
+        sb.appendLn("Please send the following information to the author:");
+        sb.appendLn("OS information, Java version, the outputted StackTrace");
+        sb.appendLn("and contents of the configuration file(${HOME}/" + confFileName + ").");
+        sb.appendLn("");
+        sb.appendLn("X/Twitter: @f_matano44");
 
         e.printStackTrace(logTargetStream);
         JOptionPane.showMessageDialog(
-            null, message,
+            null, sb.toString(),
             "Error", JOptionPane.ERROR_MESSAGE
         );
 

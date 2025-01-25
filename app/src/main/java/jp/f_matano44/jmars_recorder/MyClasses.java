@@ -6,8 +6,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-class MyClasses {
-    public static class UneditableTextArea extends JTextArea {
+final class MyClasses {
+    public static final class UneditableTextArea extends JTextArea {
         public UneditableTextArea() {
             super();
             this.setAllConfig();
@@ -30,6 +30,23 @@ class MyClasses {
             this.setBorder(null);
             // その他
             this.setAutoscrolls(false);
+        }
+    }
+
+
+    public static final class MyStringBuilder {
+        final StringBuilder sb = new StringBuilder();
+
+        public void append(final String s) {
+            this.sb.append(s);
+        }
+
+        public void appendLn(final String s) {
+            this.sb.append(s).append(System.lineSeparator());
+        }
+
+        @Override public String toString() {
+            return sb.toString();
         }
     }
 

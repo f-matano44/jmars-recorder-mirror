@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import jp.f_matano44.jmars_recorder.MyClasses.MyStringBuilder;
 import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
 
 
@@ -119,22 +120,21 @@ final class TopBarMenu extends JMenuBar {
         public ThirdPartyNotice() {
             super("3rd-Party NOTICEs");
 
-            final StringBuilder sb = new StringBuilder();
-            final String[] libs
-                = {"jFloatWavIO", "LICENSE_E.mplus", "ROHAN",
-                    "SnakeYAML", "vlcj", "VLGothic.en"};
+            final MyStringBuilder sb = new MyStringBuilder();
+            final String[] libs = {"jFloatWavIO", "LICENSE_E.mplus", "ROHAN",
+                "SnakeYAML", "vlcj", "VLGothic.en"};
             for (final String lib : libs) {
                 final InputStream is = TopBarMenu.class.getClassLoader()
                     .getResourceAsStream("3rdPartyNOTICEs/" + lib + ".txt");
 
-                Util.appendLn(sb, lib);
+                sb.appendLn(lib);
                 try (final Scanner sc = new Scanner(is)) {
                     while (sc.hasNextLine()) {
-                        Util.appendLn(sb, sc.nextLine());
+                        sb.appendLn(sc.nextLine());
                     }
                 }
-                Util.appendLn(sb, "");
-                Util.appendLn(sb, "");
+                sb.appendLn("");
+                sb.appendLn("");
             }
 
             final JTextArea textArea = new UneditableTextArea(sb.toString());
