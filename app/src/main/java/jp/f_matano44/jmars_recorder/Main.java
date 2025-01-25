@@ -106,7 +106,8 @@ public final class Main extends JFrame {
 
     // MARK: Instances
     // private final JFrame mainFrame = this;
-    private final RecorderBody recorder = new RecorderBody();
+    static final RecorderBody recorder = new RecorderBody();
+    static final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
     private final JScrollPane scriptPanel = ScriptManager.scriptPanel;
     private final JButton miniNextButton = ScriptManager.miniNextButton;
@@ -118,7 +119,6 @@ public final class Main extends JFrame {
     private final JButton no001Button = ReferencePlayer.no001Button;
     private final JToggleButton recordButton = RecorderBody.recordButton;
     private final JButton playButton = RecorderBody.playButton;
-    private final WaveFormViewer wfv = new WaveFormViewer();
 
 
     // MARK: Constants
