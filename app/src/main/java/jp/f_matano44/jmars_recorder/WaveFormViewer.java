@@ -43,6 +43,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import jp.f_matano44.jmars_recorder.MyClasses.SuperIndexViewer;
 import jp.f_matano44.jmars_recorder.MyClasses.UneditableTextArea;
+import jp.f_matano44.jmars_recorder.RecorderManager.RecorderBody;
 
 
 final class WaveFormViewer extends JPanel {
@@ -56,7 +57,7 @@ final class WaveFormViewer extends JPanel {
     private static final double[] defaultSignal = new double[0];
 
     private static int recsIndex = 0;
-    private static final List<RecorderManager> recs = new ArrayList<>();
+    private static final List<RecorderBody> recs = new ArrayList<>();
 
     // MARK: Components
     private static final PrevButton prevButton = new PrevButton();
@@ -127,7 +128,7 @@ final class WaveFormViewer extends JPanel {
         return recs.size() != 0;
     }
 
-    public void add(RecorderManager recorder) {
+    public void add(RecorderBody recorder) {
         if (recorder.getByteSignal().length != 0) {
             try {
                 recs.add(recorder.clone());
@@ -174,7 +175,7 @@ final class WaveFormViewer extends JPanel {
 
     private static void updateThis() {
         if (recs.size() != 0) {
-            final RecorderManager recorder = recs.get(recsIndex);
+            final RecorderBody recorder = recs.get(recsIndex);
             if (AppConfig.isTrimming) {
                 final int start = (int) Math.round(
                     sliderMax * recorder.getStartPointOfSpeechSection_percent());

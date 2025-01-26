@@ -47,6 +47,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
+import jp.f_matano44.jmars_recorder.RecorderManager.RecorderBody;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexSlider;
 import jp.f_matano44.jmars_recorder.ScriptManager.IndexViewer;
 
@@ -114,7 +115,7 @@ public final class Main extends JFrame {
 
     // MARK: Instances
     // private final JFrame mainFrame = this;
-    private final RecorderManager recorder = new RecorderManager();
+    private final RecorderBody recorder = RecorderManager.recorderBody;
     private final WaveFormViewer wfv = new WaveFormViewer();
     // Swing components
     private final JScrollPane scriptPanel = ScriptManager.scriptPanel;
