@@ -29,6 +29,7 @@ import java.util.Objects;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -89,7 +90,9 @@ final class RecorderManager {
             // TargetDataLine line
             TargetDataLine tempLine = null;
             try {
-                tempLine = AudioSystem.getTargetDataLine(AppConfig.format);
+                final DataLine.Info info = new DataLine.Info(
+                    TargetDataLine.class, AppConfig.format);
+                tempLine = (TargetDataLine) AudioSystem.getLine(info);
             } catch (final Exception e) {
                 e.printStackTrace(AppConfig.logTargetStream);
                 JOptionPane.showMessageDialog(
